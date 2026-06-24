@@ -131,6 +131,21 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
 .chart-wrap{position:relative;height:240px;}
 
 .tooltip-wrap{cursor:default;}
+
+/* 달력 기간 선택 */
+.cal-wrap{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;}
+.cal-box{flex:1;min-width:240px;}
+.cal-box-title{font-size:12px;color:#999;margin-bottom:10px;font-weight:500;}
+.cal-year-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.cal-year-btn{background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;padding:0 6px;}
+.cal-year-btn:hover{color:#6C63FF;}
+.cal-year-label{font-size:15px;font-weight:700;color:#1c1c2e;}
+.cal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
+.cal-month-btn{padding:8px 4px;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;border:1.5px solid #e8e8f0;background:#fff;color:#555;transition:all 0.15s;text-align:center;}
+.cal-month-btn:hover{border-color:#6C63FF;color:#6C63FF;}
+.cal-month-btn.selected{background:#6C63FF;color:#fff;border-color:#6C63FF;}
+.cal-month-btn.disabled{color:#ddd;cursor:default;border-color:#f0f0f8;}
+.cal-range-display{text-align:center;font-size:14px;font-weight:600;color:#6C63FF;margin-bottom:16px;padding:10px;background:#f0eeff;border-radius:10px;}
 .custom-tooltip{position:fixed;background:#1c1c2e;color:#fff;font-size:13px;line-height:1.9;padding:10px 16px;border-radius:10px;pointer-events:none;white-space:pre;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
 .empty{color:#ccc;font-size:13px;text-align:center;padding:40px;}
 .sheet-panel{display:none;}
@@ -173,12 +188,27 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
       <span class="popup-title" id="popupTitle">월별 추세 비교</span>
       <button class="popup-close" onclick="closePopup()">×</button>
     </div>
-    <div class="range-row">
-      <span style="font-size:13px;color:#666;">기간 선택</span>
-      <select id="rangeFrom"></select>
-      <span class="range-sep">~</span>
-      <select id="rangeTo"></select>
-      <button class="range-apply" onclick="applyRange()">적용</button>
+    <!-- 달력 기간 선택 -->
+    <div class="cal-range-display" id="calRangeDisplay">기간을 선택해주세요</div>
+    <div class="cal-wrap">
+      <div class="cal-box">
+        <div class="cal-box-title">시작 월</div>
+        <div class="cal-year-row">
+          <button class="cal-year-btn" onclick="moveYear('from',-1)">‹</button>
+          <span class="cal-year-label" id="fromYearLabel">2025</span>
+          <button class="cal-year-btn" onclick="moveYear('from',1)">›</button>
+        </div>
+        <div class="cal-months" id="fromMonths"></div>
+      </div>
+      <div class="cal-box">
+        <div class="cal-box-title">종료 월</div>
+        <div class="cal-year-row">
+          <button class="cal-year-btn" onclick="moveYear('to',-1)">‹</button>
+          <span class="cal-year-label" id="toYearLabel">2026</span>
+          <button class="cal-year-btn" onclick="moveYear('to',1)">›</button>
+        </div>
+        <div class="cal-months" id="toMonths"></div>
+      </div>
     </div>
     <!-- 차종 필터 (차량별현황만) -->
     <div id="seriesFilterWrap" style="display:none;margin-bottom:16px;">
@@ -260,6 +290,8 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
 <script>
 const COLORS=['#6C63FF','#22c997','#FF6B6B','#FFA94D','#4dabf7','#f06595','#a9e34b','#74c0fc','#e599f7','#ffd43b'];
 let rawTable=null, currentTab=0;
+let calFrom={year:2025,month:null}, calTo={year:2026,month:null};
+const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const periodState={0:'month',1:'month',2:'month',3:'month'};
 const charts={};
 let popupTab=0, selectedSeries=new Set(['__all__']);
@@ -365,14 +397,13 @@ function populatePickers(){
     const ysel=document.getElementById(`p${tab}_yearPicker`);
     if(ysel)ysel.innerHTML='<option value="">년도 선택</option>'+years.map(y=>`<option value="${y}">${y}년</option>`).join('');
   });
-  // 팝업 range 셀렉터
-  const asc=[...months].reverse();
-  ['rangeFrom','rangeTo'].forEach((id,i)=>{
-    const sel=document.getElementById(id);
-    sel.innerHTML=asc.map(m=>`<option value="${m}">${m}</option>`).join('');
-    if(i===0)sel.value=asc[0]||'';
-    else sel.value=asc[asc.length-1]||'';
-  });
+  // 달력 기본값: 최근 1년
+  const now=new Date();
+  const toY=now.getFullYear(), toM=now.getMonth()+1;
+  const fromDate=new Date(now.getFullYear()-1,now.getMonth()+1,1);
+  const fromY=fromDate.getFullYear(), fromM=fromDate.getMonth()+1;
+  calFrom={year:fromY,month:fromM};
+  calTo={year:toY,month:toM};
 }
 
 function countMap(arr,keyFn){const m={};arr.forEach(r=>{const v=keyFn(r);if(v!=null&&v!==''){m[v]=(m[v]||0)+1;}});return m;}
@@ -390,7 +421,46 @@ function openPopup(tab){
   document.getElementById('popupTitle').textContent=tab===0?'상품별 월별 추세':'차량별 월별 추세';
   document.getElementById('seriesFilterWrap').style.display=tab===1?'block':'none';
   if(tab===1) buildSeriesChips();
+  renderCal();
   applyRange();
+}
+
+function moveYear(side,dir){
+  if(side==='from') calFrom.year+=dir;
+  else calTo.year+=dir;
+  renderCal();
+}
+
+function renderCal(){
+  renderCalSide('from', calFrom, document.getElementById('fromYearLabel'), document.getElementById('fromMonths'));
+  renderCalSide('to', calTo, document.getElementById('toYearLabel'), document.getElementById('toMonths'));
+  updateRangeDisplay();
+}
+
+function renderCalSide(side, state, yearEl, monthsEl){
+  if(!yearEl||!monthsEl) return;
+  yearEl.textContent=state.year+'년';
+  monthsEl.innerHTML=MONTHS.map((label,i)=>{
+    const m=i+1;
+    const ym=`${state.year}.${String(m).padStart(2,'0')}`;
+    const isSel=state.month===m;
+    return `<button class="cal-month-btn${isSel?' selected':''}" onclick="selectMonth('${side}',${m})">${label}</button>`;
+  }).join('');
+}
+
+function selectMonth(side,m){
+  if(side==='from') calFrom.month=m;
+  else calTo.month=m;
+  renderCal();
+  if(calFrom.month&&calTo.month) applyRange();
+}
+
+function updateRangeDisplay(){
+  const el=document.getElementById('calRangeDisplay');
+  if(!el) return;
+  const f=calFrom.month?`${calFrom.year}년 ${calFrom.month}월`:'시작월 선택';
+  const t=calTo.month?`${calTo.year}년 ${calTo.month}월`:'종료월 선택';
+  el.textContent=`${f}  ~  ${t}`;
 }
 
 function closePopup(){document.getElementById('trendPopup').classList.remove('show');}
@@ -423,9 +493,10 @@ function toggleSeries(s){
 
 function applyRange(){
   if(!rawTable)return;
-  const from=document.getElementById('rangeFrom').value;
-  const to=document.getElementById('rangeTo').value;
-  if(!from||!to)return;
+  if(!calFrom.month||!calTo.month)return;
+  const from=`${calFrom.year}.${String(calFrom.month).padStart(2,'0')}`;
+  const to=`${calTo.year}.${String(calTo.month).padStart(2,'0')}`;
+  if(from>to)return;
   const{rows,idx}=getRows();
   const iDate=idx('계약실행일'),iProd=idx('상품구분'),iSeries=idx('시리즈명');
   const allMonths=getAllMonths(rows,iDate).filter(m=>m>=from&&m<=to);
@@ -461,7 +532,8 @@ function applyRange(){
 
   const content=document.getElementById('popupContent');
   content.innerHTML=`
-    <div style="overflow-x:auto;">
+    <div class="trend-chart-wrap"><canvas id="trendLineChart"></canvas></div>
+    <div style="overflow-x:auto;margin-top:20px;">
       <table class="trend-table">
         <thead><tr><th>월</th><th>신차 출고</th><th>재렌트 출고</th><th>총 출고</th></tr></thead>
         <tbody>
@@ -469,8 +541,7 @@ function applyRange(){
           <tr><td>합계</td><td class="shin">${totalShin}</td><td class="re">${totalRe}</td><td class="tot">${totalTot}</td></tr>
         </tbody>
       </table>
-    </div>
-    <div class="trend-chart-wrap"><canvas id="trendLineChart"></canvas></div>`;
+    </div>`;
 
   requestAnimationFrame(()=>{
     const canvas=document.getElementById('trendLineChart');
