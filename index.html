@@ -757,18 +757,34 @@ function renderP2(){
   const iDate=idx('계약실행일'),iProd=idx('상품구분'),iChannel=idx('판매채널'),iRental=idx('렌탈료'),iSaler=idx('판매사');
   const allFiltered=filterRows(rows,iDate,2);
 
-  // 검색어 필터
-  const searchVal=(document.getElementById('p2_search')?.value||'').trim().toLowerCase();
-  const filtered=searchVal?allFiltered.filter(r=>(r[iChannel]||'').toString().toLowerCase().includes(searchVal)||(r[iSaler]||'').toString().toLowerCase().includes(searchVal)):allFiltered;
+  // 1. 채널 검색어로 1차 필터
+  const searchVal=(document.getElementById('p2_search')?.value||chSearchQuery||'').trim().toLowerCase();
+  const byChannel=searchVal?allFiltered.filter(r=>(r[iChannel]||'').toString().toLowerCase().includes(searchVal)):allFiltered;
 
-  document.getElementById('p2_sub').textContent=`${getPeriodLabel(2)} 기준 · ${filtered.length.toLocaleString()}건`;
-  if(searchVal) document.getElementById('p2_search_info').textContent=`"${searchVal}" 검색결과 ${filtered.length}건`;
-  else document.getElementById('p2_search_info').textContent='';
+  // 2. 판매사 버튼 렌더
+  const sellerWrap=document.getElementById('p2_seller_filter');
+  const sellerChips=document.getElementById('p2_seller_chips');
+  if(searchVal&&iSaler>=0&&sellerWrap&&sellerChips){
+    const sellers=[...new Set(byChannel.map(r=>(r[iSaler]||'').toString().trim()).filter(Boolean))].sort();
+    if(sellers.length>1){
+      sellerWrap.style.display='block';
+      sellerChips.innerHTML=
+        `<button class="seller-chip series-chip all-chip${selectedSeller==='__all__'?' active':''}" data-seller="__all__" onclick="setSellerFilter('__all__')">전체</button>`+
+        sellers.map(s=>`<button class="seller-chip series-chip${selectedSeller===s?' active':''}" data-seller="${s}" onclick="setSellerFilter('${s}')">${s}</button>`).join('');
+    } else { sellerWrap.style.display='none'; }
+  } else if(sellerWrap){ sellerWrap.style.display='none'; }
 
-  // 판매사 상세 (검색어가 DEALER_MAP 그룹에 매칭되면)
+  // 3. 판매사 2차 필터
+  const filtered = (selectedSeller==='__all__') ? byChannel
+    : byChannel.filter(r=>(r[iSaler]||'').toString().trim()===selectedSeller);
+
+  document.getElementById('p2_sub').textContent=`${getPeriodLabel(2)} 기준 · ${allFiltered.length.toLocaleString()}건`
+    +(searchVal?` · "${searchVal}" 검색`:'')+(selectedSeller!=='__all__'?` · ${selectedSeller}`:'');
+  const siEl=document.getElementById('p2_search_info');
+  if(siEl)siEl.textContent='';
+
+  // 판매사 상세 테이블
   const dealerDetail=document.getElementById('p2_dealer_detail');
-  const matchedGroup=searchVal?Object.values(DEALER_MAP).find(d=>d.group.toLowerCase().includes(searchVal))||
-    (Object.keys(DEALER_MAP).some(k=>k.toLowerCase().includes(searchVal))?{group:'오토원'}:null):null;
 
   if(searchVal&&filtered.length>0){
     // 판매사별 집계
@@ -988,6 +1004,14 @@ function renderP3(){
       }
     });
   }
+}
+
+function setSellerFilter(s){
+  selectedSeller=s;
+  document.querySelectorAll('.seller-chip').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-seller')===s);
+  });
+  renderP2();
 }
 
 function setWorker(w){
