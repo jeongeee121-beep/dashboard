@@ -133,19 +133,21 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
 .tooltip-wrap{cursor:default;}
 
 /* 달력 기간 선택 */
-.cal-wrap{display:flex;gap:20px;flex-wrap:wrap;margin-bottom:20px;}
-.cal-box{flex:1;min-width:240px;}
-.cal-box-title{font-size:12px;color:#999;margin-bottom:10px;font-weight:500;}
-.cal-year-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
-.cal-year-btn{background:none;border:none;font-size:18px;cursor:pointer;color:#aaa;padding:0 6px;}
+.cal-wrap{display:none;gap:16px;flex-wrap:wrap;margin-bottom:16px;padding:16px;background:#f8f9fc;border-radius:12px;}
+.cal-wrap.open{display:flex;}
+.cal-box{flex:1;min-width:200px;}
+.cal-box-title{font-size:11px;color:#999;margin-bottom:8px;font-weight:500;}
+.cal-year-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;}
+.cal-year-btn{background:none;border:none;font-size:16px;cursor:pointer;color:#aaa;padding:0 4px;}
 .cal-year-btn:hover{color:#6C63FF;}
-.cal-year-label{font-size:15px;font-weight:700;color:#1c1c2e;}
-.cal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;}
-.cal-month-btn{padding:8px 4px;border-radius:8px;font-size:13px;font-family:inherit;cursor:pointer;border:1.5px solid #e8e8f0;background:#fff;color:#555;transition:all 0.15s;text-align:center;}
+.cal-year-label{font-size:13px;font-weight:700;color:#1c1c2e;}
+.cal-months{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;}
+.cal-month-btn{padding:6px 2px;border-radius:6px;font-size:12px;font-family:inherit;cursor:pointer;border:1.5px solid #e8e8f0;background:#fff;color:#555;transition:all 0.15s;text-align:center;}
 .cal-month-btn:hover{border-color:#6C63FF;color:#6C63FF;}
 .cal-month-btn.selected{background:#6C63FF;color:#fff;border-color:#6C63FF;}
 .cal-month-btn.disabled{color:#ddd;cursor:default;border-color:#f0f0f8;}
-.cal-range-display{text-align:center;font-size:14px;font-weight:600;color:#6C63FF;margin-bottom:16px;padding:10px;background:#f0eeff;border-radius:10px;}
+.cal-range-display{text-align:center;font-size:13px;font-weight:600;color:#6C63FF;margin-bottom:10px;padding:9px 14px;background:#f0eeff;border-radius:10px;cursor:pointer;border:2px dashed #c5bfff;transition:all 0.2s;}
+.cal-range-display:hover{background:#e8e2ff;border-color:#6C63FF;}
 .custom-tooltip{position:fixed;background:#1c1c2e;color:#fff;font-size:13px;line-height:1.9;padding:10px 16px;border-radius:10px;pointer-events:none;white-space:pre;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);}
 .empty{color:#ccc;font-size:13px;text-align:center;padding:40px;}
 .sheet-panel{display:none;}
@@ -189,8 +191,8 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
       <button class="popup-close" onclick="closePopup()">×</button>
     </div>
     <!-- 달력 기간 선택 -->
-    <div class="cal-range-display" id="calRangeDisplay">기간을 선택해주세요</div>
-    <div class="cal-wrap">
+    <div class="cal-range-display" id="calRangeDisplay" onclick="toggleCalendar()">📅 기간을 선택해주세요 (클릭하여 변경)</div>
+    <div class="cal-wrap" id="calWrap">
       <div class="cal-box">
         <div class="cal-box-title">시작 월</div>
         <div class="cal-year-row">
@@ -257,6 +259,14 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
   <!-- P2 판매채널별 -->
   <div id="panel2" class="sheet-panel">
     <div class="page-title-wrap"><div class="page-title">판매채널별 현황</div><div class="page-subtitle" id="p2_sub"></div></div>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
+      <input type="text" id="p2_search" placeholder="🔍 판매채널 검색 (예: 오토원, 카투...)" oninput="renderP2()"
+        style="padding:9px 16px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:50px;width:320px;outline:none;"/>
+      <button onclick="document.getElementById('p2_search').value='';renderP2();" 
+        style="padding:8px 16px;border-radius:50px;font-size:12px;font-family:inherit;cursor:pointer;border:1.5px solid #e0e0ee;background:#fff;color:#888;">초기화</button>
+      <span id="p2_search_info" style="font-size:12px;color:#aaa;"></span>
+    </div>
+    <div id="p2_dealer_detail" style="display:none;margin-bottom:20px;"></div>
     <div class="period-ctrl">
       <div class="period-group">
         <button class="period-btn active" onclick="setPeriod(2,'month')" id="p2_btn_month">금월 현황</button>
@@ -266,6 +276,13 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
         <select class="month-sel" id="p2_yearPicker" onchange="renderP2()"><option value="">년도 선택</option></select>
         <select class="month-sel" id="p2_monthPicker" onchange="renderP2()"><option value="">월 선택</option></select>
       </div>
+    </div>
+    <div style="padding:0 0 16px 0;display:flex;align-items:center;gap:10px;">
+      <input type="text" id="chSearchInput" placeholder="🔍 판매채널 검색 (예: 오토원, 카투...)" oninput="chSearchQuery=this.value;renderP2()"
+        style="padding:9px 16px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:10px;background:#fff;color:#1c1c2e;width:320px;outline:none;"
+        onfocus="this.style.borderColor='#6C63FF'" onblur="this.style.borderColor='#e8e8f0'"/>
+      <button onclick="chSearchQuery='';document.getElementById('chSearchInput').value='';renderP2()"
+        style="padding:8px 14px;border:1.5px solid #e0e0ee;border-radius:10px;font-size:12px;font-family:inherit;cursor:pointer;background:#fff;color:#888;">초기화</button>
     </div>
     <div id="p2_content"></div>
   </div>
@@ -293,7 +310,52 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
 
 <script>
 const COLORS=['#6C63FF','#22c997','#FF6B6B','#FFA94D','#4dabf7','#f06595','#a9e34b','#74c0fc','#e599f7','#ffd43b'];
-let rawTable=null, currentTab=0, selectedWorker='__all__';
+
+// 판매사 → {채널그룹, 수행자, 원수행자} 매핑
+const DEALER_MAP = {
+  '카투':        {group:'오토원', worker:'신선미', origin:'신선미'},
+  '오토리지':    {group:'오토원', worker:'조복경', origin:'나장열'},
+  '씨에스카':    {group:'오토원', worker:'조복경', origin:'조복경'},
+  '시현':        {group:'오토원', worker:'조복경', origin:'최형용'},
+  '스윗코':      {group:'오토원', worker:'조복경', origin:'이진희'},
+  '스마트다이렉트카':{group:'오토원', worker:'조복경', origin:'이종국'},
+  '슈어카':      {group:'오토원', worker:'조복경', origin:'이종국'},
+  '신차드림':    {group:'오토원', worker:'조복경', origin:'이종국'},
+  '오토다이렉트카':{group:'오토원', worker:'조복경', origin:'이종국'},
+  '카베이':      {group:'오토원', worker:'강병문', origin:'이종국'},
+};
+
+function getDealerInfo(channel){
+  if(!channel) return null;
+  const s=channel.toString().trim();
+  for(const [key,val] of Object.entries(DEALER_MAP)){
+    if(s.includes(key)) return{...val, name:key};
+  }
+  return null;
+}
+let rawTable=null, currentTab=0, selectedWorker='__all__', chSearchQuery='';
+
+// 오토원 산하 판매사 매핑 (판매사명 → {그룹, 원수행자, 계약수행자})
+const AUTOW_MAP = {
+  '카투':         {group:'오토원', 원수행자:'신선미', 계약수행자:'신선미'},
+  '오토리지':     {group:'오토원', 원수행자:'나장열', 계약수행자:'조복경'},
+  '씨에스카':     {group:'오토원', 원수행자:'조복경', 계약수행자:'조복경'},
+  '시현':         {group:'오토원', 원수행자:'최형용', 계약수행자:'조복경'},
+  '스윗코':       {group:'오토원', 원수행자:'이진희', 계약수행자:'조복경'},
+  '스마트다이렉트카':{group:'오토원', 원수행자:'이종국', 계약수행자:'조복경'},
+  '슈어카':       {group:'오토원', 원수행자:'이종국', 계약수행자:'조복경'},
+  '신차드림':     {group:'오토원', 원수행자:'이종국', 계약수행자:'조복경'},
+  '오토다이렉트카':{group:'오토원', 원수행자:'이종국', 계약수행자:'조복경'},
+  '카베이':       {group:'오토원', 원수행자:'이종국', 계약수행자:'강병문'},
+};
+
+function getChannelGroup(ch) {
+  const s = (ch||'').trim();
+  for (const [key, val] of Object.entries(AUTOW_MAP)) {
+    if (s.includes(key)) return val;
+  }
+  return null;
+}
 let calFrom={year:2025,month:null}, calTo={year:2026,month:null};
 const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const periodState={0:'month',1:'month',2:'month',3:'month'};
@@ -427,6 +489,10 @@ function openPopup(tab){
   if(tab===1) buildSeriesChips();
   renderCal();
   applyRange();
+  // 팝업 열 때 달력은 닫힌 상태로
+  const wrap=document.getElementById('calWrap');
+  if(wrap)wrap.classList.remove('open');
+  updateRangeDisplay();
 }
 
 function moveYear(side,dir){
@@ -456,7 +522,12 @@ function selectMonth(side,m){
   if(side==='from') calFrom.month=m;
   else calTo.month=m;
   renderCal();
-  if(calFrom.month&&calTo.month) applyRange();
+  if(calFrom.month&&calTo.month){
+    applyRange();
+    // 둘 다 선택됐으면 달력 닫기
+    const cal=document.getElementById('calWrap');
+    if(cal) cal.classList.remove('open');
+  }
 }
 
 function updateRangeDisplay(){
@@ -464,7 +535,12 @@ function updateRangeDisplay(){
   if(!el) return;
   const f=calFrom.month?`${calFrom.year}년 ${calFrom.month}월`:'시작월 선택';
   const t=calTo.month?`${calTo.year}년 ${calTo.month}월`:'종료월 선택';
-  el.textContent=`${f}  ~  ${t}`;
+  el.textContent=`📅 ${f}  ~  ${t}  (클릭하여 변경)`;
+}
+
+function toggleCalendar(){
+  const cal=document.getElementById('calWrap');
+  if(cal) cal.classList.toggle('open');
 }
 
 function closePopup(){document.getElementById('trendPopup').classList.remove('show');}
@@ -678,9 +754,64 @@ function renderP1(){
 function renderP2(){
   if(!rawTable)return;
   const{rows,idx}=getRows();
-  const iDate=idx('계약실행일'),iProd=idx('상품구분'),iChannel=idx('판매채널'),iRental=idx('렌탈료');
-  const filtered=filterRows(rows,iDate,2);
+  const iDate=idx('계약실행일'),iProd=idx('상품구분'),iChannel=idx('판매채널'),iRental=idx('렌탈료'),iSaler=idx('판매사');
+  const allFiltered=filterRows(rows,iDate,2);
+
+  // 검색어 필터
+  const searchVal=(document.getElementById('p2_search')?.value||'').trim().toLowerCase();
+  const filtered=searchVal?allFiltered.filter(r=>(r[iChannel]||'').toString().toLowerCase().includes(searchVal)||(r[iSaler]||'').toString().toLowerCase().includes(searchVal)):allFiltered;
+
   document.getElementById('p2_sub').textContent=`${getPeriodLabel(2)} 기준 · ${filtered.length.toLocaleString()}건`;
+  if(searchVal) document.getElementById('p2_search_info').textContent=`"${searchVal}" 검색결과 ${filtered.length}건`;
+  else document.getElementById('p2_search_info').textContent='';
+
+  // 판매사 상세 (검색어가 DEALER_MAP 그룹에 매칭되면)
+  const dealerDetail=document.getElementById('p2_dealer_detail');
+  const matchedGroup=searchVal?Object.values(DEALER_MAP).find(d=>d.group.toLowerCase().includes(searchVal))||
+    (Object.keys(DEALER_MAP).some(k=>k.toLowerCase().includes(searchVal))?{group:'오토원'}:null):null;
+
+  if(searchVal&&filtered.length>0){
+    // 판매사별 집계
+    const salerMap={};
+    filtered.forEach(r=>{
+      const ch=(r[iChannel]||'').toString().trim();
+      const info=getDealerInfo(ch);
+      const key=info?info.name:ch;
+      if(!salerMap[key])salerMap[key]={count:0,shin:0,re:0,worker:info?.worker||'-',origin:info?.origin||'-'};
+      salerMap[key].count++;
+      if((r[iProd]||'').includes('신차'))salerMap[key].shin++;
+      if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))salerMap[key].re++;
+    });
+    const salerEntries=Object.entries(salerMap).sort((a,b)=>b[1].count-a[1].count);
+    dealerDetail.style.display='block';
+    dealerDetail.innerHTML=`
+      <div class="card">
+        <div class="card-header"><span class="card-title">판매사별 상세 현황</span><span class="card-badge">${salerEntries.length}개 판매사</span></div>
+        <table style="width:100%;border-collapse:collapse;font-size:13px;">
+          <thead><tr style="border-bottom:2px solid #f0f0f8;">
+            <th style="text-align:left;padding:8px 12px;color:#999;font-weight:500;">판매사</th>
+            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">전체</th>
+            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">신차</th>
+            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">재렌트</th>
+            <th style="text-align:center;padding:8px 12px;color:#999;font-weight:500;">계약수행자</th>
+            <th style="text-align:center;padding:8px 12px;color:#999;font-weight:500;">원수행자</th>
+          </tr></thead>
+          <tbody>${salerEntries.map(([name,s],i)=>`
+            <tr style="border-bottom:1px solid #f8f8fc;">
+              <td style="padding:8px 12px;font-weight:600;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:7px;"></span>${name}</td>
+              <td style="text-align:right;padding:8px 12px;font-weight:700;">${s.count}</td>
+              <td style="text-align:right;padding:8px 12px;color:#6C63FF;">${s.shin}</td>
+              <td style="text-align:right;padding:8px 12px;color:#22c997;">${s.re}</td>
+              <td style="text-align:center;padding:8px 12px;color:#555;">${s.worker}</td>
+              <td style="text-align:center;padding:8px 12px;color:#888;">${s.origin}</td>
+            </tr>`).join('')}
+          </tbody>
+        </table>
+      </div>`;
+  } else {
+    dealerDetail.style.display='none';
+  }
+
   const shincha=filtered.filter(r=>(r[iProd]||'').includes('신차'));
   const rerent=filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
   const chAll=iChannel>=0?countMap(filtered,r=>(r[iChannel]||'미분류').toString().trim()):{};
