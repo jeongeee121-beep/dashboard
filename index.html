@@ -283,13 +283,17 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
         <select class="month-sel" id="p3_monthPicker" onchange="renderP3()"><option value="">월 선택</option></select>
       </div>
     </div>
+    <div id="p3_worker_filter" style="display:none;padding:0 0 16px 0;display:flex;gap:8px;flex-wrap:wrap;align-items:center;">
+      <span style="font-size:12px;color:#aaa;">수행자</span>
+      <div id="p3_worker_chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
     <div id="p3_content"></div>
   </div>
 </main>
 
 <script>
 const COLORS=['#6C63FF','#22c997','#FF6B6B','#FFA94D','#4dabf7','#f06595','#a9e34b','#74c0fc','#e599f7','#ffd43b'];
-let rawTable=null, currentTab=0;
+let rawTable=null, currentTab=0, selectedWorker='__all__';
 let calFrom={year:2025,month:null}, calTo={year:2026,month:null};
 const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
 const periodState={0:'month',1:'month',2:'month',3:'month'};
@@ -710,26 +714,99 @@ function renderP2(){
 function renderP3(){
   if(!rawTable)return;
   const{rows,idx}=getRows();
-  const iDate=idx('계약실행일'),iProd=idx('상품구분'),iWorker=idx('수행원'),iRental=idx('렌탈료'),iEnd=idx('종료후처리');
-  const filtered=filterRows(rows,iDate,3);
-  document.getElementById('p3_sub').textContent=`${getPeriodLabel(3)} 기준 · ${filtered.length.toLocaleString()}건`;
+  const iDate=idx('계약실행일'),iProd=idx('상품구분'),iWorker=idx('수행원'),iType=idx('상품유형'),iNoDepo=idx('무보증여부'),iEnd=idx('종료후처리');
+  const allFiltered=filterRows(rows,iDate,3);
+
+  // 수행자 목록 추출 → 칩 버튼 생성
+  const allWorkers=[...new Set(allFiltered.map(r=>mapWorker(r[iWorker])).filter(Boolean))].sort();
+  const chipsEl=document.getElementById('p3_worker_chips');
+  if(chipsEl){
+    chipsEl.innerHTML=
+      `<button class="series-chip all-chip${selectedWorker==='__all__'?' active':''}" onclick="setWorker('__all__')">전체</button>`+
+      allWorkers.map(w=>`<button class="series-chip${selectedWorker===w?' active':''}" onclick="setWorker('${w}')">${w}</button>`).join('');
+  }
+
+  // 선택된 수행자로 필터
+  const filtered = selectedWorker==='__all__' ? allFiltered
+    : allFiltered.filter(r=>mapWorker(r[iWorker])===selectedWorker);
+
+  document.getElementById('p3_sub').textContent=`${getPeriodLabel(3)} 기준 · ${filtered.length.toLocaleString()}건`+(selectedWorker!=='__all__'?` · ${selectedWorker}`:'');
+
+  const isNoDepo=v=>(v||'').toString().trim()==='Y';
   const isInsu=v=>(v||'').toString().trim()==='양도(인수)';
+
+  // 수행자별 집계
   const wStats={};
-  filtered.forEach(r=>{const name=mapWorker(r[iWorker]);if(!name)return;if(!wStats[name])wStats[name]={total:0,shin:0,re:0,insu:0,rentals:[]};const s=wStats[name];s.total++;if((r[iProd]||'').includes('신차'))s.shin++;if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))s.re++;if(iEnd>=0&&isInsu(r[iEnd]))s.insu++;const rv=parseFloat((r[iRental]||'').toString().replace(/[^0-9.-]/g,''));if(!isNaN(rv)&&rv>0)s.rentals.push(rv);});
+  filtered.forEach(r=>{
+    const name=mapWorker(r[iWorker]);if(!name)return;
+    if(!wStats[name])wStats[name]={total:0,shin:0,re:0,insu:0,noDepo:0};
+    const s=wStats[name];s.total++;
+    if((r[iProd]||'').includes('신차'))s.shin++;
+    if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))s.re++;
+    if(iEnd>=0&&isInsu(r[iEnd]))s.insu++;
+    if(iNoDepo>=0&&isNoDepo(r[iNoDepo]))s.noDepo++;
+  });
   const sorted=Object.entries(wStats).sort((a,b)=>b[1].total-a[1].total);
   const totalAll=filtered.length;
-  const wMap={};sorted.forEach(([k,v])=>wMap[k]=v.total);
+
+  // 상품유형별 집계
+  const typeMap=countMap(filtered,r=>(r[iType]||'').toString().trim());
+  const shinTypeMap=countMap(filtered.filter(r=>(r[iProd]||'').includes('신차')),r=>(r[iType]||'').toString().trim());
+  const reTypeMap=countMap(filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}),r=>(r[iType]||'').toString().trim());
+
+  // 월별 추세 (최근 12개월)
+  const allMonths=[...new Set(allFiltered.map(r=>getYM(r[iDate])).filter(Boolean))].sort().slice(-12);
+  const shinByM={},reByM={};
+  allMonths.forEach(m=>{shinByM[m]=0;reByM[m]=0;});
+  filtered.forEach(r=>{
+    const m=getYM(r[iDate]);if(!m||!shinByM.hasOwnProperty(m))return;
+    if((r[iProd]||'').includes('신차'))shinByM[m]++;
+    else if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))reByM[m]++;
+  });
+
+  const noDepoTotal=filtered.filter(r=>isNoDepo(r[iNoDepo])).length;
+
   document.getElementById('p3_content').innerHTML=`
     <div class="metric-grid g4" style="margin-bottom:24px;">
-      <div class="metric-card mc1"><div class="metric-label">전체 계약</div><div class="metric-value">${filtered.length.toLocaleString()}</div></div>
-      <div class="metric-card mc2"><div class="metric-label">수행자 수</div><div class="metric-value">${sorted.length}</div></div>
-      <div class="metric-card mc3"><div class="metric-label">TOP 수행자</div><div class="metric-value" style="font-size:18px;">${sorted[0]?.[0]||'-'}</div><div class="metric-sub">${sorted[0]?.[1]?.total||0}건</div></div>
-      <div class="metric-card mc4"><div class="metric-label">인수형 합계</div><div class="metric-value">${sorted.reduce((a,[,v])=>a+v.insu,0)}</div></div>
+      <div class="metric-card mc1"><div class="metric-label">전체 계약</div><div class="metric-value">${totalAll.toLocaleString()}</div></div>
+      <div class="metric-card mc2"><div class="metric-label">신차</div><div class="metric-value">${filtered.filter(r=>(r[iProd]||'').includes('신차')).length}</div></div>
+      <div class="metric-card mc3"><div class="metric-label">재렌트</div><div class="metric-value">${filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length}</div></div>
+      <div class="metric-card mc4"><div class="metric-label">무보증</div><div class="metric-value">${noDepoTotal}</div></div>
     </div>
+
+    <div class="section-title">상품유형별 현황</div>
     <div class="chart-row two" style="margin-bottom:20px;">
-      <div class="card"><div class="card-header"><span class="card-title">수행자별 계약 건수</span></div><div id="worker_bar"></div></div>
-      <div class="card"><div class="card-header"><span class="card-title">수행자별 비중</span></div><div class="donut-wrap"><div class="donut-canvas-wrap"><canvas id="donut_worker"></canvas><div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">전체</div></div></div><div class="donut-legend" id="legend_worker"></div></div></div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">신차 상품유형</span><span class="card-badge">${filtered.filter(r=>(r[iProd]||'').includes('신차')).length}건</span></div>
+        <div class="donut-wrap">
+          <div class="donut-canvas-wrap"><canvas id="donut_p3_shin"></canvas><div class="donut-center"><div class="donut-center-val">${filtered.filter(r=>(r[iProd]||'').includes('신차')).length}</div><div class="donut-center-label">신차</div></div></div>
+          <div class="donut-legend" id="legend_p3_shin"></div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f8;">
+          <span style="font-size:12px;color:#999;">무보증</span>
+          <span style="font-size:22px;font-weight:700;color:#6C63FF;margin-left:10px;">${filtered.filter(r=>(r[iProd]||'').includes('신차')&&isNoDepo(r[iNoDepo])).length}</span>
+          <span style="font-size:13px;color:#aaa;">건</span>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">재렌트 상품유형</span><span class="card-badge">${filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length}건</span></div>
+        <div class="donut-wrap">
+          <div class="donut-canvas-wrap"><canvas id="donut_p3_re"></canvas><div class="donut-center"><div class="donut-center-val">${filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length}</div><div class="donut-center-label">재렌트</div></div></div>
+          <div class="donut-legend" id="legend_p3_re"></div>
+        </div>
+        <div style="margin-top:14px;padding-top:14px;border-top:1px solid #f0f0f8;">
+          <span style="font-size:12px;color:#999;">무보증</span>
+          <span style="font-size:22px;font-weight:700;color:#22c997;margin-left:10px;">${filtered.filter(r=>{const v=(r[iProd]||'');return(v.includes('재렌트')||v.includes('재'))&&isNoDepo(r[iNoDepo]);}).length}</span>
+          <span style="font-size:13px;color:#aaa;">건</span>
+        </div>
+      </div>
     </div>
+
+    <div class="section-title">월별 추세 (신차 / 재렌트)</div>
+    <div class="card" style="margin-bottom:20px;">
+      <div style="position:relative;height:220px;"><canvas id="p3_trend_chart"></canvas></div>
+    </div>
+
     <div class="section-title">수행자별 상세</div>
     <div class="card" style="margin-bottom:40px;overflow-x:auto;">
       <table style="width:100%;border-collapse:collapse;font-size:13px;">
@@ -739,13 +816,52 @@ function renderP3(){
           <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">신차</th>
           <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">재렌트</th>
           <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">인수형</th>
-          <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">평균렌탈료</th>
-          <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">비중</th>
+          <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">무보증</th>
         </tr></thead>
-        <tbody>${sorted.map(([name,s],i)=>{const avg=s.rentals.length?Math.round(s.rentals.reduce((a,b)=>a+b,0)/s.rentals.length).toLocaleString()+'원':'-';return`<tr style="border-bottom:1px solid #f8f8fc;"><td style="padding:10px 12px;font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:8px;"></span>${name}</td><td style="text-align:right;padding:10px 12px;font-weight:700;">${s.total}</td><td style="text-align:right;padding:10px 12px;color:#6C63FF;">${s.shin}</td><td style="text-align:right;padding:10px 12px;color:#22c997;">${s.re}</td><td style="text-align:right;padding:10px 12px;color:#FF6B6B;">${s.insu}</td><td style="text-align:right;padding:10px 12px;color:#999;">${avg}</td><td style="text-align:right;padding:10px 12px;color:#aaa;">${Math.round(s.total/totalAll*100)}%</td></tr>`;}).join('')}</tbody>
+        <tbody>${sorted.map(([name,s],i)=>`
+          <tr style="border-bottom:1px solid #f8f8fc;">
+            <td style="padding:10px 12px;font-weight:600;"><span style="display:inline-block;width:8px;height:8px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:8px;"></span>${name}</td>
+            <td style="text-align:right;padding:10px 12px;font-weight:700;">${s.total}</td>
+            <td style="text-align:right;padding:10px 12px;color:#6C63FF;">${s.shin}</td>
+            <td style="text-align:right;padding:10px 12px;color:#22c997;">${s.re}</td>
+            <td style="text-align:right;padding:10px 12px;color:#FF6B6B;">${s.insu}</td>
+            <td style="text-align:right;padding:10px 12px;color:#FFA94D;">${s.noDepo}</td>
+          </tr>`).join('')}
+        </tbody>
       </table>
     </div>`;
-  renderBar('worker_bar',wMap,10);renderDonut('donut_worker','legend_worker',wMap);
+
+  renderDonut('donut_p3_shin','legend_p3_shin',shinTypeMap);
+  renderDonut('donut_p3_re','legend_p3_re',reTypeMap);
+
+  // 월별 추세 차트
+  const tCanvas=document.getElementById('p3_trend_chart');
+  if(tCanvas){
+    if(charts['p3_trend'])charts['p3_trend'].destroy();
+    charts['p3_trend']=new Chart(tCanvas.getContext('2d'),{
+      type:'bar',
+      data:{
+        labels:allMonths,
+        datasets:[
+          {label:'신차',data:allMonths.map(m=>shinByM[m]||0),backgroundColor:'#6C63FF',borderRadius:4,borderSkipped:false},
+          {label:'재렌트',data:allMonths.map(m=>reByM[m]||0),backgroundColor:'#22c997',borderRadius:4,borderSkipped:false},
+        ]
+      },
+      options:{
+        responsive:true,maintainAspectRatio:false,
+        plugins:{legend:{position:'bottom',labels:{font:{size:12},usePointStyle:true}}},
+        scales:{
+          x:{grid:{display:false},border:{display:false},ticks:{font:{size:11},maxRotation:45}},
+          y:{grid:{color:'#f0f0f8'},border:{display:false},ticks:{font:{size:11}},beginAtZero:true,stacked:false}
+        }
+      }
+    });
+  }
+}
+
+function setWorker(w){
+  selectedWorker=w;
+  renderP3();
 }
 
 function renderDonut(canvasId,legendId,dataMap){
