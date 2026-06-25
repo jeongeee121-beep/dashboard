@@ -259,14 +259,6 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
   <!-- P2 판매채널별 -->
   <div id="panel2" class="sheet-panel">
     <div class="page-title-wrap"><div class="page-title">판매채널별 현황</div><div class="page-subtitle" id="p2_sub"></div></div>
-    <div style="display:flex;gap:10px;align-items:center;margin-bottom:16px;flex-wrap:wrap;">
-      <input type="text" id="p2_search" placeholder="🔍 판매채널 검색 (예: 오토원, 카투...)" oninput="renderP2()"
-        style="padding:9px 16px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:50px;width:320px;outline:none;"/>
-      <button onclick="document.getElementById('p2_search').value='';renderP2();" 
-        style="padding:8px 16px;border-radius:50px;font-size:12px;font-family:inherit;cursor:pointer;border:1.5px solid #e0e0ee;background:#fff;color:#888;">초기화</button>
-      <span id="p2_search_info" style="font-size:12px;color:#aaa;"></span>
-    </div>
-    <div id="p2_dealer_detail" style="display:none;margin-bottom:20px;"></div>
     <div class="period-ctrl">
       <div class="period-group">
         <button class="period-btn active" onclick="setPeriod(2,'month')" id="p2_btn_month">금월 현황</button>
@@ -277,17 +269,22 @@ main{max-width:1280px;margin:0 auto;padding:28px 40px;}
         <select class="month-sel" id="p2_monthPicker" onchange="renderP2()"><option value="">월 선택</option></select>
       </div>
     </div>
-    <div style="padding:0 0 16px 0;display:flex;align-items:center;gap:10px;">
-      <input type="text" id="chSearchInput" placeholder="🔍 판매채널 검색 (예: 오토원, 카투...)" oninput="chSearchQuery=this.value;renderP2()"
-        style="padding:9px 16px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:10px;background:#fff;color:#1c1c2e;width:320px;outline:none;"
-        onfocus="this.style.borderColor='#6C63FF'" onblur="this.style.borderColor='#e8e8f0'"/>
-      <button onclick="chSearchQuery='';document.getElementById('chSearchInput').value='';renderP2()"
-        style="padding:8px 14px;border:1.5px solid #e0e0ee;border-radius:10px;font-size:12px;font-family:inherit;cursor:pointer;background:#fff;color:#888;">초기화</button>
+    <div style="display:flex;gap:10px;align-items:center;margin-bottom:10px;flex-wrap:wrap;">
+      <input type="text" id="p2_search" placeholder="🔍 판매채널 검색 (예: 오토원, 카투...)" oninput="onP2Search(this.value)"
+        style="padding:9px 16px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:50px;width:300px;outline:none;"/>
+      <button onclick="onP2Search('');document.getElementById('p2_search').value='';"
+        style="padding:8px 16px;border-radius:50px;font-size:12px;font-family:inherit;cursor:pointer;border:1.5px solid #e0e0ee;background:#fff;color:#888;">초기화</button>
     </div>
+    <!-- 판매사 버튼 -->
+    <div id="p2_seller_filter" style="display:none;margin-bottom:14px;">
+      <div style="font-size:12px;color:#aaa;margin-bottom:8px;">📦 판매사 선택</div>
+      <div id="p2_seller_chips" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+    </div>
+    <!-- 판매사 상세 테이블 -->
+    <div id="p2_dealer_detail" style="display:none;margin-bottom:20px;"></div>
     <div id="p2_content"></div>
   </div>
 
-  <!-- P3 수행자별 -->
   <div id="panel3" class="sheet-panel">
     <div class="page-title-wrap"><div class="page-title">수행자별 현황</div><div class="page-subtitle" id="p3_sub"></div></div>
     <div class="period-ctrl">
@@ -677,12 +674,65 @@ function renderP0(){
   const gudokInsu=insuRows.filter(r=>(r[iType]||'').includes('구독')).length;
   const shinAvg=avgVal(shincha,iRental),rerentAvg=avgVal(rerent,iRental);
 
+  // 누적현황일 때 연도별 요약 테이블
+  let yearSummaryHTML = '';
+  if(periodState[0]==='total'){
+    const years=[...new Set(filtered.map(r=>getYM(r[iDate])?.split('.')[0]).filter(Boolean))].sort().reverse();
+    const yRows=years.map(y=>{
+      const yData=filtered.filter(r=>getYM(r[iDate])?.startsWith(y));
+      const months=[...new Set(yData.map(r=>getYM(r[iDate])).filter(Boolean))].sort();
+      const yShin=yData.filter(r=>(r[iProd]||'').includes('신차')).length;
+      const yRe=yData.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length;
+      const monthRows=months.map(m=>{
+        const mData=yData.filter(r=>getYM(r[iDate])===m);
+        const mShin=mData.filter(r=>(r[iProd]||'').includes('신차')).length;
+        const mRe=mData.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length;
+        return `<tr style="background:#fafafe;">
+          <td style="padding:7px 12px 7px 28px;color:#888;font-size:12px;">${m}</td>
+          <td style="text-align:right;padding:7px 12px;color:#6C63FF;font-size:12px;">${mShin}</td>
+          <td style="text-align:right;padding:7px 12px;color:#22c997;font-size:12px;">${mRe}</td>
+          <td style="text-align:right;padding:7px 12px;font-weight:600;font-size:12px;">${mData.length}</td>
+        </tr>`;
+      }).join('');
+      return `
+        <tr style="border-top:2px solid #e8e8f0;cursor:pointer;" onclick="this.nextElementSibling.style.display=this.nextElementSibling.style.display==='none'?'':'none'">
+          <td style="padding:11px 12px;font-weight:700;font-size:14px;">📅 ${y}년 <span style="font-size:11px;color:#bbb;margin-left:4px;">▼ 월별 보기</span></td>
+          <td style="text-align:right;padding:11px 12px;color:#6C63FF;font-weight:700;">${yShin}</td>
+          <td style="text-align:right;padding:11px 12px;color:#22c997;font-weight:700;">${yRe}</td>
+          <td style="text-align:right;padding:11px 12px;font-weight:700;font-size:15px;">${yData.length}</td>
+        </tr>
+        <tr><td colspan="4" style="padding:0;">${monthRows?`<table style="width:100%;border-collapse:collapse;">${monthRows}</table>`:''}</td></tr>`;
+    }).join('');
+    yearSummaryHTML=`
+      <div class="card" style="margin-bottom:20px;">
+        <div class="card-header"><span class="card-title">연도별 / 월별 현황</span><span class="card-badge">${filtered.length.toLocaleString()}건 총합</span></div>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:13px;">
+            <thead><tr style="border-bottom:2px solid #f0f0f8;">
+              <th style="text-align:left;padding:10px 12px;color:#999;font-weight:500;">년 / 월</th>
+              <th style="text-align:right;padding:10px 12px;color:#6C63FF;font-weight:500;">신차</th>
+              <th style="text-align:right;padding:10px 12px;color:#22c997;font-weight:500;">재렌트</th>
+              <th style="text-align:right;padding:10px 12px;color:#999;font-weight:500;">총계</th>
+            </tr></thead>
+            <tbody>${yRows}</tbody>
+            <tfoot><tr style="border-top:2px solid #e8e8f0;background:#f8f9fc;">
+              <td style="padding:10px 12px;font-weight:700;">합계</td>
+              <td style="text-align:right;padding:10px 12px;color:#6C63FF;font-weight:700;">${shincha.length}</td>
+              <td style="text-align:right;padding:10px 12px;color:#22c997;font-weight:700;">${rerent.length}</td>
+              <td style="text-align:right;padding:10px 12px;font-weight:700;font-size:15px;">${filtered.length}</td>
+            </tr></tfoot>
+          </table>
+        </div>
+      </div>`;
+  }
+
   document.getElementById('p0_content').innerHTML=`
     <div class="metric-grid g3">
       <div class="metric-card mc1"><div class="metric-label">전체 계약</div><div class="metric-value">${filtered.length.toLocaleString()}</div></div>
       <div class="metric-card mc2"><div class="metric-label">신차</div><div class="metric-value">${shincha.length.toLocaleString()}</div></div>
       <div class="metric-card mc3"><div class="metric-label">재렌트</div><div class="metric-value">${rerent.length.toLocaleString()}</div></div>
     </div>
+    ${yearSummaryHTML}
     <div class="section-title">상품유형별 현황</div>
     <div class="chart-row two" style="margin-bottom:20px;">
       <div class="card"><div class="card-header"><span class="card-title">신차 상품유형</span><span class="card-badge">${shincha.length}건</span></div>
@@ -751,111 +801,173 @@ function renderP1(){
 }
 
 // ===================== P2 =====================
-function renderP2(){
-  if(!rawTable)return;
-  const{rows,idx}=getRows();
-  const iDate=idx('계약실행일'),iProd=idx('상품구분'),iChannel=idx('판매채널'),iRental=idx('렌탈료'),iSaler=idx('판매사');
-  const allFiltered=filterRows(rows,iDate,2);
+function onP2Search(val){
+  chSearchQuery = val;
+  selectedSeller = '__all__';
+  renderP2();
+}
 
-  // 1. 채널 검색어로 1차 필터
-  const searchVal=(document.getElementById('p2_search')?.value||chSearchQuery||'').trim().toLowerCase();
-  const byChannel=searchVal?allFiltered.filter(r=>(r[iChannel]||'').toString().toLowerCase().includes(searchVal)):allFiltered;
+function setSellerFilter(s){
+  selectedSeller = s;
+  document.querySelectorAll('#p2_seller_chips .seller-chip').forEach(el=>{
+    el.classList.toggle('active', el.getAttribute('data-seller')===s);
+  });
+  renderP2();
+}
+
+function renderP2(){
+  if(!rawTable) return;
+  const{rows,idx} = getRows();
+  const iDate=idx('계약실행일'), iProd=idx('상품구분'), iChannel=idx('판매채널');
+  const iRental=idx('렌탈료'), iSeller=idx('판매사');
+
+  const allFiltered = filterRows(rows, iDate, 2);
+  const q = (chSearchQuery||'').trim().toLowerCase();
+
+  // 1. 채널 검색어로 1차 필터 (빈값은 미입력으로)
+  const byChannel = q
+    ? allFiltered.filter(r => {
+        const ch = (r[iChannel]||'미입력').toString().toLowerCase();
+        const sl = (r[iSeller]||'미입력').toString().toLowerCase();
+        return ch.includes(q) || sl.includes(q);
+      })
+    : allFiltered;
 
   // 2. 판매사 버튼 렌더
-  const sellerWrap=document.getElementById('p2_seller_filter');
-  const sellerChips=document.getElementById('p2_seller_chips');
-  if(searchVal&&iSaler>=0&&sellerWrap&&sellerChips){
-    const sellers=[...new Set(byChannel.map(r=>(r[iSaler]||'').toString().trim()).filter(Boolean))].sort();
-    if(sellers.length>1){
-      sellerWrap.style.display='block';
-      sellerChips.innerHTML=
-        `<button class="seller-chip series-chip all-chip${selectedSeller==='__all__'?' active':''}" data-seller="__all__" onclick="setSellerFilter('__all__')">전체</button>`+
-        sellers.map(s=>`<button class="seller-chip series-chip${selectedSeller===s?' active':''}" data-seller="${s}" onclick="setSellerFilter('${s}')">${s}</button>`).join('');
-    } else { sellerWrap.style.display='none'; }
-  } else if(sellerWrap){ sellerWrap.style.display='none'; }
+  const sellerWrap = document.getElementById('p2_seller_filter');
+  const sellerChips = document.getElementById('p2_seller_chips');
+  if(q && iSeller >= 0 && sellerWrap && sellerChips){
+    const sellers = [...new Set(
+      byChannel.map(r => (r[iSeller]||'').toString().trim() || '(미입력)')
+    )].filter(s => s !== '(미입력)').sort();
+
+    if(sellers.length > 0){
+      sellerWrap.style.display = 'block';
+      sellerChips.innerHTML =
+        `<button class="seller-chip series-chip all-chip${selectedSeller==='__all__'?' active':''}" data-seller="__all__" onclick="setSellerFilter('__all__')">전체</button>` +
+        sellers.map(s =>
+          `<button class="seller-chip series-chip${selectedSeller===s?' active':''}" data-seller="${s}" onclick="setSellerFilter('${s.replace(/'/g,"\'")}')">
+            ${s}
+          </button>`
+        ).join('');
+    } else {
+      sellerWrap.style.display = 'none';
+    }
+  } else if(sellerWrap){
+    sellerWrap.style.display = 'none';
+  }
 
   // 3. 판매사 2차 필터
-  const filtered = (selectedSeller==='__all__') ? byChannel
-    : byChannel.filter(r=>(r[iSaler]||'').toString().trim()===selectedSeller);
+  const filtered = selectedSeller === '__all__'
+    ? byChannel
+    : byChannel.filter(r => (r[iSeller]||'').toString().trim() === selectedSeller ||
+        (selectedSeller==='(미입력)' && !(r[iSeller]||'').toString().trim()));
 
-  document.getElementById('p2_sub').textContent=`${getPeriodLabel(2)} 기준 · ${allFiltered.length.toLocaleString()}건`
-    +(searchVal?` · "${searchVal}" 검색`:'')+(selectedSeller!=='__all__'?` · ${selectedSeller}`:'');
-  const siEl=document.getElementById('p2_search_info');
-  if(siEl)siEl.textContent='';
+  document.getElementById('p2_sub').textContent =
+    `${getPeriodLabel(2)} 기준 · ${allFiltered.length.toLocaleString()}건` +
+    (q ? ` · "${chSearchQuery}" 검색 (${filtered.length}건)` : '') +
+    (selectedSeller!=='__all__' ? ` · ${selectedSeller}` : '');
 
-  // 판매사 상세 테이블
-  const dealerDetail=document.getElementById('p2_dealer_detail');
-
-  if(searchVal&&filtered.length>0){
-    // 판매사별 집계
-    const salerMap={};
-    filtered.forEach(r=>{
-      const ch=(r[iChannel]||'').toString().trim();
-      const info=getDealerInfo(ch);
-      const key=info?info.name:ch;
-      if(!salerMap[key])salerMap[key]={count:0,shin:0,re:0,worker:info?.worker||'-',origin:info?.origin||'-'};
-      salerMap[key].count++;
-      if((r[iProd]||'').includes('신차'))salerMap[key].shin++;
-      if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))salerMap[key].re++;
+  // 4. 판매사 상세 테이블 (검색 시)
+  const dealerDetail = document.getElementById('p2_dealer_detail');
+  if(q && filtered.length > 0 && iSeller >= 0){
+    const sellerStats = {};
+    filtered.forEach(r => {
+      const ch = (r[iChannel]||'미입력').toString().trim();
+      const sl = (r[iSeller]||'미입력').toString().trim() || '(미입력)';
+      const info = getChannelGroup(ch) || getChannelGroup(sl);
+      if(!sellerStats[sl]) sellerStats[sl] = {total:0,shin:0,re:0,info};
+      sellerStats[sl].total++;
+      if((r[iProd]||'').includes('신차')) sellerStats[sl].shin++;
+      if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재')) sellerStats[sl].re++;
     });
-    const salerEntries=Object.entries(salerMap).sort((a,b)=>b[1].count-a[1].count);
-    dealerDetail.style.display='block';
-    dealerDetail.innerHTML=`
+    const sellerRows = Object.entries(sellerStats).sort((a,b)=>b[1].total-a[1].total);
+    dealerDetail.style.display = 'block';
+    dealerDetail.innerHTML = `
       <div class="card">
-        <div class="card-header"><span class="card-title">판매사별 상세 현황</span><span class="card-badge">${salerEntries.length}개 판매사</span></div>
+        <div class="card-header">
+          <span class="card-title">판매사별 상세</span>
+          <span class="card-badge">${sellerRows.length}개 판매사</span>
+        </div>
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead><tr style="border-bottom:2px solid #f0f0f8;">
-            <th style="text-align:left;padding:8px 12px;color:#999;font-weight:500;">판매사</th>
-            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">전체</th>
-            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">신차</th>
-            <th style="text-align:right;padding:8px 12px;color:#999;font-weight:500;">재렌트</th>
-            <th style="text-align:center;padding:8px 12px;color:#999;font-weight:500;">계약수행자</th>
-            <th style="text-align:center;padding:8px 12px;color:#999;font-weight:500;">원수행자</th>
+            <th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">판매사</th>
+            <th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">계약수행자</th>
+            <th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">원수행자</th>
+            <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">전체</th>
+            <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">신차</th>
+            <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">재렌트</th>
           </tr></thead>
-          <tbody>${salerEntries.map(([name,s],i)=>`
+          <tbody>${sellerRows.map(([name,s],i) => `
             <tr style="border-bottom:1px solid #f8f8fc;">
-              <td style="padding:8px 12px;font-weight:600;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:7px;"></span>${name}</td>
-              <td style="text-align:right;padding:8px 12px;font-weight:700;">${s.count}</td>
-              <td style="text-align:right;padding:8px 12px;color:#6C63FF;">${s.shin}</td>
-              <td style="text-align:right;padding:8px 12px;color:#22c997;">${s.re}</td>
-              <td style="text-align:center;padding:8px 12px;color:#555;">${s.worker}</td>
-              <td style="text-align:center;padding:8px 12px;color:#888;">${s.origin}</td>
+              <td style="padding:9px 12px;font-weight:600;">
+                <span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:7px;"></span>
+                ${name}
+              </td>
+              <td style="padding:9px 12px;color:#555;">${s.info?.계약수행자||'-'}</td>
+              <td style="padding:9px 12px;color:#888;">${s.info?.원수행자||'-'}</td>
+              <td style="text-align:right;padding:9px 12px;font-weight:700;">${s.total}</td>
+              <td style="text-align:right;padding:9px 12px;color:#6C63FF;">${s.shin}</td>
+              <td style="text-align:right;padding:9px 12px;color:#22c997;">${s.re}</td>
             </tr>`).join('')}
           </tbody>
         </table>
       </div>`;
-  } else {
-    dealerDetail.style.display='none';
+  } else if(dealerDetail){
+    dealerDetail.style.display = 'none';
   }
 
-  const shincha=filtered.filter(r=>(r[iProd]||'').includes('신차'));
-  const rerent=filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
-  const chAll=iChannel>=0?countMap(filtered,r=>(r[iChannel]||'미분류').toString().trim()):{};
-  const chShin=iChannel>=0?countMap(shincha,r=>(r[iChannel]||'미분류').toString().trim()):{};
-  const chRe=iChannel>=0?countMap(rerent,r=>(r[iChannel]||'미분류').toString().trim()):{};
-  const chAvgMap={};
-  if(iChannel>=0&&iRental>=0){const m={};filtered.forEach(r=>{const ch=(r[iChannel]||'미분류').toString().trim();const v=parseFloat((r[iRental]||'').toString().replace(/[^0-9.-]/g,''));if(!isNaN(v)&&v>0){if(!m[ch])m[ch]=[];m[ch].push(v);}});Object.entries(m).forEach(([k,a])=>{chAvgMap[k]=Math.round(a.reduce((x,y)=>x+y,0)/a.length);});}
-  const topCh=Object.entries(chAll).sort((a,b)=>b[1]-a[1]);
+  // 5. 차트/통계
+  const shincha = filtered.filter(r=>(r[iProd]||'').includes('신차'));
+  const rerent  = filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
+  const chAll  = iChannel>=0 ? countMap(filtered, r=>(r[iChannel]||'미입력').toString().trim()) : {};
+  const chShin = iChannel>=0 ? countMap(shincha,  r=>(r[iChannel]||'미입력').toString().trim()) : {};
+  const chRe   = iChannel>=0 ? countMap(rerent,   r=>(r[iChannel]||'미입력').toString().trim()) : {};
+  const chAvgMap = {};
+  if(iChannel>=0 && iRental>=0){
+    const m={};
+    filtered.forEach(r=>{
+      const ch=(r[iChannel]||'미입력').toString().trim();
+      const v=parseFloat((r[iRental]||'').toString().replace(/[^0-9.-]/g,''));
+      if(!isNaN(v)&&v>0){if(!m[ch])m[ch]=[];m[ch].push(v);}
+    });
+    Object.entries(m).forEach(([k,a])=>{chAvgMap[k]=Math.round(a.reduce((x,y)=>x+y,0)/a.length);});
+  }
+  const topCh = Object.entries(chAll).sort((a,b)=>b[1]-a[1]);
+
   document.getElementById('p2_content').innerHTML=`
     <div class="metric-grid g4" style="margin-bottom:24px;">
-      <div class="metric-card mc1"><div class="metric-label">전체 계약</div><div class="metric-value">${filtered.length.toLocaleString()}</div></div>
+      <div class="metric-card mc1"><div class="metric-label">${q?'검색 결과':'전체 계약'}</div><div class="metric-value">${filtered.length.toLocaleString()}</div></div>
       <div class="metric-card mc2"><div class="metric-label">채널 수</div><div class="metric-value">${Object.keys(chAll).length}</div></div>
       <div class="metric-card mc3"><div class="metric-label">TOP 채널</div><div class="metric-value" style="font-size:18px;">${topCh[0]?.[0]||'-'}</div><div class="metric-sub">${topCh[0]?.[1]||0}건</div></div>
-      <div class="metric-card mc4"><div class="metric-label">전체 평균 렌탈료</div><div class="metric-value" style="font-size:20px;">${avgVal(filtered,iRental)}</div></div>
+      <div class="metric-card mc4"><div class="metric-label">평균 렌탈료</div><div class="metric-value" style="font-size:18px;">${avgVal(filtered,iRental)}</div></div>
     </div>
     <div class="chart-row two" style="margin-bottom:20px;">
-      <div class="card"><div class="card-header"><span class="card-title">채널별 전체 비중</span></div><div class="donut-wrap"><div class="donut-canvas-wrap"><canvas id="donut_ch_all"></canvas><div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">전체</div></div></div><div class="donut-legend" id="legend_ch_all"></div></div></div>
+      <div class="card"><div class="card-header"><span class="card-title">채널별 비중</span></div>
+        <div class="donut-wrap"><div class="donut-canvas-wrap"><canvas id="donut_ch_all"></canvas>
+          <div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">${q?'검색':'전체'}</div></div>
+        </div><div class="donut-legend" id="legend_ch_all"></div></div>
+      </div>
       <div class="card"><div class="card-header"><span class="card-title">채널별 평균 렌탈료</span></div><div id="ch_avg_bar"></div></div>
     </div>
     <div class="chart-row two" style="margin-bottom:40px;">
       <div class="card"><div class="card-header"><span class="card-title">신차 채널별</span><span class="card-badge">${shincha.length}건</span></div><div id="ch_shin_bar"></div></div>
       <div class="card"><div class="card-header"><span class="card-title">재렌트 채널별</span><span class="card-badge">${rerent.length}건</span></div><div id="ch_re_bar"></div></div>
     </div>`;
-  renderDonut('donut_ch_all','legend_ch_all',chAll);renderBar('ch_shin_bar',chShin,8);renderBar('ch_re_bar',chRe,8);
-  const avgEntries=Object.entries(chAvgMap).sort((a,b)=>b[1]-a[1]).slice(0,8);const maxAvg=avgEntries[0]?.[1]||1;
+
+  renderDonut('donut_ch_all','legend_ch_all',chAll);
+  renderBar('ch_shin_bar',chShin,8);
+  renderBar('ch_re_bar',chRe,8);
+  const avgEntries=Object.entries(chAvgMap).sort((a,b)=>b[1]-a[1]).slice(0,8);
+  const maxAvg=avgEntries[0]?.[1]||1;
   const avgEl=document.getElementById('ch_avg_bar');
-  if(avgEl)avgEl.innerHTML=avgEntries.map(([k,v],i)=>`<div class="bar-item"><div class="bar-meta"><span class="bar-name">${k}</span><span class="bar-count">${v.toLocaleString()}원</span></div><div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxAvg*100)}%;background:${COLORS[i%COLORS.length]};"></div></div></div>`).join('');
+  if(avgEl) avgEl.innerHTML=avgEntries.map(([k,v],i)=>`
+    <div class="bar-item">
+      <div class="bar-meta"><span class="bar-name">${k}</span><span class="bar-count">${v.toLocaleString()}원</span></div>
+      <div class="bar-track"><div class="bar-fill" style="width:${Math.round(v/maxAvg*100)}%;background:${COLORS[i%COLORS.length]};"></div></div>
+    </div>`).join('');
 }
+
 
 // ===================== P3 =====================
 function renderP3(){
