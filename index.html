@@ -974,4 +974,26 @@ function renderDonut(canvasId,legendId,dataMap){
 }
 function renderBar(elId,dataMap,limit=7){
   const el=document.getElementById(elId);if(!el)return;
-  
+    const entries=Object.entries(dataMap).sort((a,b)=>b[1]-a[1]).slice(0,limit);
+  const total=entries.reduce((s,[,v])=>s+v,0);
+  if(!entries.length){el.innerHTML='<div class="empty">데이터 없음</div>';return;}
+  el.innerHTML=entries.map(([k,v],i)=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span>${k}</span><span style="color:#999;">${v.toLocaleString()}건 · ${Math.round(v/total*100)}%</span></div><div style="background:#f3f3f8;border-radius:5px;height:6px;overflow:hidden;"><div style="height:100%;border-radius:5px;background:${COLORS[i%COLORS.length]};width:${Math.round(v/total*100)}%;"></div></div></div>`).join('');
+}
+function bindTooltips(){
+  document.querySelectorAll('.tooltip-wrap').forEach(el=>{
+    const tip=el.getAttribute('data-tip');if(!tip)return;let box=null;
+    el.addEventListener('mouseenter',e=>{box=document.createElement('div');box.className='custom-tooltip';box.innerText=tip;document.body.appendChild(box);moveTip(box,e);});
+    el.addEventListener('mousemove',e=>{if(box)moveTip(box,e);});
+    el.addEventListener('mouseleave',()=>{if(box){box.remove();box=null;}});
+  });
+}
+function moveTip(box,e){
+  const bw=box.offsetWidth||160,bh=box.offsetHeight||50,vw=window.innerWidth,vh=window.innerHeight;
+  let x=e.clientX+14,y=e.clientY-10;
+  if(x+bw>vw-10)x=e.clientX-bw-10;if(y+bh>vh-10)y=vh-bh-10;
+  box.style.left=x+'px';box.style.top=y+'px';
+}
+function pct(curr,prev){if(!prev)return null;return((curr-prev)/prev*100).toFixed(1);}
+</script>
+</body>
+</html>
