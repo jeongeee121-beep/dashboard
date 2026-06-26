@@ -358,7 +358,7 @@ async function loadAll(){
   const id=document.getElementById('sheetId').value.trim();
   if(!id){setStatus('시트 ID를 입력해주세요.',false);return;}
   setStatus('불러오는 중...',null);
-  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('신차 / 재렌트')}`;
+  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('시트1')}`;
   try{
     const res=await fetch(url);const text=await res.text();
     const match=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
