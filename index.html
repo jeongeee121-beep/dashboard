@@ -204,20 +204,15 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
 <!-- PERIOD BAR -->
 <div class="period-bar" id="periodBar">
   <div class="period-seg">
-    <button class="seg-btn active" onclick="setMode('month')" id="seg_month">금월</button>
-    <button class="seg-btn" onclick="setMode('accum')" id="seg_accum">누적</button>
+    <button class="seg-btn active" onclick="setMode('month')" id="seg_month">월별</button>
+    <button class="seg-btn" onclick="setMode('year')" id="seg_year">년도별</button>
   </div>
   <div class="period-sep"></div>
   <select class="period-sel" id="yearSel" onchange="onYearChange()"><option value="">년도</option></select>
-  <select class="period-sel" id="monthSel" onchange="renderCurrent()" style="display:none;"><option value="">월</option></select>
-  <button class="trend-btn-top" id="trendTopBtn" onclick="openTrendPopup()" style="display:none;">📈 추세 비교</button>
+  <select class="period-sel" id="monthSel" onchange="renderCurrent()"><option value="">월</option></select>
 </div>
 
-<!-- 누적 기간 선택 패널 -->
-<div class="accum-panel" id="accumPanel">
-  <div class="accum-panel-title">기간 선택</div>
-  <div class="accum-btns" id="accumBtns"></div>
-</div>
+
 
 <!-- SHEET TABS -->
 <div class="sheet-tabs" id="sheetTabs">
@@ -321,38 +316,35 @@ function switchTab(idx){
   currentTab=idx;
   [0,1,2,3].forEach(i=>{document.getElementById(`tab${i}`).classList.toggle('active',i===idx);document.getElementById(`panel${i}`).classList.toggle('active',i===idx);});
   // 추세 비교 버튼은 0,1만
-  document.getElementById('trendTopBtn').style.display=(idx<=1)?'flex':'none';
+  // trendTopBtn removed
   setTimeout(()=>renderCurrent(),30);
 }
 
 function setMode(m){
   viewMode=m;
-  ['month','accum'].forEach(k=>document.getElementById(`seg_${k}`).classList.toggle('active',k===m));
-  document.getElementById('monthSel').style.display=m==='month'?'inline-block':'none';
-  document.getElementById('accumPanel').classList.toggle('show',m==='accum');
+  ['month','year'].forEach(k=>{const el=document.getElementById('seg_'+k);if(el)el.classList.toggle('active',k===m);});
+  const mSel=document.getElementById('monthSel');
+  if(mSel)mSel.style.display=m==='month'?'inline-block':'none';
   renderCurrent();
 }
 
 function onYearChange(){
-  selYear=document.getElementById('yearSel').value;
-  selMonth='';
-  // 월 셀렉터 업데이트
+  const yr=document.getElementById('yearSel').value;
   const mSel=document.getElementById('monthSel');
-  if(selYear){
+  if(!mSel)return;
+  if(yr&&rawTable){
     const{rows,idx}=getRows();
     const iDate=idx('계약실행일');
-    const months=[...new Set(rows.filter(r=>getYM(r[iDate])?.startsWith(selYear)).map(r=>getYM(r[iDate])).filter(Boolean))].sort();
-    mSel.innerHTML='<option value="">전체</option>'+months.map(m=>`<option value="${m}">${m.replace(selYear+'.','').replace(/^0/,'')}월</option>`).join('');
-    mSel.value='';
+    const months=[...new Set(rows.filter(r=>getYM(r[iDate])?.startsWith(yr)).map(r=>getYM(r[iDate])).filter(Boolean))].sort();
+    mSel.innerHTML='<option value="">월 선택</option>'+months.map(m=>`<option value="${m}">${parseInt(m.split('.')[1])}월</option>`).join('');
+    const tm=thisMonth();
+    if(months.includes(tm))mSel.value=tm;
+    else mSel.value=months[months.length-1]||'';
   }
   renderCurrent();
 }
 
-function setAccumRange(r){
-  accumRange=r;
-  document.querySelectorAll('.accum-btn').forEach(el=>el.classList.toggle('active',el.getAttribute('data-range')===r));
-  renderCurrent();
-}
+
 
 async function loadAll(){
   const id=document.getElementById('sheetId').value.trim();
@@ -397,33 +389,24 @@ function getYM(v){
 function thisMonth(){const n=new Date();return`${n.getFullYear()}.${String(n.getMonth()+1).padStart(2,'0')}`;}
 
 function getFilteredRows(rows,iDate){
+  const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
+  const mo=document.getElementById('monthSel')?.value||'';
   if(viewMode==='month'){
-    const yr=selYear||new Date().getFullYear().toString();
-    const mo=document.getElementById('monthSel')?.value||'';
     if(mo)return rows.filter(r=>getYM(r[iDate])===mo);
-    if(selYear)return rows.filter(r=>getYM(r[iDate])?.startsWith(yr));
     return rows.filter(r=>getYM(r[iDate])===thisMonth());
   } else {
-    // accum
-    if(accumRange==='all')return rows;
-    if(accumRange.includes('~')){
-      const[from,to]=accumRange.split('~');
-      return rows.filter(r=>{const m=getYM(r[iDate]);return m&&m>=from&&m<=to;});
-    }
-    return rows.filter(r=>getYM(r[iDate])?.startsWith(accumRange));
+    return rows.filter(r=>getYM(r[iDate])?.startsWith(yr));
   }
 }
 
 function getPeriodLabel(){
+  const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
+  const mo=document.getElementById('monthSel')?.value||'';
   if(viewMode==='month'){
-    const yr=selYear||new Date().getFullYear().toString();
-    const mo=document.getElementById('monthSel')?.value||'';
-    if(mo)return mo.replace('.',`년 `).replace(/\.0?/,'월 ');
-    if(selYear)return selYear+'년 전체';
-    return thisMonth().replace('.',`년 `)+'월';
+    if(mo){const p=mo.split('.');return p[0]+'년 '+parseInt(p[1])+'월';}
+    const p=thisMonth().split('.');return p[0]+'년 '+parseInt(p[1])+'월';
   }
-  if(accumRange==='all')return'전체 누적';
-  return accumRange+'년 누적';
+  return yr+'년 전체';
 }
 
 function getAllMonths(rows,iDate){
@@ -437,10 +420,19 @@ function populatePickers(){
 
   const ySel=document.getElementById('yearSel');
   ySel.innerHTML='<option value="">년도 선택</option>'+years.map(y=>`<option value="${y}">${y}년</option>`).join('');
-  // 기본값: 올해
   const thisY=new Date().getFullYear().toString();
   if(years.includes(thisY))ySel.value=thisY;
-  selYear=ySel.value;
+  onYearChange();
+  // 월 셀렉터 초기화 - 현재 달 자동 선택
+  const mSel=document.getElementById('monthSel');
+  const thisYM=thisMonth();
+  const thisYMonths=[...new Set(rawTable.rows.map(r=>{
+    const cols=rawTable.cols.map(c=>c.label);
+    const iDate=cols.findIndex(c=>c&&c.includes('계약실행일'));
+    return iDate>=0?getYM(r.c[iDate]?.v||null):null;
+  }).filter(m=>m&&m.startsWith(thisY)))].sort();
+  mSel.innerHTML='<option value="">월 선택</option>'+thisYMonths.map(m=>`<option value="${m}">${parseInt(m.split('.')[1])}월</option>`).join('');
+  if(thisYMonths.includes(thisYM))mSel.value=thisYM;
 
   // 누적 버튼
   const accumBtns=document.getElementById('accumBtns');
@@ -454,15 +446,6 @@ function populatePickers(){
   const fromD=new Date(now.getFullYear()-1,now.getMonth()+1,1);
   calFrom={year:fromD.getFullYear(),month:fromD.getMonth()+1};
   calTo={year:toY,month:toM};
-
-  // range 셀렉터
-  const asc=[...months].reverse();
-  ['rangeFrom','rangeTo'].forEach((id,i)=>{
-    const el=document.getElementById(id);
-    if(!el)return;
-    el.innerHTML=asc.map(m=>`<option value="${m}">${m}</option>`).join('');
-    el.value=i===0?asc[0]||'':asc[asc.length-1]||'';
-  });
 }
 
 function countMap(arr,keyFn){const m={};arr.forEach(r=>{const v=keyFn(r);if(v!=null&&v!==''){m[v]=(m[v]||0)+1;}});return m;}
@@ -471,6 +454,15 @@ function avgVal(arr,iR){
   const v=arr.map(r=>parseFloat((r[iR]||'').toString().replace(/[^0-9.-]/g,''))).filter(v=>!isNaN(v)&&v>0);
   if(!v.length)return'-';
   return Math.round(v.reduce((a,b)=>a+b,0)/v.length).toLocaleString()+'원';
+}
+
+function toggleTrendTable(){
+  const w=document.getElementById('trendTableWrap2');
+  const btn=document.getElementById('trendTableToggle');
+  if(!w)return;
+  const show=w.style.display==='none';
+  w.style.display=show?'block':'none';
+  if(btn)btn.textContent=show?'▲ 숨기기':'▼ 상세';
 }
 
 function renderCurrent(){
@@ -576,15 +568,25 @@ function renderP0(){
         </div>
       </div>
       <div class="card">
-        <div class="card-header"><span class="card-title">월별 추세 비교</span></div>
+        <div class="card-header">
+          <span class="card-title">월별 추세 비교</span>
+          <div style="display:flex;gap:8px;align-items:center;">
+            <button onclick="toggleTrendTable()" id="trendTableToggle"
+              style="padding:4px 10px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid #e0e0ee;background:#fff;color:#888;">▼ 상세</button>
+            <button onclick="openTrendPopup()"
+              style="padding:4px 10px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid #6C63FF;background:#fff;color:#6C63FF;">자세히보기</button>
+          </div>
+        </div>
         <div class="chart-wrap"><canvas id="trend_mini"></canvas></div>
-        <table class="trend-table" style="margin-top:10px;">
-          <thead><tr><th>월</th><th style="color:#6C63FF;">신차</th><th style="color:#22c997;">재렌트</th><th>총 계약</th></tr></thead>
-          <tbody>
-            ${recentMonths.map(m=>`<tr><td>${m}</td><td class="shin-c">${shinByM[m]||0}</td><td class="re-c">${reByM[m]||0}</td><td>${(shinByM[m]||0)+(reByM[m]||0)}</td></tr>`).join('')}
-            <tr><td>합계</td><td class="shin-c">${recentMonths.reduce((a,m)=>a+(shinByM[m]||0),0)}</td><td class="re-c">${recentMonths.reduce((a,m)=>a+(reByM[m]||0),0)}</td><td>${recentMonths.reduce((a,m)=>a+(shinByM[m]||0)+(reByM[m]||0),0)}</td></tr>
-          </tbody>
-        </table>
+        <div id="trendTableWrap2" style="display:none;margin-top:10px;">
+          <table class="trend-table">
+            <thead><tr><th>월</th><th style="color:#6C63FF;">신차</th><th style="color:#22c997;">재렌트</th><th>총 계약</th></tr></thead>
+            <tbody>
+              \${recentMonths.map(m=>`<tr><td>\${m}</td><td class="shin-c">\${shinByM[m]||0}</td><td class="re-c">\${reByM[m]||0}</td><td>\${(shinByM[m]||0)+(reByM[m]||0)}</td></tr>`).join('')}
+              <tr><td>합계</td><td class="shin-c">\${recentMonths.reduce((a,m)=>a+(shinByM[m]||0),0)}</td><td class="re-c">\${recentMonths.reduce((a,m)=>a+(reByM[m]||0),0)}</td><td>\${recentMonths.reduce((a,m)=>a+(shinByM[m]||0)+(reByM[m]||0),0)}</td></tr>
+            </tbody>
+          </table>
+        </div>
       </div>
     </div>
 
