@@ -316,7 +316,6 @@ function switchTab(idx){
   currentTab=idx;
   [0,1,2,3].forEach(i=>{document.getElementById(`tab${i}`).classList.toggle('active',i===idx);document.getElementById(`panel${i}`).classList.toggle('active',i===idx);});
   // 추세 비교 버튼은 0,1만
-  // trendTopBtn removed
   setTimeout(()=>renderCurrent(),30);
 }
 
@@ -414,39 +413,27 @@ function getAllMonths(rows,iDate){
 }
 
 function populatePickers(){
-  const{rows,idx}=getRows();const iDate=idx('계약실행일');
+  const{rows,idx}=getRows();
+  const iDate=idx('계약실행일');
   const years=[...new Set(rows.map(r=>getYM(r[iDate])?.split('.')[0]).filter(Boolean))].sort().reverse();
-  const months=getAllMonths(rows,iDate).reverse();
 
+  // 년도 셀렉터
   const ySel=document.getElementById('yearSel');
-  ySel.innerHTML='<option value="">년도 선택</option>'+years.map(y=>`<option value="${y}">${y}년</option>`).join('');
-  const thisY=new Date().getFullYear().toString();
-  if(years.includes(thisY))ySel.value=thisY;
-  onYearChange();
-  // 월 셀렉터 초기화 - 현재 달 자동 선택
-  const mSel=document.getElementById('monthSel');
-  const thisYM=thisMonth();
-  const thisYMonths=[...new Set(rawTable.rows.map(r=>{
-    const cols=rawTable.cols.map(c=>c.label);
-    const iDate=cols.findIndex(c=>c&&c.includes('계약실행일'));
-    return iDate>=0?getYM(r.c[iDate]?.v||null):null;
-  }).filter(m=>m&&m.startsWith(thisY)))].sort();
-  mSel.innerHTML='<option value="">월 선택</option>'+thisYMonths.map(m=>`<option value="${m}">${parseInt(m.split('.')[1])}월</option>`).join('');
-  if(thisYMonths.includes(thisYM))mSel.value=thisYM;
-
-  // 누적 버튼
-  const accumBtns=document.getElementById('accumBtns');
-  accumBtns.innerHTML=
-    `<button class="accum-btn active" data-range="all" onclick="setAccumRange('all')">전체</button>`+
-    years.map(y=>`<button class="accum-btn" data-range="${y}" onclick="setAccumRange('${y}')">${y}년</button>`).join('');
+  if(ySel){
+    ySel.innerHTML=years.map(y=>`<option value="${y}">${y}년</option>`).join('');
+    const thisY=new Date().getFullYear().toString();
+    if(years.includes(thisY))ySel.value=thisY;
+  }
 
   // 달력 기본값: 최근 1년
   const now=new Date();
-  const toY=now.getFullYear(),toM=now.getMonth()+1;
-  const fromD=new Date(now.getFullYear()-1,now.getMonth()+1,1);
-  calFrom={year:fromD.getFullYear(),month:fromD.getMonth()+1};
-  calTo={year:toY,month:toM};
+  calFrom={year:now.getFullYear()-1,month:now.getMonth()+1};
+  calTo={year:now.getFullYear(),month:now.getMonth()+1};
+
+  // 월 셀렉터 초기화 (현재 년도 월 목록 + 현재달 선택)
+  onYearChange();
 }
+
 
 function countMap(arr,keyFn){const m={};arr.forEach(r=>{const v=keyFn(r);if(v!=null&&v!==''){m[v]=(m[v]||0)+1;}});return m;}
 function avgVal(arr,iR){
