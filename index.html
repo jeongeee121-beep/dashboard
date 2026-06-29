@@ -199,6 +199,14 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
   <input id="sheetId" value="14j3hDW3Hn-1ftkJlqZhEZhWTt38eZU8S4yMoadenrR4"/>
   <button class="btn-load" onclick="loadAll()">불러오기</button>
   <span id="statusMsg"></span>
+  <div id="dataModeBtns" style="display:none;margin-left:8px;display:none;">
+    <div style="display:flex;background:#f0f0f8;border-radius:8px;padding:3px;gap:2px;">
+      <button onclick="setDataMode('exec')" id="btn_exec"
+        style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:#6C63FF;color:#fff;transition:all 0.15s;">실행</button>
+      <button onclick="setDataMode('takso')" id="btn_takso"
+        style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.15s;">탁송</button>
+    </div>
+  </div>
 </div>
 
 <!-- PERIOD BAR -->
@@ -296,7 +304,7 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
 <script>
 const COLORS=['#6C63FF','#22c997','#FF6B6B','#FFA94D','#4dabf7','#f06595','#a9e34b','#74c0fc','#e599f7','#ffd43b'];
 const MONTHS_KR=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
-let rawTable=null, currentTab=0;
+let rawTable=null, rawTaksoTable=null, currentTab=0, dataMode='exec';
 let viewMode='month'; // 'month' | 'accum'
 let selYear='', selMonth='', accumRange='all'; // accum: 'all'|'YYYY'|'YYYY.MM~YYYY.MM'
 let selectedWorker='__all__', chSearchQuery='', selectedSeller='__all__';
@@ -307,10 +315,37 @@ const charts={};
 const WORKER_MAP={'이연수':'하모니','이현수':'하모니','백광현':'하모니','양서영':'토스','염대현':'토스','박주영':'토스','주식회사 하렌파트너스':'하렌파트너스'};
 function mapWorker(v){const s=(v||'').toString().trim();if(!s)return null;for(const[k,l]of Object.entries(WORKER_MAP))if(s.includes(k))return l;return s.slice(0,3)||null;}
 
+// 탁송 수행자 매핑
+function mapTaksoWorker(v){
+  const s=(v||'').toString().trim();
+  if(!s)return'미확인';
+  if(s.includes('특이건'))return'특이건';
+  if(s.includes('하렌파트너스')||s.includes('주식회사 하렌'))return'하렌파트너스';
+  // 괄호 앞 이름만 (예: 이진희(차드림) → 이진희)
+  const m=s.match(/^([^(（]+)/);
+  return m?m[1].trim().slice(0,3):s.slice(0,3);
+}
+
 const AUTOW_MAP={'카투':{계약수행자:'신선미',원수행자:'신선미'},'오토리지':{계약수행자:'조복경',원수행자:'나장열'},'씨에스카':{계약수행자:'조복경',원수행자:'조복경'},'시현':{계약수행자:'조복경',원수행자:'최형용'},'스윗코':{계약수행자:'조복경',원수행자:'이진희'},'스마트다이렉트카':{계약수행자:'조복경',원수행자:'이종국'},'슈어카':{계약수행자:'조복경',원수행자:'이종국'},'신차드림':{계약수행자:'조복경',원수행자:'이종국'},'오토다이렉트카':{계약수행자:'조복경',원수행자:'이종국'},'카베이':{계약수행자:'강병문',원수행자:'이종국'}};
 function getChannelGroup(ch){const s=(ch||'').trim();for(const[k,v]of Object.entries(AUTOW_MAP))if(s.includes(k))return v;return null;}
 
 function setStatus(msg,ok){const el=document.getElementById('statusMsg');el.textContent=msg;el.style.color=ok===false?'#FF6B6B':ok===true?'#22c997':'#999';}
+
+function setDataMode(mode){
+  dataMode=mode;
+  const execBtn=document.getElementById('btn_exec');
+  const taksoBtn=document.getElementById('btn_takso');
+  if(execBtn){execBtn.style.background=mode==='exec'?'#6C63FF':'transparent';execBtn.style.color=mode==='exec'?'#fff':'#888';}
+  if(taksoBtn){taksoBtn.style.background=mode==='takso'?'#6C63FF':'transparent';taksoBtn.style.color=mode==='takso'?'#fff':'#888';}
+
+  if(mode==='takso'){
+    // 탁송 탭으로 전환시 상품별현황 탭만 보이게
+    switchTab(0);
+    renderTakso();
+  } else {
+    renderCurrent();
+  }
+}
 
 function switchTab(idx){
   currentTab=idx;
@@ -454,6 +489,7 @@ function toggleTrendTable(){
 
 function renderCurrent(){
   if(!rawTable)return;
+  if(dataMode==='takso'){renderTakso();return;}
   if(currentTab===0)renderP0();
   else if(currentTab===1)renderP1();
   else if(currentTab===2)renderP2();
@@ -955,6 +991,133 @@ function applyRange(){
   }
   const tw=document.getElementById('trendTableWrap');
   if(tw)tw.innerHTML=`<table class="trend-table"><thead><tr><th>월</th><th>신차</th><th>재렌트</th><th>총 출고</th></tr></thead><tbody>${allMonths.map(m=>`<tr><td>${m}</td><td class="shin-c">${shinMap[m]||0}</td><td class="re-c">${reMap[m]||0}</td><td style="font-weight:600;">${totMap[m]||0}</td></tr>`).join('')}<tr><td>합계</td><td class="shin-c">${tShin}</td><td class="re-c">${tRe}</td><td style="font-weight:700;">${tTot}</td></tr></tbody></table>`;
+}
+
+// ===================== 탁송 현황 =====================
+function renderTakso(){
+  if(!rawTaksoTable){
+    document.getElementById('p0_content').innerHTML='<div style="text-align:center;padding:60px;color:#bbb;">탁송 데이터를 불러오는 중이거나 없어요.</div>';
+    return;
+  }
+
+  const cols=rawTaksoTable.cols.map(c=>c.label);
+  const rows=rawTaksoTable.rows.map(r=>r.c.map(c=>c?c.v:null));
+  const idx=n=>cols.findIndex(c=>c&&c.includes(n));
+
+  // 컬럼 인덱스
+  const iDate=idx('요청일시');   // D열 - 희망일자(출고일)
+  const iWorker=idx('수행자');   // F열
+  const iProd=idx('상품명');     // K열
+  const iType=idx('신차구분');   // M열 - 신차/재렌트
+  const iCar=idx('차종');        // N열
+
+  // 희망일자(U열) 따로 찾기
+  const iHope=cols.findIndex(c=>c&&(c.includes('희망일자')||c.includes('희망')));
+  const iDateFinal = iHope >= 0 ? iHope : iDate;
+
+  // 금월 필터
+  const tm=thisMonth();
+  const filtered=rows.filter(r=>getYM(r[iDateFinal])===tm);
+  const shincha=filtered.filter(r=>(r[iType]||'').toString().includes('신차'));
+  const rerent=filtered.filter(r=>{const v=(r[iType]||'').toString();return v.includes('재렌트')||v.includes('재');});
+
+  const prodMap=iProd>=0?countMap(filtered,r=>(r[iProd]||'기타').toString().trim()):{};
+  const shinProdMap=iProd>=0?countMap(shincha,r=>(r[iProd]||'기타').toString().trim()):{};
+  const reProdMap=iProd>=0?countMap(rerent,r=>(r[iProd]||'기타').toString().trim()):{};
+  const carMap=iCar>=0?countMap(filtered,r=>(r[iCar]||'미확인').toString().trim()):{};
+  const shinCarMap=iCar>=0?countMap(shincha,r=>(r[iCar]||'미확인').toString().trim()):{};
+  const reCarMap=iCar>=0?countMap(rerent,r=>(r[iCar]||'미확인').toString().trim()):{};
+  const workerMap=iWorker>=0?countMap(filtered,r=>mapTaksoWorker(r[iWorker])):{};
+  const shinWorkerMap=iWorker>=0?countMap(shincha,r=>mapTaksoWorker(r[iWorker])):{};
+  const reWorkerMap=iWorker>=0?countMap(rerent,r=>mapTaksoWorker(r[iWorker])):{};
+
+  document.getElementById('p0_content').innerHTML=`
+    <div style="text-align:center;padding:6px 0 20px;color:#888;font-size:13px;">📦 탁송 출고 현황 · ${tm.replace('.',`년 `)}월 기준</div>
+
+    <!-- 요약 카드 -->
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
+      <div class="sum-card" style="border-left:4px solid #6C63FF;">
+        <div class="sum-label">총 탁송 출고</div>
+        <div class="sum-value">${filtered.length}<span style="font-size:16px;color:#aaa;"> 건</span></div>
+      </div>
+      <div class="sum-card" style="border-left:4px solid #22c997;">
+        <div class="sum-label">신차</div>
+        <div class="sum-value" style="color:#6C63FF;">${shincha.length}<span style="font-size:16px;color:#aaa;"> 건</span></div>
+      </div>
+      <div class="sum-card" style="border-left:4px solid #FF6B6B;">
+        <div class="sum-label">재렌트</div>
+        <div class="sum-value" style="color:#22c997;">${rerent.length}<span style="font-size:16px;color:#aaa;"> 건</span></div>
+      </div>
+    </div>
+
+    <!-- 상품별 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">상품별 전체</span><span class="card-badge">${filtered.length}건</span></div>
+        <div class="donut-wrap">
+          <div class="donut-canvas-wrap"><canvas id="t_donut_prod"></canvas>
+            <div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">전체</div></div>
+          </div>
+          <div class="donut-legend" id="t_legend_prod"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">신차 상품별</span><span class="card-badge">${shincha.length}건</span></div>
+        <div id="t_shin_prod_bar"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">재렌트 상품별</span><span class="card-badge">${rerent.length}건</span></div>
+        <div id="t_re_prod_bar"></div>
+      </div>
+    </div>
+
+    <!-- 차량별 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">차종별 전체</span><span class="card-badge">${filtered.length}건</span></div>
+        <div id="t_car_bar"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">신차 차종별</span><span class="card-badge">${shincha.length}건</span></div>
+        <div id="t_shin_car_bar"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">재렌트 차종별</span><span class="card-badge">${rerent.length}건</span></div>
+        <div id="t_re_car_bar"></div>
+      </div>
+    </div>
+
+    <!-- 수행자별 -->
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">수행자별 전체</span></div>
+        <div class="donut-wrap">
+          <div class="donut-canvas-wrap"><canvas id="t_donut_worker"></canvas>
+            <div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">전체</div></div>
+          </div>
+          <div class="donut-legend" id="t_legend_worker"></div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">신차 수행자별</span><span class="card-badge">${shincha.length}건</span></div>
+        <div id="t_shin_worker_bar"></div>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">재렌트 수행자별</span><span class="card-badge">${rerent.length}건</span></div>
+        <div id="t_re_worker_bar"></div>
+      </div>
+    </div>`;
+
+  // 차트 렌더
+  renderDonut('t_donut_prod','t_legend_prod',prodMap);
+  renderBar('t_shin_prod_bar',shinProdMap,8);
+  renderBar('t_re_prod_bar',reProdMap,8);
+  renderBar('t_car_bar',carMap,8);
+  renderBar('t_shin_car_bar',shinCarMap,8);
+  renderBar('t_re_car_bar',reCarMap,8);
+  renderDonut('t_donut_worker','t_legend_worker',workerMap);
+  renderBar('t_shin_worker_bar',shinWorkerMap,8);
+  renderBar('t_re_worker_bar',reWorkerMap,8);
 }
 
 // ===================== 공통 렌더 함수 =====================
