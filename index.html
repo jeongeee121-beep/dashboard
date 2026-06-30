@@ -1109,24 +1109,9 @@ function renderTakso(){
     </div>
 
     <!-- 수행자별 -->
-    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:16px;">
-      <div class="card">
-        <div class="card-header"><span class="card-title">수행자별 전체</span></div>
-        <div class="donut-wrap">
-          <div class="donut-canvas-wrap"><canvas id="t_donut_worker"></canvas>
-            <div class="donut-center"><div class="donut-center-val">${filtered.length}</div><div class="donut-center-label">전체</div></div>
-          </div>
-          <div class="donut-legend" id="t_legend_worker"></div>
-        </div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">신차 수행자별</span><span class="card-badge">${shincha.length}건</span></div>
-        <div id="t_shin_worker_bar"></div>
-      </div>
-      <div class="card">
-        <div class="card-header"><span class="card-title">재렌트 수행자별</span><span class="card-badge">${rerent.length}건</span></div>
-        <div id="t_re_worker_bar"></div>
-      </div>
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header"><span class="card-title">수행자별 통합 현황</span><span class="card-badge">${filtered.length}건</span></div>
+      <div id="t_worker_table"></div>
     </div>`;
 
   // 차트 렌더
@@ -1136,9 +1121,7 @@ function renderTakso(){
   renderBar('t_car_bar',carMap,8);
   renderBar('t_shin_car_bar',shinCarMap,8);
   renderBar('t_re_car_bar',reCarMap,8);
-  renderDonut('t_donut_worker','t_legend_worker',workerMap);
-  renderBar('t_shin_worker_bar',shinWorkerMap,8);
-  renderBar('t_re_worker_bar',reWorkerMap,8);
+  renderWorkerTable('t_worker_table',workerMap,shinWorkerMap,reWorkerMap);
 }
 
 // ===================== 공통 렌더 함수 =====================
@@ -1158,6 +1141,41 @@ function renderBar(elId,dataMap,limit=7){
   const total=entries.reduce((s,[,v])=>s+v,0);
   if(!entries.length){el.innerHTML='<div class="empty">데이터 없음</div>';return;}
   el.innerHTML=entries.map(([k,v],i)=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span>${k}</span><span style="color:#999;">${v.toLocaleString()}건 · ${Math.round(v/total*100)}%</span></div><div style="background:#f3f3f8;border-radius:5px;height:6px;overflow:hidden;"><div style="height:100%;border-radius:5px;background:${COLORS[i%COLORS.length]};width:${Math.round(v/total*100)}%;"></div></div></div>`).join('');
+}
+function renderWorkerTable(elId,totalMap,shinMap,reMap){
+  const el=document.getElementById(elId);if(!el)return;
+  const names=Object.keys(totalMap).sort((a,b)=>(totalMap[b]||0)-(totalMap[a]||0));
+  if(!names.length){el.innerHTML='<div class="empty">데이터 없음</div>';return;}
+  const rows=names.map(name=>{
+    const total=totalMap[name]||0,shin=shinMap[name]||0,re=reMap[name]||0;
+    const base=shin+re;
+    const pct=base?Math.round(shin/base*100):0;
+    return `<tr style="border-bottom:1px solid #f5f5f8;">
+      <td style="padding:9px 12px;font-weight:600;">${name}</td>
+      <td style="text-align:right;padding:9px 12px;font-weight:700;">${total.toLocaleString()}건</td>
+      <td style="text-align:right;padding:9px 12px;color:#6C63FF;">${shin.toLocaleString()}건</td>
+      <td style="text-align:right;padding:9px 12px;color:#22c997;">${re.toLocaleString()}건</td>
+      <td style="padding:9px 12px 9px 18px;">
+        <div style="display:flex;align-items:center;gap:8px;">
+          <div style="flex:1;height:6px;border-radius:3px;background:#FF6B6B;overflow:hidden;display:flex;">
+            <div style="width:${pct}%;background:#6C63FF;height:100%;"></div>
+          </div>
+          <span style="font-size:11px;color:#999;min-width:60px;text-align:right;">신차 ${pct}%</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join('');
+  el.innerHTML=`<table style="width:100%;border-collapse:collapse;font-size:12px;table-layout:fixed;">
+    <colgroup><col style="width:18%;"><col style="width:13%;"><col style="width:13%;"><col style="width:13%;"><col style="width:43%;"></colgroup>
+    <thead><tr style="border-bottom:2px solid #f0f0f8;">
+      <th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">수행자</th>
+      <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">전체</th>
+      <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">신차</th>
+      <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">재렌트</th>
+      <th style="text-align:left;padding:9px 12px 9px 18px;color:#999;font-weight:500;">출고비율</th>
+    </tr></thead>
+    <tbody>${rows}</tbody>
+  </table>`;
 }
 function bindTooltips(){
   document.querySelectorAll('.tooltip-wrap').forEach(el=>{
