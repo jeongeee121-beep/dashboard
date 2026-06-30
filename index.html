@@ -1041,12 +1041,12 @@ function renderTakso(){
 
   // 금월 필터
   const tm=thisMonth();
-  const filtered=rows.filter(r=>getYM(r[iDateFinal])===tm);
-  const shincha=filtered.filter(r=>(r[iType]||'').toString().includes('신차'));
-  const rerentRaw=filtered.filter(r=>{const v=(r[iType]||'').toString();return v.includes('재렌트')||v.includes('재');});
-  const vehicleChange=rerentRaw.filter(r=>mapTaksoWorker(r[iWorker])==='특이건');
-  const rerent=rerentRaw.filter(r=>mapTaksoWorker(r[iWorker])!=='특이건');
+  const filteredAll=rows.filter(r=>getYM(r[iDateFinal])===tm);
+  const vehicleChange=filteredAll.filter(r=>mapTaksoWorker(r[iWorker])==='특이건');
+  const filtered=filteredAll.filter(r=>mapTaksoWorker(r[iWorker])!=='특이건');
   const vcNote=vehicleChange.length?` <span style="font-size:10px;color:#bbb;font-weight:400;">* 차량교체 ${vehicleChange.length}건</span>`:'';
+  const shincha=filtered.filter(r=>(r[iType]||'').toString().includes('신차'));
+  const rerent=filtered.filter(r=>{const v=(r[iType]||'').toString();return v.includes('재렌트')||v.includes('재');});
 
   const prodMap=iProd>=0?countMap(filtered,r=>(r[iProd]||'기타').toString().trim()):{};
   const shinProdMap=iProd>=0?countMap(shincha,r=>(r[iProd]||'기타').toString().trim()):{};
@@ -1065,7 +1065,7 @@ function renderTakso(){
     <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:20px;">
       <div class="sum-card" style="border-left:4px solid #6C63FF;">
         <div class="sum-label">총 탁송 출고</div>
-        <div class="sum-value">${(filtered.length-vehicleChange.length).toLocaleString()}<span style="font-size:16px;color:#aaa;"> 건</span></div>
+        <div class="sum-value">${filtered.length.toLocaleString()}<span style="font-size:16px;color:#aaa;"> 건</span></div>
         ${vcNote?`<div style="margin-top:2px;">${vcNote}</div>`:''}
       </div>
       <div class="sum-card" style="border-left:4px solid #22c997;">
@@ -1174,19 +1174,21 @@ function renderWorkerBars(elId,totalMap,shinMap,reMap){
   const entries=Object.entries(totalMap).sort((a,b)=>b[1]-a[1]);
   if(!entries.length){el.innerHTML='<div class="empty">데이터 없음</div>';return;}
   const maxV=entries[0][1]||1;
+  const grandTotal=entries.reduce((s,[,v])=>s+v,0)||1;
   el.innerHTML=entries.map(([k,v])=>{
     const shin=shinMap[k]||0,re=reMap[k]||0;
     const base=shin+re||1;
     const shinPct=Math.round(shin/base*100);
     const rePct=100-shinPct;
     const barWidth=Math.round(v/maxV*100);
+    const sharePct=(v/grandTotal*100).toFixed(1);
     return `<div style="margin-bottom:14px;">
       <div style="display:flex;justify-content:space-between;align-items:baseline;margin-bottom:3px;">
         <span style="font-size:15px;font-weight:700;">${k}</span>
         <span style="font-size:13px;font-weight:700;color:#1c1c2e;">계 ${v.toLocaleString()}건</span>
       </div>
       <div style="display:flex;justify-content:flex-end;margin-bottom:5px;font-size:11px;color:#999;">
-        <span style="color:#6C63FF;">신차 ${shin.toLocaleString()}건</span>&nbsp;·&nbsp;<span style="color:#22c997;">재렌트 ${re.toLocaleString()}건</span>
+        <span style="color:#6C63FF;">신차 ${shin.toLocaleString()}건</span>&nbsp;·&nbsp;<span style="color:#22c997;">재렌트 ${re.toLocaleString()}건</span>&nbsp;·&nbsp;<span>신차:재렌트 ${shinPct}:${rePct}</span>&nbsp;·&nbsp;<span>총출고대비 ${sharePct}%</span>
       </div>
       <div style="background:#f3f3f8;border-radius:5px;height:7px;overflow:hidden;width:${barWidth}%;display:flex;">
         <div style="height:100%;background:#6C63FF;width:${shinPct}%;"></div>
