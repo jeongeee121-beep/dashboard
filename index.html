@@ -396,6 +396,23 @@ async function loadAll(){
     document.getElementById('lastUpdate').textContent=`↻ 최종 업데이트: ${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     // sheetTabs already visible
     // periodBar already visible
+    // 탁송 데이터도 함께 로드
+    try{
+      const tUrl=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent('탁송데이터')}`;
+      const tRes=await fetch(tUrl);
+      const tText=await tRes.text();
+      const tMatch=tText.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
+      if(tMatch){
+        const tJson=JSON.parse(tMatch[1]);
+        if(tJson.table?.rows?.length){
+          rawTaksoTable=tJson.table;
+          console.log('탁송 로드 성공:',rawTaksoTable.rows.length,'건');
+        }
+      } else {
+        console.log('탁송 매칭 실패, 응답:', tText.slice(0,200));
+      }
+    }catch(e){console.log('탁송 로드 실패:',e.message);}
+
     // 실행/탁송 버튼 표시
     const modeBtns=document.getElementById('dataModeBtns');
     if(modeBtns)modeBtns.style.display='flex';
@@ -403,7 +420,7 @@ async function loadAll(){
     [0,1,2,3].forEach(i=>setBadge(`tab${i}`,rawTable.rows.length));
     populatePickers();
     renderCurrent();
-    setStatus(`✓ ${rawTable.rows.length.toLocaleString()}건`,true);
+    setStatus(`✓ ${rawTable.rows.length.toLocaleString()}건`+(rawTaksoTable?` / 탁송 ${rawTaksoTable.rows.length.toLocaleString()}건`:' / 탁송 로드안됨'),true);
   }catch(e){setStatus('❌ '+e.message+' / '+e.stack?.split('\n')[0],false);console.error(e);}
 }
 
