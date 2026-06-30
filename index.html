@@ -396,6 +396,10 @@ async function loadAll(){
     document.getElementById('lastUpdate').textContent=`↻ 최종 업데이트: ${now.getFullYear()}.${String(now.getMonth()+1).padStart(2,'0')}.${String(now.getDate()).padStart(2,'0')} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
     // sheetTabs already visible
     // periodBar already visible
+    // 실행/탁송 버튼 표시
+    const modeBtns=document.getElementById('dataModeBtns');
+    if(modeBtns)modeBtns.style.display='flex';
+
     [0,1,2,3].forEach(i=>setBadge(`tab${i}`,rawTable.rows.length));
     populatePickers();
     renderCurrent();
