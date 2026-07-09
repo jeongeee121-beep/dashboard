@@ -1469,51 +1469,58 @@ function renderTakso(){
       <div id="takso_worker_detail" style="display:none;margin-top:12px;">
         <table style="width:100%;border-collapse:collapse;font-size:13px;">
           <thead><tr style="border-bottom:2px solid #f0f0f8;">
-            <th style="text-align:left;padding:8px 10px;color:#999;font-weight:500;width:36px;">순위</th>
-            <th style="text-align:left;padding:8px 10px;color:#999;font-weight:500;width:90px;">수행자</th>
-            <th style="text-align:left;padding:8px 10px;color:#999;font-weight:500;">건수</th>
-            <th style="text-align:right;padding:8px 10px;color:#999;font-weight:500;width:50px;">계</th>
-            <th style="text-align:right;padding:8px 10px;color:#999;font-weight:500;width:50px;">신차</th>
-            <th style="text-align:right;padding:8px 10px;color:#999;font-weight:500;width:50px;">재렌트</th>
+            <th style="text-align:left;padding:8px 10px;color:#999;font-weight:500;width:100px;">수행자</th>
+            <th style="text-align:left;padding:8px 10px;color:#999;font-weight:500;">건수 (신차 / 재렌트)</th>
+            <th style="text-align:right;padding:8px 10px;color:#999;font-weight:500;width:40px;">계</th>
+            <th style="text-align:right;padding:8px 10px;color:#6C63FF;font-weight:500;width:40px;">신차</th>
+            <th style="text-align:right;padding:8px 10px;color:#22c997;font-weight:500;width:50px;">재렌트</th>
           </tr></thead>
-          <tbody>${workerSorted.map(([name,s],i)=>`
-            <tr style="border-bottom:1px solid #f5f5f8;">
-              <td style="padding:8px 10px;color:#aaa;">${i+1}</td>
+          <tbody>${workerSorted.map(([name,s],i)=>{
+            const shinW=workerMaxTotal>0?Math.round(s.shin/workerMaxTotal*100):0;
+            const reW=workerMaxTotal>0?Math.round(s.re/workerMaxTotal*100):0;
+            return`<tr style="border-bottom:1px solid #f5f5f8;">
               <td style="padding:8px 10px;font-weight:600;">${name}</td>
               <td style="padding:8px 10px;">
-                <div style="background:#f3f3f8;border-radius:5px;height:16px;overflow:hidden;">
-                  <div style="height:100%;border-radius:5px;background:${COLORS[i%COLORS.length]};width:${Math.round(s.total/workerMaxTotal*100)}%;"></div>
+                <div style="background:#f3f3f8;border-radius:5px;height:18px;overflow:hidden;display:flex;">
+                  <div style="height:100%;background:#6C63FF;width:${shinW}%;"></div>
+                  <div style="height:100%;background:#22c997;width:${reW}%;"></div>
                 </div>
               </td>
               <td style="text-align:right;padding:8px 10px;font-weight:700;">${s.total}</td>
-              <td style="text-align:right;padding:8px 10px;color:#6C63FF;">${s.shin}</td>
-              <td style="text-align:right;padding:8px 10px;color:#22c997;">${s.re}</td>
-            </tr>`).join('')}
+              <td style="text-align:right;padding:8px 10px;color:#6C63FF;font-weight:600;">${s.shin}</td>
+              <td style="text-align:right;padding:8px 10px;color:#22c997;font-weight:600;">${s.re}</td>
+            </tr>`;}).join('')}
           </tbody>
         </table>
       </div>
     </div>
 
-    <!-- 차종별: 기본 숨김, ▼ 더보기 -->
+    <!-- 차종별: 기본 상위 8개, 상세보기 누르면 전체 -->
     <div class="section-title-mini" style="margin-bottom:12px;">차종별 현황</div>
-    <button onclick="toggleTaksoCarDetail()" id="takso_car_toggle"
-      style="width:100%;padding:10px;border:1px solid #e0e0ee;border-radius:10px;background:#f8f9fc;font-size:13px;font-family:inherit;cursor:pointer;color:#666;margin-bottom:12px;">
-      ▼ 차종별 상세 보기
-    </button>
-    <div id="takso_car_detail" style="display:none;">
-      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:20px;">
-        <div class="card">
-          <div class="card-header"><span class="card-title">차종별 전체</span><span class="card-badge">${filtered.length}건</span></div>
-          <div id="t_car_bar"></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">신차 차종별</span><span class="card-badge">${shincha.length}건</span></div>
-          <div id="t_shin_car_bar"></div>
-        </div>
-        <div class="card">
-          <div class="card-header"><span class="card-title">재렌트 차종별</span><span class="card-badge">${rerent.length}건</span></div>
-          <div id="t_re_car_bar"></div>
-        </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px;margin-bottom:12px;">
+      <div class="card">
+        <div class="card-header"><span class="card-title">차종별 전체</span><span class="card-badge">${Object.keys(carMap).length}종</span></div>
+        <div id="t_car_bar"></div>
+        <button onclick="toggleTaksoCarDetail('all')" id="takso_car_toggle_all"
+          style="width:100%;margin-top:10px;padding:7px;border:1px solid #e0e0ee;border-radius:8px;background:#f8f9fc;font-size:12px;font-family:inherit;cursor:pointer;color:#666;">
+          ▼ 전체 보기
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">신차 차종별</span><span class="card-badge">${shincha.length}건</span></div>
+        <div id="t_shin_car_bar"></div>
+        <button onclick="toggleTaksoCarDetail('shin')" id="takso_car_toggle_shin"
+          style="width:100%;margin-top:10px;padding:7px;border:1px solid #e0e0ee;border-radius:8px;background:#f8f9fc;font-size:12px;font-family:inherit;cursor:pointer;color:#666;">
+          ▼ 전체 보기
+        </button>
+      </div>
+      <div class="card">
+        <div class="card-header"><span class="card-title">재렌트 차종별</span><span class="card-badge">${rerent.length}건</span></div>
+        <div id="t_re_car_bar"></div>
+        <button onclick="toggleTaksoCarDetail('re')" id="takso_car_toggle_re"
+          style="width:100%;margin-top:10px;padding:7px;border:1px solid #e0e0ee;border-radius:8px;background:#f8f9fc;font-size:12px;font-family:inherit;cursor:pointer;color:#666;">
+          ▼ 전체 보기
+        </button>
       </div>
     </div>`;
 
@@ -1522,13 +1529,11 @@ function renderTakso(){
   renderDonut('t_donut_prod_re','t_legend_prod_re',reProdMap);
   renderDonut('t_donut_worker','t_legend_worker',workerMap);
 
-  // 차종별은 펼쳐진 상태일 때만 렌더
-  if(document.getElementById('takso_car_detail')?.style.display!=='none'){
-    renderBar('t_car_bar',carMap,10);
-    renderBar('t_shin_car_bar',shinCarMap,10);
-    renderBar('t_re_car_bar',reCarMap,10);
-  }
-  // 토글 함수 - 펼칠 때 차종 바 렌더
+  // 차종별 기본 상위 8개
+  renderBar('t_car_bar',carMap,8);
+  renderBar('t_shin_car_bar',shinCarMap,8);
+  renderBar('t_re_car_bar',reCarMap,8);
+  // 전체보기용 저장
   window._taksoCarMap=carMap;
   window._taksoShinCarMap=shinCarMap;
   window._taksoReCarMap=reCarMap;
@@ -1543,17 +1548,21 @@ function toggleTaksoWorkerDetail(){
   if(btn)btn.textContent=show?'▲ 수행자별 상세 접기':'▼ 수행자별 상세 보기';
 }
 
-function toggleTaksoCarDetail(){
-  const el=document.getElementById('takso_car_detail');
-  const btn=document.getElementById('takso_car_toggle');
-  if(!el)return;
-  const show=el.style.display==='none';
-  el.style.display=show?'block':'none';
-  if(btn)btn.textContent=show?'▲ 차종별 접기':'▼ 차종별 상세 보기';
-  if(show){
-    renderBar('t_car_bar',window._taksoCarMap||{},10);
-    renderBar('t_shin_car_bar',window._taksoShinCarMap||{},10);
-    renderBar('t_re_car_bar',window._taksoReCarMap||{},10);
+function toggleTaksoCarDetail(type){
+  const barId=type==='all'?'t_car_bar':type==='shin'?'t_shin_car_bar':'t_re_car_bar';
+  const btnId=type==='all'?'takso_car_toggle_all':type==='shin'?'takso_car_toggle_shin':'takso_car_toggle_re';
+  const dataMap=type==='all'?window._taksoCarMap:type==='shin'?window._taksoShinCarMap:window._taksoReCarMap;
+  const btn=document.getElementById(btnId);
+  // 토글 상태 확인 (data-expanded 속성)
+  const expanded=btn&&btn.getAttribute('data-expanded')==='true';
+  if(expanded){
+    // 접기 - 상위 8개만
+    renderBar(barId,dataMap||{},8);
+    if(btn){btn.textContent='▼ 전체 보기';btn.setAttribute('data-expanded','false');}
+  } else {
+    // 전체 보기 - limit 999
+    renderBar(barId,dataMap||{},999);
+    if(btn){btn.textContent='▲ 접기';btn.setAttribute('data-expanded','true');}
   }
 }
 
