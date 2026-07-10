@@ -210,13 +210,14 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
   <input id="sheetId" value="14j3hDW3Hn-1ftkJlqZhEZhWTt38eZU8S4yMoadenrR4"/>
   <button class="btn-load" onclick="loadAll()">불러오기</button>
   <span id="statusMsg"></span>
-  <div id="dataModeBtns" style="display:none;margin-left:8px;">
-    <div style="display:flex;background:#f0f0f8;border-radius:8px;padding:3px;gap:2px;">
-      <button onclick="setDataMode('exec')" id="btn_exec"
-        style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:#6C63FF;color:#fff;transition:all 0.15s;">실행</button>
-      <button onclick="setDataMode('takso')" id="btn_takso"
-        style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.15s;">탁송</button>
-    </div>
+</div>
+<!-- 실행/탁송 버튼 (period-bar 옆에) -->
+<div id="dataModeBtns" style="display:none;padding:8px 28px;background:#fff;border-bottom:1px solid #e8e8f0;">
+  <div style="display:flex;background:#f0f0f8;border-radius:8px;padding:3px;gap:2px;width:fit-content;">
+    <button onclick="setDataMode('exec')" id="btn_exec"
+      style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:#6C63FF;color:#fff;transition:all 0.15s;">실행</button>
+    <button onclick="setDataMode('takso')" id="btn_takso"
+      style="padding:5px 16px;border-radius:6px;font-size:13px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:transparent;color:#888;transition:all 0.15s;">탁송</button>
   </div>
 </div>
 
@@ -494,7 +495,7 @@ async function loadAll(){
 
     // 실행/탁송 버튼 표시
     const modeBtns=document.getElementById('dataModeBtns');
-    if(modeBtns)modeBtns.style.display='flex';
+    if(modeBtns)modeBtns.style.display='block';
 
     [0,1,2,3].forEach(i=>setBadge(`tab${i}`,rawTable.rows.length));
     populatePickers();
