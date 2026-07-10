@@ -315,7 +315,7 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
   <!-- P0: 상품별 현황 -->
   <div id="panel0" class="sheet-panel active">
     <!-- 탁송 모드 전용 기간 선택 -->
-    <div id="takso_period_bar" style="display:none;margin-bottom:16px;display:none;">
+    <div id="takso_period_bar" style="display:none;margin-bottom:16px;">
       <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
         <span style="font-size:13px;color:#888;font-weight:500;">📅 기간</span>
         <select id="takso_year_sel" onchange="onTaksoYearChange()"
@@ -1701,12 +1701,25 @@ function loadNotices(){
   const notices=JSON.parse(sessionStorage.getItem('dashboard_notices')||'[]');
   const el=document.getElementById('noticeList');
   if(!el)return;
-  if(!notices.length){el.innerHTML='';return;}
-  el.innerHTML=notices.reverse().map((n,i)=>`
-    <div style="padding:10px 12px;background:#f8f9fc;border-radius:8px;margin-bottom:6px;font-size:12px;">
-      <div style="color:#555;">${n.text}</div>
-      <div style="color:#bbb;margin-top:4px;">${n.time}</div>
+  if(!notices.length){el.innerHTML='<div style="font-size:12px;color:#ccc;text-align:center;padding:10px;">등록된 요청사항이 없어요</div>';return;}
+  el.innerHTML=[...notices].reverse().map((n,i)=>`
+    <div style="padding:10px 12px;background:#f8f9fc;border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+      <div style="flex:1;">
+        <div style="color:#555;line-height:1.5;">${n.text}</div>
+        <div style="color:#bbb;margin-top:4px;font-size:11px;">${n.time}</div>
+      </div>
+      <button onclick="deleteNotice(${notices.length-1-i})"
+        style="padding:3px 8px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid #e0e0ee;background:#fff;color:#FF6B6B;flex-shrink:0;">
+        삭제
+      </button>
     </div>`).join('');
+}
+
+function deleteNotice(idx){
+  const notices=JSON.parse(sessionStorage.getItem('dashboard_notices')||'[]');
+  notices.splice(idx,1);
+  sessionStorage.setItem('dashboard_notices',JSON.stringify(notices));
+  loadNotices();
 }
 
 // 페이지 로드 시 자동 불러오기
