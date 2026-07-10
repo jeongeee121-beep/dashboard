@@ -203,7 +203,7 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
 </div>
 
 <!-- CONNECT -->
-<div class="connect-bar">
+<div class="connect-bar" style="display:none;">
   <label>시트 ID</label>
   <input id="sheetId" value="14j3hDW3Hn-1ftkJlqZhEZhWTt38eZU8S4yMoadenrR4"/>
   <button class="btn-load" onclick="loadAll()">불러오기</button>
@@ -1637,6 +1637,8 @@ function moveTip(box,e){
   box.style.left=x+'px';box.style.top=y+'px';
 }
 function calcPctGlobal(curr,prev){if(!prev)return null;return((curr-prev)/prev*100).toFixed(1);}
+// 페이지 로드 시 자동 불러오기
+window.addEventListener('load', ()=>{ loadAll(); });
 </script>
 </body>
 </html>
