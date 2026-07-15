@@ -1644,10 +1644,11 @@ function renderDonut(canvasId,legendId,dataMap){
 }
 function renderBar(elId,dataMap,limit=7){
   const el=document.getElementById(elId);if(!el)return;
-    const entries=Object.entries(dataMap).sort((a,b)=>b[1]-a[1]).slice(0,limit);
-  const total=entries.reduce((s,[,v])=>s+v,0);
+  const allEntries=Object.entries(dataMap).sort((a,b)=>b[1]-a[1]);
+  const totalAll=allEntries.reduce((s,[,v])=>s+v,0); // 전체 합계 기준
+  const entries=allEntries.slice(0,limit);
   if(!entries.length){el.innerHTML='<div class="empty">데이터 없음</div>';return;}
-  el.innerHTML=entries.map(([k,v],i)=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span>${k}</span><span style="color:#999;">${v.toLocaleString()}건 · ${Math.round(v/total*100)}%</span></div><div style="background:#f3f3f8;border-radius:5px;height:6px;overflow:hidden;"><div style="height:100%;border-radius:5px;background:${COLORS[i%COLORS.length]};width:${Math.round(v/total*100)}%;"></div></div></div>`).join('');
+  el.innerHTML=entries.map(([k,v],i)=>`<div style="margin-bottom:10px;"><div style="display:flex;justify-content:space-between;margin-bottom:4px;font-size:12px;"><span>${k}</span><span style="color:#999;">${v.toLocaleString()}건 · ${Math.round(v/totalAll*100)}%</span></div><div style="background:#f3f3f8;border-radius:5px;height:6px;overflow:hidden;"><div style="height:100%;border-radius:5px;background:${COLORS[i%COLORS.length]};width:${Math.round(v/totalAll*100)}%;"></div></div></div>`).join('');
 }
 function renderWorkerBars(elId,totalMap,shinMap,reMap){
   const el=document.getElementById(elId);if(!el)return;
