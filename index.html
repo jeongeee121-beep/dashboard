@@ -263,6 +263,9 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
     <!-- 요청사항 입력 -->
     <div>
       <div style="font-size:13px;font-weight:600;color:#6C63FF;margin-bottom:10px;padding-bottom:6px;border-bottom:2px solid #f0eeff;">✏️ 요청사항</div>
+      <input type="text" id="noticeNameInput" placeholder="이름 (예: 홍길동)" 
+        style="width:100%;padding:10px 12px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:10px;outline:none;box-sizing:border-box;margin-bottom:8px;"
+        onfocus="this.style.borderColor='#6C63FF'" onblur="this.style.borderColor='#e8e8f0'"/>
       <textarea id="noticeInput" placeholder="개선사항이나 요청사항을 남겨주세요 😊" rows="4"
         style="width:100%;padding:12px;font-size:13px;font-family:inherit;border:1.5px solid #e8e8f0;border-radius:10px;resize:none;outline:none;box-sizing:border-box;"
         onfocus="this.style.borderColor='#6C63FF'" onblur="this.style.borderColor='#e8e8f0'"></textarea>
@@ -1689,38 +1692,54 @@ function closeNotice(){
 document.getElementById('noticePopup').addEventListener('click',e=>{
   if(e.target===document.getElementById('noticePopup'))closeNotice();
 });
-function submitNotice(){
+const NOTICE_URL='https://script.google.com/macros/s/AKfycbwNszvunfsY5YWEYe6vE3OB5a7Tqqp_CYR8oxFuW5uP1OpKkXv7J7lLUTWNbLTrku6uDw/exec';
+
+async function submitNotice(){
   const val=document.getElementById('noticeInput')?.value.trim();
+  const nameVal=document.getElementById('noticeNameInput')?.value.trim()||'익명';
   if(!val)return;
-  const notices=JSON.parse(sessionStorage.getItem('dashboard_notices')||'[]');
-  notices.push({text:val,time:new Date().toLocaleString('ko-KR')});
-  sessionStorage.setItem('dashboard_notices',JSON.stringify(notices));
-  document.getElementById('noticeInput').value='';
-  loadNotices();
-}
-function loadNotices(){
-  const notices=JSON.parse(sessionStorage.getItem('dashboard_notices')||'[]');
-  const el=document.getElementById('noticeList');
-  if(!el)return;
-  if(!notices.length){el.innerHTML='<div style="font-size:12px;color:#ccc;text-align:center;padding:10px;">등록된 요청사항이 없어요</div>';return;}
-  el.innerHTML=[...notices].reverse().map((n,i)=>`
-    <div style="padding:10px 12px;background:#f8f9fc;border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
-      <div style="flex:1;">
-        <div style="color:#555;line-height:1.5;">${n.text}</div>
-        <div style="color:#bbb;margin-top:4px;font-size:11px;">${n.time}</div>
-      </div>
-      <button onclick="deleteNotice(${notices.length-1-i})"
-        style="padding:3px 8px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid #e0e0ee;background:#fff;color:#FF6B6B;flex-shrink:0;">
-        삭제
-      </button>
-    </div>`).join('');
+  const btn=document.querySelector('#noticePopup button[onclick="submitNotice()"]');
+  if(btn)btn.textContent='등록 중...';
+  try{
+    await fetch(NOTICE_URL,{method:'POST',body:JSON.stringify({action:'add',text:val,name:nameVal})});
+    document.getElementById('noticeInput').value='';
+    await loadNotices();
+  }catch(e){console.error(e);}
+  if(btn)btn.textContent='등록하기';
 }
 
-function deleteNotice(idx){
-  const notices=JSON.parse(sessionStorage.getItem('dashboard_notices')||'[]');
-  notices.splice(idx,1);
-  sessionStorage.setItem('dashboard_notices',JSON.stringify(notices));
-  loadNotices();
+async function loadNotices(){
+  const el=document.getElementById('noticeList');
+  if(!el)return;
+  el.innerHTML='<div style="font-size:12px;color:#ccc;text-align:center;padding:10px;">불러오는 중...</div>';
+  try{
+    const res=await fetch(NOTICE_URL);
+    const data=await res.json();
+    if(!data.length){el.innerHTML='<div style="font-size:12px;color:#ccc;text-align:center;padding:10px;">등록된 요청사항이 없어요</div>';return;}
+    el.innerHTML=[...data].reverse().map((n,i)=>`
+      <div style="padding:10px 12px;background:#f8f9fc;border-radius:8px;margin-bottom:6px;font-size:12px;display:flex;justify-content:space-between;align-items:flex-start;gap:8px;">
+        <div style="flex:1;">
+          <div style="display:flex;gap:8px;align-items:center;margin-bottom:3px;">
+            <span style="font-weight:600;color:#6C63FF;">${n.name||'익명'}</span>
+            <span style="color:#ddd;">|</span>
+            <span style="color:#bbb;font-size:11px;">${n.time}</span>
+          </div>
+          <div style="color:#555;line-height:1.5;">${n.text}</div>
+        </div>
+        <button onclick="deleteNotice('${n.time}')"
+          style="padding:3px 8px;border-radius:6px;font-size:11px;font-family:inherit;cursor:pointer;border:1px solid #e0e0ee;background:#fff;color:#FF6B6B;flex-shrink:0;">
+          삭제
+        </button>
+      </div>`).join('');
+  }catch(e){el.innerHTML='<div style="font-size:12px;color:#FF6B6B;text-align:center;padding:10px;">불러오기 실패</div>';}
+}
+
+async function deleteNotice(time){
+  if(!confirm('삭제할까요?'))return;
+  try{
+    await fetch(NOTICE_URL,{method:'POST',body:JSON.stringify({action:'delete',time:time})});
+    await loadNotices();
+  }catch(e){console.error(e);}
 }
 
 // 페이지 로드 시 자동 불러오기
