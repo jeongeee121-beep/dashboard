@@ -2327,7 +2327,12 @@ function renderExec(){
   const isShin=r=>((r[iProd]||'')+'').includes('신차');
   const isRe=r=>{const v=(r[iProd]||'')+'';return v.includes('재렌트')||v.includes('재');};
 
-  const monthRows=rows.filter(r=>getYM(r[iDate])===baseYM);
+  const baseDay=base.getDate();
+  const monthRows=rows.filter(r=>{
+    if(getYM(r[iDate])!==baseYM)return false;
+    const d=getDayNum(r[iDate]);
+    return d==null||d<=baseDay;   // 기준일까지의 출고분만
+  });
   const prevRows=rows.filter(r=>getYM(r[iDate])===prevYM);
   const shin=monthRows.filter(isShin).length, re=monthRows.filter(isRe).length;
   const pShin=prevRows.filter(isShin).length, pRe=prevRows.filter(isRe).length;
@@ -2359,6 +2364,8 @@ function renderExec(){
         const list=[];let taksoCnt=0;
         tRows.forEach(r=>{
           if(getYM(r[tDate])!==baseYM)return;
+          const dd=getDayNum(r[tDate]);
+          if(dd!=null&&dd>baseDay)return;   // 기준일 이후 탁송 제외
           const a=((r[tAsset]||'')+'').trim();
           if(!a||seen.has(a))return;
           seen.add(a);taksoCnt++;
@@ -2478,7 +2485,11 @@ function renderExec(){
   // ---- 3. Trend ----
   const labels=[];
   for(let m=0;m<=bM;m++)labels.push(`${bY}.${String(m+1).padStart(2,'0')}`);
-  const cntBy=(pred)=>labels.map(l=>rows.filter(r=>getYM(r[iDate])===l&&pred(r)).length);
+  const cntBy=(pred)=>labels.map(l=>rows.filter(r=>{
+    if(getYM(r[iDate])!==l)return false;
+    if(l===baseYM){const d=getDayNum(r[iDate]);if(d!=null&&d>baseDay)return false;}
+    return pred(r);
+  }).length);
   const shinArr=cntBy(isShin), reArr=cntBy(isRe);
   const totalArr=shinArr.map((v,i)=>v+reArr[i]);
   const tgtArr=targetsMap?labels.map(l=>{const t=targetsMap[l];return t?(t.shin||0)+(t.re||0):null;}):null;
