@@ -2574,12 +2574,10 @@ function renderExec(){
         </div>`:''}
       </div>
       ${exDeltaHtml(re,pRe)}
+      ${(taksoAvail&&taksoSwapCnt>0)?`<span style="font-size:11px;color:#B4B8C9;font-weight:600;">* 차량교체 ${taksoSwapCnt}건은 집계에서 제외</span>`:''}
     </div>${unexecHtml}`;
   const swapNote=document.getElementById('exSwapNote');
-  if(swapNote){
-    swapNote.style.display=(taksoAvail&&taksoSwapCnt>0)?'block':'none';
-    swapNote.textContent=`* 차량교체 ${taksoSwapCnt}건(수행자 미기재·특이건)은 집계에서 제외`;
-  }
+  if(swapNote)swapNote.style.display='none';
 
   // ---- 2. Goal Tracking ----
   const mStart=new Date(bY,bM,1), mEnd=new Date(bY,bM+1,0);
