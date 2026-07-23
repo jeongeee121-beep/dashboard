@@ -2439,7 +2439,13 @@ function renderExec(){
   try{
     if(typeof rawTaksoTable!=='undefined'&&rawTaksoTable){
       const tkCols=rawTaksoTable.cols.map(c=>(c.label||'')+'');
-      const tkDate=(tkCols.findIndex(c=>c.includes('희망'))>=0)?tkCols.findIndex(c=>c.includes('희망')):tkCols.findIndex(c=>c.includes('요청일시'));
+      const tkHope=tkCols.findIndex(c=>c.includes('희망'));
+      const tkReq=tkCols.findIndex(c=>c.includes('요청일시'));
+      const tkDate=tkHope>=0?tkHope:tkReq;   // (존재 여부 판단용, 실제 값은 rowDate로 행마다 재계산)
+      const rowDateKPI=r=>{
+        if(tkHope>=0){const v=r[tkHope];if(v!=null&&(v+'').trim()!=='')return v;}
+        return tkReq>=0?r[tkReq]:null;
+      };
       const tkType=tkCols.findIndex(c=>c.includes('신차구분'));
       const tkAsset=tkCols.findIndex(c=>c.includes('자산번호'));
       const tkWk=tkCols.findIndex(c=>c.includes('수행자')||c.includes('수행원'));
@@ -2447,14 +2453,15 @@ function renderExec(){
         const seenCur=new Set(),seenPrev=new Set();
         rawTaksoTable.rows.forEach(rw=>{
           const r=rw.c.map(c=>c?c.v:null);
-          const ym=getYM(r[tkDate]);
+          const rd=rowDateKPI(r);
+          const ym=getYM(rd);
           if(ym!==baseYM&&ym!==prevYM)return;
           const swap=tkWk>=0&&isSwapWk(r[tkWk]);   // 차량교체건: 집계 제외, 개수만 표시
           const a=(tkAsset>=0?((r[tkAsset]||'')+''):'').trim();
           const tv=tkType>=0?((r[tkType]||'')+''):'';
           const isS=tv.includes('신차'), isR=!isS&&(tv.includes('재렌트')||tv.includes('재'));
           if(ym===baseYM){
-            const d=getDayNum(r[tkDate]);
+            const d=getDayNum(rd);
             if(d!=null&&d>baseDay)return;
             if(a){if(seenCur.has(a))return;seenCur.add(a);}
             if(swap){taksoSwapCnt++;return;}
@@ -2491,7 +2498,11 @@ function renderExec(){
       const tAsset=tCols.findIndex(c=>c.includes('자산번호'));
       const tHope=tCols.findIndex(c=>c.includes('희망'));
       const tReq=tCols.findIndex(c=>c.includes('요청일시'));
-      const tDate=tHope>=0?tHope:tReq;
+      const rowDate=r=>{                       // 행 단위 폴백: 희망일자 있으면 그걸, 없으면 요청일시
+        if(tHope>=0){const v=r[tHope];if(v!=null&&(v+'').trim()!=='')return v;}
+        return tReq>=0?r[tReq]:null;
+      };
+      const tDate=tHope>=0?tHope:tReq;   // (표시용 · 존재 여부 판단용, 실제 값은 rowDate()로 행마다 재계산)
       const tCar=tCols.findIndex(c=>c.includes('차종'));
       const tWk=tCols.findIndex(c=>c.includes('수행자'));
       const tProd=tCols.findIndex(c=>c.includes('상품명'));
@@ -2502,8 +2513,9 @@ function renderExec(){
         const seen=new Set();
         const list=[];let taksoCnt=0;
         tRows.forEach(r=>{
-          if(getYM(r[tDate])!==baseYM)return;
-          const dd=getDayNum(r[tDate]);
+          const rd=rowDate(r);
+          if(getYM(rd)!==baseYM)return;
+          const dd=getDayNum(rd);
           if(dd!=null&&dd>baseDay)return;   // 기준일 이후 탁송 제외
           if(tWk>=0&&isSwapWk(r[tWk]))return;   // 차량교체건 제외
           const a=((r[tAsset]||'')+'').trim();
@@ -2521,7 +2533,7 @@ function renderExec(){
             prod:tProd>=0?((r[tProd]||'')+''):'',
             car:tCar>=0?((r[tCar]||'')+''):'',
             wk:(tWk>=0&&typeof mapWorker==='function')?(mapWorker(r[tWk])||''):'',
-            day:getDayNum(r[tDate])
+            day:getDayNum(rd)
           });
         });
         list.sort((x,y)=>(x.day||99)-(y.day||99));
@@ -2804,12 +2816,18 @@ function escH(s){return (s==null?'':s).toString().replace(/&/g,'&amp;').replace(
 function taksoResolveCols(){
   if(typeof rawTaksoTable==='undefined'||!rawTaksoTable)return null;
   const tkCols=rawTaksoTable.cols.map(c=>(c.label||'')+'');
-  const tkDate=(tkCols.findIndex(c=>c.includes('희망'))>=0)?tkCols.findIndex(c=>c.includes('희망')):tkCols.findIndex(c=>c.includes('요청일시'));
+  const tkHope=tkCols.findIndex(c=>c.includes('희망'));
+  const tkReq=tkCols.findIndex(c=>c.includes('요청일시'));
+  const tkDate=tkHope>=0?tkHope:tkReq;
   const tkType=tkCols.findIndex(c=>c.includes('신차구분'));
   const tkAsset=tkCols.findIndex(c=>c.includes('자산번호'));
   const tkWk=tkCols.findIndex(c=>c.includes('수행자')||c.includes('수행원'));
   if(tkDate<0)return null;
-  return {tkDate,tkType,tkAsset,tkWk};
+  const rowDate=r=>{                          // 행 단위 폴백: 희망일자 있으면 그걸, 없으면 요청일시
+    if(tkHope>=0){const v=r[tkHope];if(v!=null&&(v+'').trim()!=='')return v;}
+    return tkReq>=0?r[tkReq]:null;
+  };
+  return {tkDate,tkType,tkAsset,tkWk,rowDate};
 }
 function isSwapWorkerVal(v){const s=((v==null?'':v)+'').trim();return !s||s.includes('특이건');}
 // 탁송데이터 기준 shin/re/중고매입 집계 (자산 중복 제거, 차량교체건 제외)
@@ -2820,9 +2838,10 @@ function taksoAggFor(ym,dayStart,dayEnd){
   const seen=new Set();
   rawTaksoTable.rows.forEach(rw=>{
     const r=rw.c.map(c=>c?c.v:null);
-    if(getYM(r[cc.tkDate])!==ym)return;
+    const rd=cc.rowDate(r);
+    if(getYM(rd)!==ym)return;
     if(dayStart!=null){
-      const d=getDayNum(r[cc.tkDate]);
+      const d=getDayNum(rd);
       if(d==null||d<dayStart||d>dayEnd)return;
     }
     if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
