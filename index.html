@@ -6,6 +6,7 @@
 <title>하모니렌트카 · 판매지원팀 대시보드</title>
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
 
 
@@ -385,6 +386,53 @@ main .main-grid{width:100%;}
 .detail-memo-empty a{color:var(--primary);font-weight:700;text-decoration:none;}
 .detail-memo-empty a:hover{text-decoration:underline;}
 
+
+/* ===== 일일 리포트 ===== */
+.rp{width:840px;max-width:100%;margin:0 auto;background:#fff;border-radius:18px;padding:30px 32px 24px;box-shadow:0 8px 30px rgba(30,32,60,0.08);font-family:inherit;}
+.rp-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.rp-title{font-size:21px;font-weight:900;color:#1E2038;display:flex;align-items:center;gap:9px;}
+.rp-title span{color:#C6C9D6;font-weight:400;}
+.rp-date{background:var(--bg);border:1px solid var(--line);border-radius:10px;padding:8px 16px;font-size:14px;font-weight:800;color:#3D3F5C;}
+.rp-banner{background:#F4F6FF;border:1.5px solid #DFE4FB;border-radius:13px;padding:15px 20px;font-size:14px;font-weight:600;color:#2B2E4A;line-height:1.65;margin-bottom:16px;}
+.rp-banner b.up{color:#2563EB;}
+.rp-banner b.good{color:#10B981;}
+.rp-banner b.warn{color:#EF4444;}
+.rp-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px;}
+.rp-kpi{border:1px solid var(--line);border-radius:13px;padding:13px 12px;text-align:center;}
+.rp-kpi .l{font-size:11.5px;font-weight:700;color:#8A8FA3;margin-bottom:6px;}
+.rp-kpi .v{font-size:23px;font-weight:900;color:#1E2038;}
+.rp-kpi .v small{font-size:12px;font-weight:700;color:#8A8FA3;}
+.rp-kpi .s{font-size:10.5px;font-weight:600;color:#B4B8C9;margin-top:5px;}
+.rp-kpi .s .up{color:#10B981;} .rp-kpi .s .dn{color:#EF4444;}
+.rp-2col{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-bottom:14px;}
+.rp-3col{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:12px;margin-bottom:14px;}
+.rp-card{border:1px solid var(--line);border-radius:13px;padding:15px 17px;}
+.rp-ct{font-size:13.5px;font-weight:800;color:#2B2E4A;margin-bottom:11px;}
+.rp-ct small{font-weight:600;color:#B4B8C9;font-size:11px;margin-left:4px;}
+.rp-issue{display:flex;gap:9px;align-items:flex-start;padding:8px 0;border-bottom:1px solid #F3F4F9;font-size:12.5px;color:#3D3F5C;line-height:1.5;}
+.rp-issue:last-child{border-bottom:none;}
+.rp-issue .dot{width:7px;height:7px;border-radius:50%;background:var(--primary);flex-shrink:0;margin-top:5px;}
+.rp-baritem{display:flex;align-items:center;gap:9px;margin-bottom:8px;font-size:12.5px;}
+.rp-baritem .nm{width:64px;flex-shrink:0;font-weight:700;color:#3D3F5C;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.rp-baritem .bar{flex:1;height:14px;background:var(--bg);border-radius:7px;overflow:hidden;}
+.rp-baritem .bar i{display:block;height:100%;background:#3B82F6;border-radius:7px;}
+.rp-baritem .ct{width:34px;text-align:right;font-weight:800;color:#1E2038;flex-shrink:0;}
+.rp-medal{display:flex;align-items:center;gap:10px;padding:9px 12px;background:var(--bg);border-radius:10px;margin-bottom:8px;font-size:13px;}
+.rp-medal .nm{flex:1;font-weight:700;color:#2B2E4A;}
+.rp-medal .ct{font-weight:900;color:#1E2038;}
+.rp-prog{height:16px;background:var(--bg);border-radius:8px;overflow:hidden;margin:10px 0 8px;}
+.rp-prog i{display:block;height:100%;background:linear-gradient(90deg,#5B5FE8,#3B82F6);border-radius:8px;}
+.rp-fcrow{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;}
+.rp-fc{background:var(--bg);border-radius:11px;padding:13px 10px;text-align:center;}
+.rp-fc .l{font-size:11px;font-weight:700;color:#8A8FA3;margin-bottom:5px;}
+.rp-fc .v{font-size:20px;font-weight:900;color:#1E2038;}
+.rp-fc .v small{font-size:11px;color:#8A8FA3;}
+.rp-table{width:100%;border-collapse:collapse;font-size:13px;}
+.rp-table th{background:var(--bg);padding:9px 12px;font-weight:700;color:#8A8FA3;text-align:center;font-size:12px;}
+.rp-table td{padding:9px 12px;text-align:center;border-top:1px solid #F3F4F9;font-weight:700;color:#2B2E4A;}
+.rp-table td:first-child{font-weight:800;}
+.rp-foot{text-align:center;font-size:12.5px;color:#8A8FA3;font-weight:600;padding-top:16px;margin-top:6px;border-top:1px dashed var(--line);}
+
 </style>
 </head>
 <body>
@@ -399,6 +447,7 @@ main .main-grid{width:100%;}
     <div class="nav-label">판매</div>
     <button class="sb-item active" data-page="exec" onclick="goPage('exec')"><span>🏠</span><span>판매현황</span></button>
     <button class="sb-item" data-page="monthly" onclick="goPage('monthly')"><span>📊</span><span>기간별 비교</span></button>
+    <button class="sb-item" data-page="report" onclick="goPage('report')"><span>📋</span><span>일일 리포트</span></button>
 
     <div class="nav-label">상세 분석 (실무)</div>
     <button class="sb-item" data-page="product" onclick="goPage('product')"><span>📦</span><span>상품별 현황</span></button>
@@ -508,6 +557,15 @@ main .main-grid{width:100%;}
     </div><!-- /execPage -->
 
     <!-- ===================== 월별 비교 페이지 ===================== -->
+    <div id="reportPage" style="display:none;">
+      <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:16px;">
+        <button id="rpDownBtn" onclick="downloadReportJPG()"
+          style="background:var(--primary);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(91,95,232,0.35);">📥 JPG로 다운로드</button>
+        <span style="font-size:11.5px;color:#8A8FA3;">탁송(출고) 기준 · 오늘 데이터로 자동 생성돼요</span>
+      </div>
+      <div id="dailyReport"></div>
+    </div>
+
     <div id="monthlyPage" style="display:none;">
       <div class="ex-toprow">
         <div>
@@ -2221,6 +2279,7 @@ const exCharts={};
 const PAGE_TITLES={
   exec:['판매현황 요약','한눈에 보는 판매 실적과 주요 지표'],
   monthly:['기간별 비교','월별·주간 출고 비교와 프로모션 메모'],
+  report:['일일 리포트','매일 마감 데이터로 만드는 판매지원팀 일일 보고 (JPG 저장 가능)'],
   product:['상품별 현황','상품별 출고 상세 (실무)'],
   model:['차종별 현황','차종별 출고 상세 (실무)'],
   channel:['판매채널별 현황','채널별 출고 상세 (실무)'],
@@ -2237,16 +2296,19 @@ function goPage(p){
   const tEl=document.getElementById('pageTitle'),dEl=document.getElementById('pageDesc');
   if(tEl)tEl.textContent=t[0]; if(dEl)dEl.textContent=t[1];
   const mon=document.getElementById('monthlyPage');
-  if(p==='exec'||p==='monthly'){
+  const rep=document.getElementById('reportPage');
+  if(p==='exec'||p==='monthly'||p==='report'){
     exec.style.display=(p==='exec')?'block':'none';
     if(mon)mon.style.display=(p==='monthly')?'block':'none';
+    if(rep)rep.style.display=(p==='report')?'block':'none';
     if(mainEl)mainEl.style.display='none';
     if(pb)pb.style.display='none';
     const dmb=document.getElementById('detailMemoBox');if(dmb)dmb.style.display='none';
-    if(p==='exec')renderExec();else renderMonthly();
+    if(p==='exec')renderExec();else if(p==='monthly')renderMonthly();else renderReport();
   }else{
     exec.style.display='none';
     if(mon)mon.style.display='none';
+    if(rep)rep.style.display='none';
     if(mainEl)mainEl.style.display='block';
     if(p==='takso'){setDataMode('takso');}
     else{
@@ -3210,6 +3272,222 @@ function p1MemoHTML(months){
   </div>`;
 }
 
+/* ===================== 일일 리포트 ===================== */
+let rpCharts={};
+function renderReport(){
+  const el=document.getElementById('dailyReport');
+  if(!el)return;
+  if(!rawTable){el.innerHTML='<div style="text-align:center;color:#bbb;padding:80px;font-size:14px;">데이터 로딩 중이에요...</div>';return;}
+  const today=new Date();
+  const y=today.getFullYear(), mo=today.getMonth()+1, dd=today.getDate();
+  const ym=`${y}.${String(mo).padStart(2,'0')}`;
+  const yoil=['일','월','화','수','목','금','토'][today.getDay()];
+
+  const dayAgg=(dt)=>{
+    const a=taksoAggFor(`${dt.getFullYear()}.${String(dt.getMonth()+1).padStart(2,'0')}`,dt.getDate(),dt.getDate());
+    return a||{shin:0,re:0,used:0};
+  };
+  const tAgg=dayAgg(today);
+  const yd=new Date(today); yd.setDate(yd.getDate()-1);
+  const yAgg=dayAgg(yd);
+  const todayTotal=tAgg.shin+tAgg.re, yTotal=yAgg.shin+yAgg.re;
+  const dayDiff=todayTotal-yTotal;
+
+  const cum=taksoAggFor(ym,1,dd)||{shin:0,re:0,used:0};
+  const cumTotal=cum.shin+cum.re;
+
+  const tgt=targetsMap?targetsMap[ym]:null;
+  const tTotal=tgt?((tgt.shin||0)+(tgt.re||0)):null;
+
+  const mStart=new Date(y,mo-1,1), mEnd=new Date(y,mo,0);
+  const totalBiz=bizDays(mStart,mEnd);
+  const elapsedBiz=Math.max(bizDays(mStart,today),1);
+  const remainBiz=Math.max(bizDays(today,mEnd)-1,0);
+  const dailyTgt=tTotal?Math.ceil(tTotal/totalBiz):null;
+  const dayPct=(dailyTgt&&dailyTgt>0)?Math.round(todayTotal/dailyTgt*100):null;
+  const cumPct=tTotal?Math.round(cumTotal/tTotal*100):null;
+  const expect=Math.round(cumTotal/elapsedBiz*totalBiz);
+  const expectPct=tTotal?Math.round(expect/tTotal*100):null;
+  const needPerDay=(tTotal&&remainBiz>0)?(Math.max(tTotal-cumTotal,0)/remainBiz):null;
+
+  const unexec=(window._exUnexec&&window._exUnexec.ym===ym)?window._exUnexec.list.length:null;
+
+  // 최근 7일
+  const days=[];
+  for(let i=6;i>=0;i--){const d3=new Date(today);d3.setDate(d3.getDate()-i);days.push(d3);}
+  const dayData=days.map(d3=>({d:d3,agg:dayAgg(d3)}));
+
+  // 차종 TOP5 / 수행자 TOP3 (오늘, 차량교체 제외)
+  const cc=taksoResolveCols();
+  const carMap={},wkMap={};
+  if(cc&&rawTaksoTable){
+    const tkColsAll=rawTaksoTable.cols.map(c=>(c.label||'')+'');
+    const tCarI=tkColsAll.findIndex(c=>c.includes('차종'));
+    rawTaksoTable.rows.forEach(rw=>{
+      const r=rw.c.map(c=>c?c.v:null);
+      const rd=cc.rowDate(r);
+      if(getYM(rd)!==ym)return;
+      if(getDayNum(rd)!==dd)return;
+      if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
+      if(tCarI>=0){const cv=((r[tCarI]||'')+'').trim()||'미확인';carMap[cv]=(carMap[cv]||0)+1;}
+      if(cc.tkWk>=0){
+        const wv=(typeof mapTaksoWorker==='function')?mapTaksoWorker(r[cc.tkWk]):((r[cc.tkWk]||'')+'').trim();
+        if(wv&&wv!=='미확인')wkMap[wv]=(wkMap[wv]||0)+1;
+      }
+    });
+  }
+  const carTop=Object.entries(carMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const carMax=carTop[0]?carTop[0][1]:1;
+  const wkTop=Object.entries(wkMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const medals=['🥇','🥈','🥉'];
+
+  const issues=(issuesList||[]).filter(e=>e.ym===ym).slice(0,5);
+
+  // 요약 배너 문구
+  let banner='';
+  if(dayPct!=null){
+    if(dayPct>=100)banner+=`오늘은 일일 목표 대비 <b class="up">${dayPct}%</b> 달성하여 <b class="good">${Math.max(todayTotal-dailyTgt,0)}대 초과</b> 출고했습니다. `;
+    else banner+=`오늘은 일일 목표 대비 <b class="warn">${dayPct}%</b> 달성했습니다 (목표 ${dailyTgt}대 중 ${todayTotal}대). `;
+  }else banner+=`오늘 <b class="up">${todayTotal}대</b>를 출고했습니다. `;
+  if(dayDiff!==0)banner+=`전일 대비 ${dayDiff>0?`<b class="good">+${dayDiff}대 증가</b>`:`<b class="warn">${dayDiff}대 감소</b>`}했으며, `;
+  if(unexec!=null)banner+=`미실행(인수증 대기) <b class="warn">${unexec}건</b>이 진행 중입니다.`;
+  else banner+=`오늘도 수고 많으셨습니다.`;
+
+  el.innerHTML=`
+  <div class="rp" id="rpCapture">
+    <div class="rp-head">
+      <div class="rp-title">🚙 하모니렌트카 <span>|</span> 출고 일일 리포트</div>
+      <div class="rp-date">${y}.${String(mo).padStart(2,'0')}.${String(dd).padStart(2,'0')} (${yoil})</div>
+    </div>
+    <div class="rp-banner">📢 ${banner}</div>
+    <div class="rp-kpis">
+      <div class="rp-kpi"><div class="l">오늘 출고 🚗</div><div class="v">${todayTotal}<small>대</small></div>
+        <div class="s">${dayDiff===0?'전일과 동일':`<span class="${dayDiff>0?'up':'dn'}">${dayDiff>0?'▲':'▼'} ${Math.abs(dayDiff)}대</span> (전일 대비)`}</div></div>
+      <div class="rp-kpi"><div class="l">일일 목표 대비 🎯</div><div class="v">${dayPct!=null?dayPct+'<small>%</small>':'<small>목표 미설정</small>'}</div>
+        <div class="s">${dailyTgt?`일일 목표 ${dailyTgt}대`:'목표설정 탭 필요'}</div></div>
+      <div class="rp-kpi"><div class="l">누적 출고 (${mo}월) 📅</div><div class="v">${cumTotal.toLocaleString()}<small>대</small></div>
+        <div class="s">${cumPct!=null?`목표 ${tTotal.toLocaleString()}대 대비 <b style="color:#2563EB;">${cumPct}%</b>`:'&nbsp;'}</div></div>
+      <div class="rp-kpi"><div class="l">미실행 (대기) ⏳</div><div class="v" style="color:${unexec>0?'#EF4444':'#10B981'};">${unexec!=null?unexec:'-'}<small>건</small></div>
+        <div class="s">인수증 서명 대기</div></div>
+      <div class="rp-kpi"><div class="l">남은 영업일 🗓</div><div class="v">${remainBiz}<small>일</small></div>
+        <div class="s">목표 달성까지</div></div>
+    </div>
+    <div class="rp-2col">
+      <div class="rp-card">
+        <div class="rp-ct">일일 출고 추이 <small>최근 7일</small></div>
+        <div style="position:relative;height:215px;"><canvas id="rpTrendChart"></canvas></div>
+      </div>
+      <div class="rp-card">
+        <div class="rp-ct">이번달 주요 이슈</div>
+        ${issues.length
+          ?issues.map(e=>`<div class="rp-issue"><div class="dot"></div>${escH(e.text)}</div>`).join('')
+          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">등록된 이슈가 없어요 — 기간별 비교 페이지에서 메모를 추가하면 여기에 표시돼요</div>'}
+      </div>
+    </div>
+    <div class="rp-3col">
+      <div class="rp-card">
+        <div class="rp-ct">출고 구성 <small>오늘</small></div>
+        <div style="position:relative;height:130px;"><canvas id="rpDonutChart"></canvas></div>
+        <div style="display:flex;justify-content:center;gap:14px;margin-top:9px;font-size:12px;font-weight:700;">
+          <span style="color:#3B82F6;">● 신차 ${tAgg.shin}대</span>
+          <span style="color:#10B981;">● 재렌트 ${tAgg.re}대</span>
+        </div>
+      </div>
+      <div class="rp-card">
+        <div class="rp-ct">차종별 출고 TOP 5 <small>오늘</small></div>
+        ${carTop.length
+          ?carTop.map(([nm,ct])=>`<div class="rp-baritem"><div class="nm">${escH(nm)}</div><div class="bar"><i style="width:${Math.round(ct/carMax*100)}%"></i></div><div class="ct">${ct}대</div></div>`).join('')
+          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">오늘 출고 데이터가 없어요</div>'}
+      </div>
+      <div class="rp-card">
+        <div class="rp-ct">수행자별 출고 TOP 3 <small>오늘</small></div>
+        ${wkTop.length
+          ?wkTop.map(([nm,ct],i)=>`<div class="rp-medal"><span>${medals[i]}</span><span class="nm">${escH(nm)}</span><span class="ct">${ct}대</span></div>`).join('')
+          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">오늘 출고 데이터가 없어요</div>'}
+      </div>
+    </div>
+    <div class="rp-2col" style="grid-template-columns:1fr 1fr;">
+      <div class="rp-card">
+        <div class="rp-ct">목표 진행 현황 <small>${mo}월</small></div>
+        ${tTotal?`
+        <div style="display:flex;justify-content:space-between;font-size:12px;font-weight:700;color:#8A8FA3;"><span>0</span><span>목표 ${tTotal.toLocaleString()}대</span></div>
+        <div class="rp-prog"><i style="width:${Math.min(cumPct,100)}%"></i></div>
+        <div style="text-align:center;font-size:15px;font-weight:900;color:#2563EB;margin-bottom:8px;">${cumTotal.toLocaleString()}대 (${cumPct}%)</div>
+        <div style="background:${expect>=tTotal?'#EAF7F1':'#FDF1F1'};border-radius:10px;padding:10px 13px;font-size:12.5px;font-weight:700;color:${expect>=tTotal?'#0E8A62':'#C2410C'};">
+          ${expect>=tTotal?'👍 목표 달성 가능 페이스':'⚠ 페이스 부족'} — ${needPerDay!=null?`하루 평균 <b>${needPerDay.toFixed(1)}대</b> 출고 시 목표 달성`:(cumTotal>=tTotal?'이미 목표를 달성했어요! 🎉':'남은 영업일이 없어요')}
+        </div>`:'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">목표설정 탭에 목표를 넣으면 표시돼요</div>'}
+      </div>
+      <div class="rp-card">
+        <div class="rp-ct">예상 실적 <small>${mo}월</small></div>
+        <div class="rp-fcrow">
+          <div class="rp-fc"><div class="l">월말 예상 출고</div><div class="v">${expect.toLocaleString()}<small>대</small></div></div>
+          <div class="rp-fc"><div class="l">달성률 예상</div><div class="v" style="color:${expectPct!=null&&expectPct>=100?'#10B981':'#EF4444'};">${expectPct!=null?expectPct+'%':'-'}</div></div>
+          <div class="rp-fc"><div class="l">하루 필요 출고</div><div class="v">${needPerDay!=null?Math.ceil(needPerDay):'-'}<small>대</small></div></div>
+        </div>
+        <div style="font-size:10.5px;color:#B4B8C9;margin-top:9px;text-align:center;">현재 페이스(영업일 기준) 유지 시 추정 · 신차 ${cum.shin.toLocaleString()} / 재렌트 ${cum.re.toLocaleString()} 누적</div>
+      </div>
+    </div>
+    <div class="rp-card" style="margin-bottom:14px;">
+      <div class="rp-ct">상세 현황 <small>오늘 vs 전일</small></div>
+      <table class="rp-table">
+        <tr><th>구분</th><th>오늘 출고</th><th>전일 출고</th><th>전일 대비</th></tr>
+        <tr><td>신차</td><td>${tAgg.shin}대</td><td>${yAgg.shin}대</td><td style="color:${tAgg.shin-yAgg.shin>=0?'#10B981':'#EF4444'};">${tAgg.shin-yAgg.shin>=0?'▲':'▼'} ${Math.abs(tAgg.shin-yAgg.shin)}대</td></tr>
+        <tr><td>재렌트</td><td>${tAgg.re}대</td><td>${yAgg.re}대</td><td style="color:${tAgg.re-yAgg.re>=0?'#10B981':'#EF4444'};">${tAgg.re-yAgg.re>=0?'▲':'▼'} ${Math.abs(tAgg.re-yAgg.re)}대</td></tr>
+        <tr><td>전체</td><td>${todayTotal}대</td><td>${yTotal}대</td><td style="color:${dayDiff>=0?'#10B981':'#EF4444'};">${dayDiff>=0?'▲':'▼'} ${Math.abs(dayDiff)}대</td></tr>
+      </table>
+    </div>
+    <div class="rp-foot">💡 모두 수고 많으셨습니다! 내일도 화이팅입니다 😊 &nbsp;·&nbsp; 탁송(출고) 기준 자동 생성</div>
+  </div>`;
+
+  // 차트
+  if(rpCharts.trend)rpCharts.trend.destroy();
+  rpCharts.trend=new Chart(document.getElementById('rpTrendChart'),{
+    type:'bar',
+    data:{
+      labels:dayData.map(x=>`${x.d.getMonth()+1}/${x.d.getDate()}(${['일','월','화','수','목','금','토'][x.d.getDay()]})`),
+      datasets:[
+        {label:'신차',data:dayData.map(x=>x.agg.shin),backgroundColor:'#3B82F6',borderRadius:4,maxBarThickness:16},
+        {label:'재렌트',data:dayData.map(x=>x.agg.re),backgroundColor:'#10B981',borderRadius:4,maxBarThickness:16},
+        {label:'전체',data:dayData.map(x=>x.agg.shin+x.agg.re),backgroundColor:'#C7CAD9',borderRadius:4,maxBarThickness:16}
+      ]
+    },
+    options:{
+      animation:false,maintainAspectRatio:false,
+      plugins:{legend:{position:'top',align:'start',labels:{boxWidth:9,boxHeight:9,font:{family:"Pretendard",size:11}}}},
+      scales:{
+        y:{beginAtZero:true,grace:'12%',grid:{color:'#F0F1F7'},ticks:{font:{family:"Pretendard",size:10}}},
+        x:{grid:{display:false},ticks:{font:{family:"Pretendard",size:10}}}
+      }
+    }
+  });
+  if(rpCharts.donut)rpCharts.donut.destroy();
+  rpCharts.donut=new Chart(document.getElementById('rpDonutChart'),{
+    type:'doughnut',
+    data:{labels:['신차','재렌트'],datasets:[{data:[tAgg.shin,tAgg.re],backgroundColor:['#3B82F6','#10B981'],borderWidth:0}]},
+    options:{animation:false,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}
+  });
+}
+
+function downloadReportJPG(){
+  const el=document.getElementById('rpCapture');
+  if(!el){alert('리포트가 아직 생성되지 않았어요. 잠시 후 다시 시도해주세요.');return;}
+  if(typeof html2canvas==='undefined'){alert('이미지 라이브러리 로딩 중이에요. 잠시 후 다시 시도해주세요.');return;}
+  const btn=document.getElementById('rpDownBtn');
+  if(btn){btn.disabled=true;btn.textContent='⏳ 이미지 생성 중...';}
+  html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false}).then(cv=>{
+    const n=new Date();
+    const a=document.createElement('a');
+    a.download=`하모니_출고일일리포트_${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}.jpg`;
+    a.href=cv.toDataURL('image/jpeg',0.93);
+    a.click();
+  }).catch(e=>{
+    console.error(e);
+    alert('이미지 생성에 실패했어요. 새로고침 후 다시 시도해주세요.');
+  }).finally(()=>{
+    if(btn){btn.disabled=false;btn.textContent='📥 JPG로 다운로드';}
+  });
+}
+
 
 window.addEventListener('load', async ()=>{
   const inp=document.getElementById('baseDateInput');
@@ -3220,6 +3498,7 @@ window.addEventListener('load', async ()=>{
   try{ await loadExecExtras(); }catch(e){ console.error(e); }
   if(navPage==='exec')renderExec();
   else if(navPage==='monthly')renderMonthly();
+  else if(navPage==='report')renderReport();
 });
 
 </script>
