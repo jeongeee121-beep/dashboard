@@ -399,10 +399,10 @@ main .main-grid{width:100%;}
 .rp-banner b.warn{color:#EF4444;}
 .rp-kpis{display:grid;grid-template-columns:repeat(5,1fr);gap:11px;margin-bottom:16px;}
 .rp-kpi{border:1px solid var(--line);border-radius:13px;padding:13px 12px;text-align:center;}
-.rp-kpi .l{font-size:11.5px;font-weight:700;color:#8A8FA3;margin-bottom:6px;}
-.rp-kpi .v{font-size:23px;font-weight:900;color:#1E2038;}
-.rp-kpi .v small{font-size:12px;font-weight:700;color:#8A8FA3;}
-.rp-kpi .s{font-size:10.5px;font-weight:600;color:#B4B8C9;margin-top:5px;}
+.rp-kpi .l{font-size:14px;font-weight:700;color:#8A8FA3;margin-bottom:7px;}
+.rp-kpi .v{font-size:29px;font-weight:900;color:#1E2038;}
+.rp-kpi .v small{font-size:15px;font-weight:700;color:#8A8FA3;}
+.rp-kpi .s{font-size:13px;font-weight:700;color:#8A8FA3;margin-top:6px;line-height:1.45;}
 .rp-kpi .s .up{color:#10B981;} .rp-kpi .s .dn{color:#EF4444;}
 .rp-2col{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-bottom:14px;}
 .rp-3col{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:12px;margin-bottom:14px;}
@@ -3373,8 +3373,8 @@ function renderReport(){
         <div class="s">신차 : ${tmAgg.shin} / 재렌트 : ${tmAgg.re}</div></div>
       <div class="rp-kpi"><div class="l">당월 누적 출고 📅</div><div class="v">${cumTotal.toLocaleString()}<small>대</small></div>
         <div class="s">신차 : ${cum.shin.toLocaleString()} / 재렌트 : ${cum.re.toLocaleString()}${cumPct!=null?`<br>목표 대비 <b style="color:#2563EB;">${cumPct}%</b>`:''}</div></div>
-      <div class="rp-kpi"><div class="l">미실행 (대기) ⏳</div><div class="v" style="color:${unexec>0?'#EF4444':'#10B981'};">${unexec!=null?unexec:'-'}<small>건</small></div>
-        <div class="s">인수증 서명 대기 · 오늘 기준</div></div>
+      <div class="rp-kpi"><div class="l">미실행 ⏳</div><div class="v" style="color:${unexec>0?'#EF4444':'#10B981'};">${unexec!=null?unexec:'-'}<small>건</small></div>
+        <div class="s">인수증 서명 대기 · (당일 기준)</div></div>
       <div class="rp-kpi"><div class="l">남은 영업일 🗓</div><div class="v">${remainBiz}<small>일</small></div>
         <div class="s">목표 달성까지</div></div>
     </div>
