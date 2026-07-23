@@ -2786,6 +2786,44 @@ function getDayNum(v){
 }
 function escH(s){return (s==null?'':s).toString().replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');}
 
+function taksoResolveCols(){
+  if(typeof rawTaksoTable==='undefined'||!rawTaksoTable)return null;
+  const tkCols=rawTaksoTable.cols.map(c=>(c.label||'')+'');
+  const tkDate=(tkCols.findIndex(c=>c.includes('희망'))>=0)?tkCols.findIndex(c=>c.includes('희망')):tkCols.findIndex(c=>c.includes('요청일시'));
+  const tkType=tkCols.findIndex(c=>c.includes('신차구분'));
+  const tkAsset=tkCols.findIndex(c=>c.includes('자산번호'));
+  const tkWk=tkCols.findIndex(c=>c.includes('수행자')||c.includes('수행원'));
+  if(tkDate<0)return null;
+  return {tkDate,tkType,tkAsset,tkWk};
+}
+function isSwapWorkerVal(v){const s=((v==null?'':v)+'').trim();return !s||s.includes('특이건');}
+// 탁송데이터 기준 shin/re/중고매입 집계 (자산 중복 제거, 차량교체건 제외)
+function taksoAggFor(ym,dayStart,dayEnd){
+  const cc=taksoResolveCols();
+  if(!cc)return null;
+  let shin=0,re=0,used=0;
+  const seen=new Set();
+  rawTaksoTable.rows.forEach(rw=>{
+    const r=rw.c.map(c=>c?c.v:null);
+    if(getYM(r[cc.tkDate])!==ym)return;
+    if(dayStart!=null){
+      const d=getDayNum(r[cc.tkDate]);
+      if(d==null||d<dayStart||d>dayEnd)return;
+    }
+    if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
+    const a=(cc.tkAsset>=0?((r[cc.tkAsset]||'')+''):'').trim();
+    if(a){if(seen.has(a))return;seen.add(a);}
+    const tv=cc.tkType>=0?((r[cc.tkType]||'')+''):'';
+    const isS=tv.includes('신차'), isR=!isS&&(tv.includes('재렌트')||tv.includes('재'));
+    if(isS)shin++;
+    else if(isR){
+      re++;
+      if(a&&typeof assetBuyMap!=='undefined'&&assetBuyMap&&(assetBuyMap[a]||'').includes('중고'))used++;
+    }
+  });
+  return {shin,re,used};
+}
+
 function renderMonthly(){
   if(!rawTable)return;
   const{rows,idx}=getRows();
@@ -2802,12 +2840,30 @@ function renderMonthly(){
   const shinArr=labels.map(l=>rows.filter(r=>getYM(r[iDate])===l&&isShin(r)).length);
   const reArr=labels.map(l=>rows.filter(r=>getYM(r[iDate])===l&&isRe(r)).length);
 
+  // ---- 당월(실제 오늘 기준)만 탁송데이터로 덮어쓰기 · 월이 지나면 자동으로 실행 기준으로 복귀 ----
+  const _today=new Date();
+  const todayYM=`${_today.getFullYear()}.${String(_today.getMonth()+1).padStart(2,'0')}`;
+  let taksoOverrideUsed=false;
+  const todayIdx=labels.indexOf(todayYM);
+  if(todayIdx>=0){
+    const agg=taksoAggFor(todayYM);
+    if(agg){
+      shinArr[todayIdx]=agg.shin;
+      reArr[todayIdx]=agg.re;
+      taksoOverrideUsed=true;
+    }
+  }
+
   // 중고매입 구분 (차량 RAW DATA 매칭)
   const colLabels=rawTable.cols.map(c=>(c.label||'')+'');
   const iAsset=colLabels.findIndex(c=>c.includes('자산번호'));
   const canUsed=!!(assetBuyMap&&iAsset>=0);
   const isUsed=r=>{const a=((r[iAsset]||'')+'').trim();return (assetBuyMap[a]||'').includes('중고');};
   const reUsedArr=canUsed?labels.map(l=>rows.filter(r=>getYM(r[iDate])===l&&isRe(r)&&isUsed(r)).length):labels.map(()=>0);
+  if(taksoOverrideUsed&&canUsed&&todayIdx>=0){
+    const agg2=taksoAggFor(todayYM);
+    if(agg2)reUsedArr[todayIdx]=agg2.used;
+  }
   const reOwnArr=reArr.map((v,i)=>v-reUsedArr[i]);
 
   // ---- 월별/주간 모드 분기 ----
@@ -2844,17 +2900,25 @@ function renderMonthly(){
       dCur=dEnd+1;
     }
     chLabels=[];chShin=[];chRe=[];chUsed=[];chTitles=[];
+    const isCurMonthWeek=(ymSel===todayYM);
     weekRanges.forEach(([s,e2],w)=>{
-      const wk=rows.filter(r=>{
-        if(getYM(r[iDate])!==ymSel)return false;
-        const d=getDayNum(r[iDate]);
-        return d!=null&&d>=s&&d<=e2;
-      });
       chLabels.push((w+1)+'주차');
-      chTitles.push(`${mcMonth}월 ${w+1}주차 (${mcMonth}/${s} ~ ${mcMonth}/${e2})`);
-      chShin.push(wk.filter(isShin).length);
-      chRe.push(wk.filter(isRe).length);
-      chUsed.push(canUsed?wk.filter(r=>isRe(r)&&isUsed(r)).length:0);
+      chTitles.push(`${mcMonth}월 ${w+1}주차 (${mcMonth}/${s} ~ ${mcMonth}/${e2})`+(isCurMonthWeek?' · 탁송 기준':''));
+      if(isCurMonthWeek){
+        const agg=taksoAggFor(ymSel,s,e2)||{shin:0,re:0,used:0};
+        chShin.push(agg.shin);
+        chRe.push(agg.re);
+        chUsed.push(canUsed?agg.used:0);
+      }else{
+        const wk=rows.filter(r=>{
+          if(getYM(r[iDate])!==ymSel)return false;
+          const d=getDayNum(r[iDate]);
+          return d!=null&&d>=s&&d<=e2;
+        });
+        chShin.push(wk.filter(isShin).length);
+        chRe.push(wk.filter(isRe).length);
+        chUsed.push(canUsed?wk.filter(r=>isRe(r)&&isUsed(r)).length:0);
+      }
     });
   }else{
     if(mSel)mSel.style.display='none';
@@ -2919,9 +2983,10 @@ function renderMonthly(){
   });
   const cap=document.getElementById('mcCaption');
   if(cap){
-    cap.innerHTML=canUsed
+    const swapNote=taksoOverrideUsed?` · ${parseInt(todayYM.split('.')[1])}월(당월)은 탁송 기준, 이전 월은 실행 확정 기준`:'';
+    cap.innerHTML=(canUsed
       ?'빗금 = <b>중고매입</b> 차량 · 막대에 마우스를 올리면 자사/중고매입 대수가 표시돼요'
-      :"※ 구글시트 '차량 RAW DATA' 탭(자산번호·매입구분)이 연동되면 재렌트 막대에 중고매입 비율이 빗금으로 표시돼요";
+      :"※ 구글시트 '차량 RAW DATA' 탭(자산번호·매입구분)이 연동되면 재렌트 막대에 중고매입 비율이 빗금으로 표시돼요")+swapNote;
   }
 
   const memos=getLocalMemos();
@@ -3001,8 +3066,7 @@ function stripedPattern(base){
     g.moveTo(2,15);g.lineTo(15,2);
     g.moveTo(-8,8);g.lineTo(8,-8);
     g.stroke();
-    const ctx=document.getElementById('mcChart').getContext('2d');
-    return ctx.createPattern(p,'repeat');
+    return g.createPattern(p,'repeat');
   }catch(e){return base;}
 }
 
@@ -3076,7 +3140,7 @@ function stripedFor(canvasEl,base){
     g.moveTo(2,15);g.lineTo(15,2);
     g.moveTo(-8,8);g.lineTo(8,-8);
     g.stroke();
-    return canvasEl.getContext('2d').createPattern(p,'repeat');
+    return g.createPattern(p,'repeat');
   }catch(e){return base;}
 }
 
