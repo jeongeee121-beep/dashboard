@@ -7,7 +7,6 @@
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/static/pretendard.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <style>
-/* ===== 기존 컴포넌트 스타일 (상세 화면·팝업용) ===== */
 
 
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -546,7 +545,6 @@ main .main-grid{width:100%;}
 
 
 
-<!-- ===================== 상세 분석 (기존 화면) ===================== -->
 
 
 <!-- TOP BAR -->
@@ -736,8 +734,8 @@ main .main-grid{width:100%;}
 
 
 
-  </div><!-- /main-col -->
-</div><!-- /app -->
+  </div>
+</div>
 
 <script>
 
@@ -2214,7 +2212,7 @@ async function deleteNotice(time){
 
 
 // ===================== v10: 경영현황 =====================
-let navPage='exec', targetsMap=null, issuesList=null, exDrillKey='상품별', assetBuyMap=null, assetCarNo=null;
+let navPage='exec', targetsMap=null, issuesList=null, exDrillKey='상품별', assetBuyMap=null, assetCarNo=null, unexecExcludeMap=null;
 let holidaySet=new Set();
 // ▼▼▼ 팀 공유 메모: Apps Script 배포 URL을 아래 따옴표 안에 붙여넣으세요 ▼▼▼
 const ISSUE_URL='https://script.google.com/macros/s/AKfycbzK57bSaTVSDyMtvz9raJ8I92NncY-XNqC756elylrDzVwP9tsVWVHQBkcVlQVTs_pt/exec';
@@ -2313,8 +2311,24 @@ function parseIssuesTable(tI){
 }
 
 async function loadExecExtras(){
-  const [tT,tI,tV,tH]=await Promise.all([fetchSheetTab('목표설정'),fetchSheetTab('이슈'),fetchSheetTab('차량 RAW DATA'),fetchSheetTab('공휴일')]);
+  const [tT,tI,tV,tH,tX]=await Promise.all([fetchSheetTab('목표설정'),fetchSheetTab('이슈'),fetchSheetTab('차량 RAW DATA'),fetchSheetTab('공휴일'),fetchSheetTab('미실행제외')]);
   targetsMap=null;issuesList=null;assetBuyMap=null;
+  unexecExcludeMap=null;
+  if(tX){
+    const fA=findColFlexible(tX,'자산번호');
+    const fR=findColFlexible(tX,'사유');
+    if(fA){
+      unexecExcludeMap={};
+      const start=fA.skipFirst?1:0;
+      for(let k=start;k<tX.rows.length;k++){
+        const c=tX.rows[k].c;if(!c)continue;
+        const a=cellStr(c[fA.i]);
+        if(!a)continue;
+        unexecExcludeMap[a]=fR?cellStr(c[fR.i]):'';
+      }
+      if(!Object.keys(unexecExcludeMap).length)unexecExcludeMap=null;
+    }
+  }
   holidaySet=new Set();
   if(tH){
     const hCols=tH.cols.map(c=>((c.label||'')+'').trim());
@@ -2494,6 +2508,7 @@ function renderExec(){
           if(tWk>=0&&isSwapWk(r[tWk]))return;   // 차량교체건 제외
           const a=((r[tAsset]||'')+'').trim();
           if(!a||seen.has(a))return;
+          if(unexecExcludeMap&&Object.prototype.hasOwnProperty.call(unexecExcludeMap,a))return;   // 수동 제외 처리(차량번호 변경 등)
           seen.add(a);taksoCnt++;
           if(!execSet.has(a)){
             const tv=tType>=0?((r[tType]||'')+''):'';
@@ -3181,7 +3196,7 @@ window.addEventListener('load', async ()=>{
   const inp=document.getElementById('baseDateInput');
   const n=new Date();
   inp.value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
-  goPage('exec');   // 데이터 로딩 전에 판매현황 화면부터 표시
+  goPage('exec');
   try{ await loadAll(); }catch(e){ console.error(e); }
   try{ await loadExecExtras(); }catch(e){ console.error(e); }
   if(navPage==='exec')renderExec();
