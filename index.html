@@ -3290,6 +3290,9 @@ function renderReport(){
   const tAgg=dayAgg(today);
   const yd=new Date(today); yd.setDate(yd.getDate()-1);
   const yAgg=dayAgg(yd);
+  const tm=new Date(today); tm.setDate(tm.getDate()+1);
+  const tmAgg=dayAgg(tm);
+  const tmTotal=tmAgg.shin+tmAgg.re;
   const todayTotal=tAgg.shin+tAgg.re, yTotal=yAgg.shin+yAgg.re;
   const dayDiff=todayTotal-yTotal;
 
@@ -3312,9 +3315,16 @@ function renderReport(){
 
   const unexec=(window._exUnexec&&window._exUnexec.ym===ym)?window._exUnexec.list.length:null;
 
-  // 최근 7일
+  // 최근 7영업일 (주말·공휴일 제외)
+  const isBizDayRp=dt=>{const w=dt.getDay();return w!==0&&w!==6&&!holidaySet.has(dateKey(dt));};
   const days=[];
-  for(let i=6;i>=0;i--){const d3=new Date(today);d3.setDate(d3.getDate()-i);days.push(d3);}
+  const dcur=new Date(today);
+  let guard=0;
+  while(days.length<7&&guard<40){
+    if(isBizDayRp(dcur))days.unshift(new Date(dcur));
+    dcur.setDate(dcur.getDate()-1);
+    guard++;
+  }
   const dayData=days.map(d3=>({d:d3,agg:dayAgg(d3)}));
 
   // 차종 TOP5 / 수행자 TOP3 (오늘, 차량교체 제외)
@@ -3344,11 +3354,7 @@ function renderReport(){
   const issues=(issuesList||[]).filter(e=>e.ym===ym).slice(0,5);
 
   // 요약 배너 문구
-  let banner='';
-  if(dayPct!=null){
-    if(dayPct>=100)banner+=`오늘은 일일 목표 대비 <b class="up">${dayPct}%</b> 달성하여 <b class="good">${Math.max(todayTotal-dailyTgt,0)}대 초과</b> 출고했습니다. `;
-    else banner+=`오늘은 일일 목표 대비 <b class="warn">${dayPct}%</b> 달성했습니다 (목표 ${dailyTgt}대 중 ${todayTotal}대). `;
-  }else banner+=`오늘 <b class="up">${todayTotal}대</b>를 출고했습니다. `;
+  let banner=`오늘은 <b class="up">${todayTotal}대</b> (신차 ${tAgg.shin} · 재렌트 ${tAgg.re})를 출고했습니다. `;
   if(dayDiff!==0)banner+=`전일 대비 ${dayDiff>0?`<b class="good">+${dayDiff}대 증가</b>`:`<b class="warn">${dayDiff}대 감소</b>`}했으며, `;
   if(unexec!=null)banner+=`미실행(인수증 대기) <b class="warn">${unexec}건</b>이 진행 중입니다.`;
   else banner+=`오늘도 수고 많으셨습니다.`;
@@ -3356,25 +3362,25 @@ function renderReport(){
   el.innerHTML=`
   <div class="rp" id="rpCapture">
     <div class="rp-head">
-      <div class="rp-title">🚙 하모니렌트카 <span>|</span> 출고 일일 리포트</div>
+      <div class="rp-title">🚙 판매지원팀 <span>|</span> 출고 일일 보고</div>
       <div class="rp-date">${y}.${String(mo).padStart(2,'0')}.${String(dd).padStart(2,'0')} (${yoil})</div>
     </div>
     <div class="rp-banner">📢 ${banner}</div>
     <div class="rp-kpis">
-      <div class="rp-kpi"><div class="l">오늘 출고 🚗</div><div class="v">${todayTotal}<small>대</small></div>
-        <div class="s">${dayDiff===0?'전일과 동일':`<span class="${dayDiff>0?'up':'dn'}">${dayDiff>0?'▲':'▼'} ${Math.abs(dayDiff)}대</span> (전일 대비)`}</div></div>
-      <div class="rp-kpi"><div class="l">일일 목표 대비 🎯</div><div class="v">${dayPct!=null?dayPct+'<small>%</small>':'<small>목표 미설정</small>'}</div>
-        <div class="s">${dailyTgt?`일일 목표 ${dailyTgt}대`:'목표설정 탭 필요'}</div></div>
-      <div class="rp-kpi"><div class="l">누적 출고 (${mo}월) 📅</div><div class="v">${cumTotal.toLocaleString()}<small>대</small></div>
-        <div class="s">${cumPct!=null?`목표 ${tTotal.toLocaleString()}대 대비 <b style="color:#2563EB;">${cumPct}%</b>`:'&nbsp;'}</div></div>
+      <div class="rp-kpi"><div class="l">당일 출고 🚗</div><div class="v">${todayTotal}<small>대</small></div>
+        <div class="s">신차 : ${tAgg.shin} / 재렌트 : ${tAgg.re}</div></div>
+      <div class="rp-kpi"><div class="l">익일 출고 📆</div><div class="v">${tmTotal}<small>대</small></div>
+        <div class="s">신차 : ${tmAgg.shin} / 재렌트 : ${tmAgg.re}</div></div>
+      <div class="rp-kpi"><div class="l">당월 누적 출고 📅</div><div class="v">${cumTotal.toLocaleString()}<small>대</small></div>
+        <div class="s">신차 : ${cum.shin.toLocaleString()} / 재렌트 : ${cum.re.toLocaleString()}${cumPct!=null?`<br>목표 대비 <b style="color:#2563EB;">${cumPct}%</b>`:''}</div></div>
       <div class="rp-kpi"><div class="l">미실행 (대기) ⏳</div><div class="v" style="color:${unexec>0?'#EF4444':'#10B981'};">${unexec!=null?unexec:'-'}<small>건</small></div>
-        <div class="s">인수증 서명 대기</div></div>
+        <div class="s">인수증 서명 대기 · 오늘 기준</div></div>
       <div class="rp-kpi"><div class="l">남은 영업일 🗓</div><div class="v">${remainBiz}<small>일</small></div>
         <div class="s">목표 달성까지</div></div>
     </div>
     <div class="rp-2col">
       <div class="rp-card">
-        <div class="rp-ct">일일 출고 추이 <small>최근 7일</small></div>
+        <div class="rp-ct">일일 출고 추이 <small>최근 7영업일 · 주말/공휴일 제외</small></div>
         <div style="position:relative;height:215px;"><canvas id="rpTrendChart"></canvas></div>
       </div>
       <div class="rp-card">
@@ -3441,6 +3447,17 @@ function renderReport(){
 
   // 차트
   if(rpCharts.trend)rpCharts.trend.destroy();
+  const rpTotals=dayData.map(x=>x.agg.shin+x.agg.re);
+  const rpCntPlugin={id:'rpCnt',afterDatasetsDraw(chart){
+    try{
+      const ctx=chart.ctx;
+      const meta=chart.getDatasetMeta(2);   // 전체 막대만
+      ctx.save();
+      ctx.font='800 11px Pretendard';ctx.fillStyle='#5A5F73';ctx.textAlign='center';
+      meta.data.forEach((bar,i)=>{if(rpTotals[i])ctx.fillText(rpTotals[i].toLocaleString(),bar.x,bar.y-5);});
+      ctx.restore();
+    }catch(e){}
+  }};
   rpCharts.trend=new Chart(document.getElementById('rpTrendChart'),{
     type:'bar',
     data:{
@@ -3448,14 +3465,15 @@ function renderReport(){
       datasets:[
         {label:'신차',data:dayData.map(x=>x.agg.shin),backgroundColor:'#3B82F6',borderRadius:4,maxBarThickness:16},
         {label:'재렌트',data:dayData.map(x=>x.agg.re),backgroundColor:'#10B981',borderRadius:4,maxBarThickness:16},
-        {label:'전체',data:dayData.map(x=>x.agg.shin+x.agg.re),backgroundColor:'#C7CAD9',borderRadius:4,maxBarThickness:16}
+        {label:'전체',data:rpTotals,backgroundColor:'#C7CAD9',borderRadius:4,maxBarThickness:16}
       ]
     },
+    plugins:[rpCntPlugin],
     options:{
       animation:false,maintainAspectRatio:false,
       plugins:{legend:{position:'top',align:'start',labels:{boxWidth:9,boxHeight:9,font:{family:"Pretendard",size:11}}}},
       scales:{
-        y:{beginAtZero:true,grace:'12%',grid:{color:'#F0F1F7'},ticks:{font:{family:"Pretendard",size:10}}},
+        y:{beginAtZero:true,grace:'14%',grid:{color:'#F0F1F7'},ticks:{font:{family:"Pretendard",size:10}}},
         x:{grid:{display:false},ticks:{font:{family:"Pretendard",size:10}}}
       }
     }
