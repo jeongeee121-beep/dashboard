@@ -405,7 +405,7 @@ main .main-grid{width:100%;}
 .rp-kpi .s{font-size:13px;font-weight:700;color:#8A8FA3;margin-top:6px;line-height:1.45;word-break:keep-all;}
 .rp-kpi .s .up{color:#10B981;} .rp-kpi .s .dn{color:#EF4444;}
 .rp-2col{display:grid;grid-template-columns:1.35fr 1fr;gap:12px;margin-bottom:14px;}
-.rp-3col{display:grid;grid-template-columns:1fr 1.1fr 1fr;gap:12px;margin-bottom:14px;}
+.rp-3col{display:grid;grid-template-columns:1fr 1.15fr 1fr;gap:14px;margin-bottom:14px;}
 .rp-card{border:1px solid var(--line);border-radius:13px;padding:15px 17px;}
 .rp-ct{font-size:13.5px;font-weight:800;color:#2B2E4A;margin-bottom:11px;}
 .rp-ct small{font-weight:600;color:#B4B8C9;font-size:11px;margin-left:4px;}
@@ -3344,8 +3344,13 @@ function renderReport(){
       const isS=tv.includes('신차');
       if(tCarI>=0){
         const cv=((r[tCarI]||'')+'').trim()||'미확인';
-        if(!carMap[cv])carMap[cv]={shin:0,re:0};
-        if(isS)carMap[cv].shin++; else carMap[cv].re++;
+        if(!carMap[cv])carMap[cv]={shin:0,re:0,used:0};
+        if(isS)carMap[cv].shin++;
+        else{
+          carMap[cv].re++;
+          const av=(cc.tkAsset>=0?((r[cc.tkAsset]||'')+''):'').trim();
+          if(av&&typeof assetBuyMap!=='undefined'&&assetBuyMap&&(assetBuyMap[av]||'').includes('중고'))carMap[cv].used++;
+        }
       }
       if(tProdI>=0){
         const pv=((r[tProdI]||'')+'').trim()||'미확인';
@@ -3357,7 +3362,7 @@ function renderReport(){
       }
     });
   }
-  const carTop=Object.entries(carMap).map(([nm,v])=>[nm,v.shin+v.re,v.shin,v.re]).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const carTop=Object.entries(carMap).map(([nm,v])=>[nm,v.shin+v.re,v.shin,v.re,v.used||0]).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const carMax=carTop[0]?carTop[0][1]:1;
   const prodTop=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]);
   const prodColors=['#5B5FE8','#10B981','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#14B8A6','#F97316'];
@@ -3367,10 +3372,10 @@ function renderReport(){
   const issues=(issuesList||[]).filter(e=>e.ym===ym).slice(0,5);
 
   // 요약 배너 문구
-  let banner=`오늘은 <b class="up">${todayTotal}대</b> (신차 ${tAgg.shin} · 재렌트 ${tAgg.re})를 출고했습니다. `;
+  let banner=`당일은 <b class="up">${todayTotal}대</b> (신차 ${tAgg.shin} · 재렌트 ${tAgg.re})를 출고했습니다. `;
   if(dayDiff!==0)banner+=`전일 대비 ${dayDiff>0?`<b class="good">+${dayDiff}대 증가</b>`:`<b class="warn">${dayDiff}대 감소</b>`}했으며, `;
   if(unexec!=null)banner+=`미실행(인수증 대기) <b class="warn">${unexec}건</b>이 진행 중입니다.`;
-  else banner+=`오늘도 수고 많으셨습니다.`;
+  else banner+=`당일도 수고 많으셨습니다.`;
 
   el.innerHTML=`
   <div class="rp" id="rpCapture">
@@ -3405,23 +3410,38 @@ function renderReport(){
     </div>
     <div class="rp-3col">
       <div class="rp-card">
-        <div class="rp-ct">출고 구성 <small>상품별 · 오늘</small></div>
+        <div class="rp-ct">출고 구성 <small>상품별 · 당일</small></div>
         <div style="position:relative;height:130px;"><canvas id="rpDonutChart"></canvas></div>
         <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px;margin-top:9px;font-size:11.5px;font-weight:700;">
-          ${prodTop.length?prodTop.map(([nm,ct],i)=>`<span style="color:${prodColors[i%prodColors.length]};">● ${escH(nm)} ${ct}대</span>`).join(''):'<span style="color:#C6C9D6;font-weight:600;">오늘 출고 데이터가 없어요</span>'}
+          ${prodTop.length?prodTop.map(([nm,ct],i)=>`<span style="color:${prodColors[i%prodColors.length]};">● ${escH(nm)} ${ct}대</span>`).join(''):'<span style="color:#C6C9D6;font-weight:600;">당일 출고 데이터가 없어요</span>'}
         </div>
       </div>
-      <div class="rp-card">
-        <div class="rp-ct">차종별 출고 TOP 5 <small>오늘 · <span style="color:#3B82F6;">■신차</span> <span style="color:#10B981;">■재렌트</span></small></div>
+      <div class="rp-card" style="padding:17px 19px;">
+        <div class="rp-ct" style="margin-bottom:4px;">차종별 출고 TOP 5 <small>당일</small></div>
+        <div style="display:flex;gap:12px;align-items:center;margin-bottom:13px;font-size:11px;font-weight:700;color:#8A8FA3;">
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#3B82F6;margin-right:4px;vertical-align:-1px;"></span>신차</span>
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:#10B981;margin-right:4px;vertical-align:-1px;"></span>재렌트</span>
+          <span><span style="display:inline-block;width:9px;height:9px;border-radius:2px;background:repeating-linear-gradient(45deg,#10B981,#10B981 2px,#eafbf3 2px,#eafbf3 4px);margin-right:4px;vertical-align:-1px;border:1px solid #10B981;"></span>중고매입</span>
+        </div>
         ${carTop.length
-          ?carTop.map(([nm,ct,shinCt,reCt])=>`<div class="rp-baritem"><div class="nm">${escH(nm)}</div><div class="bar" style="display:flex;">${shinCt?`<i style="width:${Math.round(shinCt/carMax*100)}%;background:#3B82F6;border-radius:${reCt?'7px 0 0 7px':'7px'};"></i>`:''}${reCt?`<i style="width:${Math.round(reCt/carMax*100)}%;background:#10B981;border-radius:${shinCt?'0 7px 7px 0':'7px'};"></i>`:''}</div><div class="ct">${ct}대</div></div>`).join('')
-          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">오늘 출고 데이터가 없어요</div>'}
+          ?carTop.map(([nm,ct,shinCt,reCt,usedCt])=>{
+            const ownCt=reCt-usedCt;
+            const wShin=Math.round(shinCt/carMax*100);
+            const wOwn=Math.round(ownCt/carMax*100);
+            const wUsed=Math.round(usedCt/carMax*100);
+            const segs=[];
+            if(shinCt)segs.push(`<i style="width:${wShin}%;background:#3B82F6;"></i>`);
+            if(ownCt)segs.push(`<i style="width:${wOwn}%;background:#10B981;"></i>`);
+            if(usedCt)segs.push(`<i style="width:${wUsed}%;background:repeating-linear-gradient(45deg,#10B981,#10B981 3px,#eafbf3 3px,#eafbf3 6px);"></i>`);
+            return `<div class="rp-baritem" style="margin-bottom:11px;"><div class="nm">${escH(nm)}</div><div class="bar" style="display:flex;overflow:hidden;">${segs.join('')}</div><div class="ct">${ct}대</div></div>`;
+          }).join('')
+          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">당일 출고 데이터가 없어요</div>'}
       </div>
       <div class="rp-card">
-        <div class="rp-ct">수행자별 출고 TOP 3 <small>오늘</small></div>
+        <div class="rp-ct">수행자별 출고 TOP 3 <small>당일</small></div>
         ${wkTop.length
           ?wkTop.map(([nm,ct],i)=>`<div class="rp-medal"><span>${medals[i]}</span><span class="nm">${escH(nm)}</span><span class="ct">${ct}대</span></div>`).join('')
-          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">오늘 출고 데이터가 없어요</div>'}
+          :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">당일 출고 데이터가 없어요</div>'}
       </div>
     </div>
     <div class="rp-2col" style="grid-template-columns:1fr 1fr;">
@@ -3446,9 +3466,9 @@ function renderReport(){
       </div>
     </div>
     <div class="rp-card" style="margin-bottom:14px;">
-      <div class="rp-ct">상세 현황 <small>오늘 vs 전일</small></div>
+      <div class="rp-ct">상세 현황 <small>당일 vs 전일</small></div>
       <table class="rp-table">
-        <tr><th>구분</th><th>오늘 출고</th><th>전일 출고</th><th>전일 대비</th></tr>
+        <tr><th>구분</th><th>당일 출고</th><th>전일 출고</th><th>전일 대비</th></tr>
         <tr><td>신차</td><td>${tAgg.shin}대</td><td>${yAgg.shin}대</td><td style="color:${tAgg.shin-yAgg.shin>=0?'#10B981':'#EF4444'};">${tAgg.shin-yAgg.shin>=0?'▲':'▼'} ${Math.abs(tAgg.shin-yAgg.shin)}대</td></tr>
         <tr><td>재렌트</td><td>${tAgg.re}대</td><td>${yAgg.re}대</td><td style="color:${tAgg.re-yAgg.re>=0?'#10B981':'#EF4444'};">${tAgg.re-yAgg.re>=0?'▲':'▼'} ${Math.abs(tAgg.re-yAgg.re)}대</td></tr>
         <tr><td>전체</td><td>${todayTotal}대</td><td>${yTotal}대</td><td style="color:${dayDiff>=0?'#10B981':'#EF4444'};">${dayDiff>=0?'▲':'▼'} ${Math.abs(dayDiff)}대</td></tr>
