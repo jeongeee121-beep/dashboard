@@ -3466,8 +3466,10 @@ function renderReport(){
   const todayTotal=tAgg.shin+tAgg.re, yTotal=yAgg.shin+yAgg.re;
   const dayDiff=todayTotal-yTotal;
 
-  const cum=taksoAggFor(ym,1,dd)||{shin:0,re:0,used:0};
+  const cum=taksoAggFor(ym,null,null)||{shin:0,re:0,used:0};   // 당월 전체(탁송데이터 기준, 기준일 컷 없음) — KPI 카드 표시용
   const cumTotal=cum.shin+cum.re;
+  const cumCut=taksoAggFor(ym,1,dd)||{shin:0,re:0,used:0};     // 기준일까지만 — 페이스 계산(예상실적)용
+  const cumCutTotal=cumCut.shin+cumCut.re;
 
   const tgt=targetsMap?targetsMap[ym]:null;
   const tTotal=tgt?((tgt.shin||0)+(tgt.re||0)):null;
@@ -3479,9 +3481,9 @@ function renderReport(){
   const dailyTgt=tTotal?Math.ceil(tTotal/totalBiz):null;
   const dayPct=(dailyTgt&&dailyTgt>0)?Math.round(todayTotal/dailyTgt*100):null;
   const cumPct=tTotal?Math.round(cumTotal/tTotal*100):null;
-  const expect=Math.round(cumTotal/elapsedBiz*totalBiz);
+  const expect=Math.round(cumCutTotal/elapsedBiz*totalBiz);
   const expectPct=tTotal?Math.round(expect/tTotal*100):null;
-  const needPerDay=(tTotal&&remainBiz>0)?(Math.max(tTotal-cumTotal,0)/remainBiz):null;
+  const needPerDay=(tTotal&&remainBiz>0)?(Math.max(tTotal-cumCutTotal,0)/remainBiz):null;
 
   let unexec=(window._exUnexec&&window._exUnexec.ym===ym&&window._exUnexec.day===dd)?window._exUnexec.list.length:null;
   if(unexec===null){
