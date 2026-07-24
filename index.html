@@ -397,7 +397,7 @@ main .main-grid{width:100%;}
 .rp-banner b.up{color:#2563EB;}
 .rp-banner b.good{color:#10B981;}
 .rp-banner b.warn{color:#EF4444;}
-.rp-kpis{display:grid;grid-template-columns:1fr 1fr 1.3fr 1.3fr 1fr;gap:11px;margin-bottom:16px;}
+.rp-kpis{display:grid;grid-template-columns:1.15fr 1fr 1.3fr 1.3fr 1fr;gap:11px;margin-bottom:16px;}
 .rp-kpi{border:1px solid var(--line);border-radius:13px;padding:13px 12px;text-align:center;word-break:keep-all;}
 .rp-kpi .l{font-size:14px;font-weight:700;color:#8A8FA3;margin-bottom:7px;}
 .rp-kpi .v{font-size:29px;font-weight:900;color:#1E2038;}
@@ -3327,27 +3327,40 @@ function renderReport(){
   }
   const dayData=days.map(d3=>({d:d3,agg:dayAgg(d3)}));
 
-  // 차종 TOP5 / 수행자 TOP3 (오늘, 차량교체 제외)
+  // 차종 TOP5(신차/재렌트 분리) · 상품별 구성 · 수행자 TOP3 (오늘, 차량교체 제외)
   const cc=taksoResolveCols();
-  const carMap={},wkMap={};
+  const carMap={},wkMap={},prodMap={};
   if(cc&&rawTaksoTable){
     const tkColsAll=rawTaksoTable.cols.map(c=>(c.label||'')+'');
     const tCarI=tkColsAll.findIndex(c=>c.includes('차종'));
+    const tProdI=tkColsAll.findIndex(c=>c.includes('상품명'));
     rawTaksoTable.rows.forEach(rw=>{
       const r=rw.c.map(c=>c?c.v:null);
       const rd=cc.rowDate(r);
       if(getYM(rd)!==ym)return;
       if(getDayNum(rd)!==dd)return;
       if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
-      if(tCarI>=0){const cv=((r[tCarI]||'')+'').trim()||'미확인';carMap[cv]=(carMap[cv]||0)+1;}
+      const tv=cc.tkType>=0?((r[cc.tkType]||'')+''):'';
+      const isS=tv.includes('신차');
+      if(tCarI>=0){
+        const cv=((r[tCarI]||'')+'').trim()||'미확인';
+        if(!carMap[cv])carMap[cv]={shin:0,re:0};
+        if(isS)carMap[cv].shin++; else carMap[cv].re++;
+      }
+      if(tProdI>=0){
+        const pv=((r[tProdI]||'')+'').trim()||'미확인';
+        prodMap[pv]=(prodMap[pv]||0)+1;
+      }
       if(cc.tkWk>=0){
         const wv=(typeof mapTaksoWorker==='function')?mapTaksoWorker(r[cc.tkWk]):((r[cc.tkWk]||'')+'').trim();
         if(wv&&wv!=='미확인')wkMap[wv]=(wkMap[wv]||0)+1;
       }
     });
   }
-  const carTop=Object.entries(carMap).sort((a,b)=>b[1]-a[1]).slice(0,5);
+  const carTop=Object.entries(carMap).map(([nm,v])=>[nm,v.shin+v.re,v.shin,v.re]).sort((a,b)=>b[1]-a[1]).slice(0,5);
   const carMax=carTop[0]?carTop[0][1]:1;
+  const prodTop=Object.entries(prodMap).sort((a,b)=>b[1]-a[1]);
+  const prodColors=['#5B5FE8','#10B981','#3B82F6','#F59E0B','#EF4444','#8B5CF6','#14B8A6','#F97316'];
   const wkTop=Object.entries(wkMap).sort((a,b)=>b[1]-a[1]).slice(0,3);
   const medals=['🥇','🥈','🥉'];
 
@@ -3362,21 +3375,21 @@ function renderReport(){
   el.innerHTML=`
   <div class="rp" id="rpCapture">
     <div class="rp-head">
-      <div class="rp-title">🚙 판매지원팀 <span>|</span> 출고 일일 보고</div>
+      <div class="rp-title">🚙 판매지원팀 <span>|</span> 일일 보고</div>
       <div class="rp-date">${y}.${String(mo).padStart(2,'0')}.${String(dd).padStart(2,'0')} (${yoil})</div>
     </div>
     <div class="rp-banner">📢 ${banner}</div>
     <div class="rp-kpis">
       <div class="rp-kpi"><div class="l">당일 출고 🚗</div><div class="v">${todayTotal}<small>대</small></div>
-        <div class="s">신차 : ${tAgg.shin} / 재렌트 : ${tAgg.re}</div></div>
+        <div class="s" style="white-space:nowrap;font-size:12px;">신차 : ${tAgg.shin} / 재렌트 : ${tAgg.re}</div></div>
       <div class="rp-kpi"><div class="l">익일 출고 📆</div><div class="v">${tmTotal}<small>대</small></div>
         <div class="s">신차 : ${tmAgg.shin} / 재렌트 : ${tmAgg.re}</div></div>
       <div class="rp-kpi"><div class="l">당월 누적 출고 📅</div><div class="v">${cumTotal.toLocaleString()}<small>대</small></div>
         <div class="s">신차 : ${cum.shin.toLocaleString()} / 재렌트 : ${cum.re.toLocaleString()}${cumPct!=null?`<br>목표 대비 <b style="color:#2563EB;">${cumPct}%</b>`:''}</div></div>
       <div class="rp-kpi"><div class="l">미실행 ⏳</div><div class="v" style="color:${unexec>0?'#EF4444':'#10B981'};">${unexec!=null?unexec:'-'}<small>건</small></div>
-        <div class="s">인수증 서명 대기 · (당일 기준)</div></div>
+        <div class="s">인수증 서명 대기</div></div>
       <div class="rp-kpi"><div class="l">남은 영업일 🗓</div><div class="v">${remainBiz}<small>일</small></div>
-        <div class="s">목표 달성까지</div></div>
+        </div>
     </div>
     <div class="rp-2col">
       <div class="rp-card">
@@ -3392,17 +3405,16 @@ function renderReport(){
     </div>
     <div class="rp-3col">
       <div class="rp-card">
-        <div class="rp-ct">출고 구성 <small>오늘</small></div>
+        <div class="rp-ct">출고 구성 <small>상품별 · 오늘</small></div>
         <div style="position:relative;height:130px;"><canvas id="rpDonutChart"></canvas></div>
-        <div style="display:flex;justify-content:center;gap:14px;margin-top:9px;font-size:12px;font-weight:700;">
-          <span style="color:#3B82F6;">● 신차 ${tAgg.shin}대</span>
-          <span style="color:#10B981;">● 재렌트 ${tAgg.re}대</span>
+        <div style="display:flex;flex-wrap:wrap;justify-content:center;gap:8px 12px;margin-top:9px;font-size:11.5px;font-weight:700;">
+          ${prodTop.length?prodTop.map(([nm,ct],i)=>`<span style="color:${prodColors[i%prodColors.length]};">● ${escH(nm)} ${ct}대</span>`).join(''):'<span style="color:#C6C9D6;font-weight:600;">오늘 출고 데이터가 없어요</span>'}
         </div>
       </div>
       <div class="rp-card">
-        <div class="rp-ct">차종별 출고 TOP 5 <small>오늘</small></div>
+        <div class="rp-ct">차종별 출고 TOP 5 <small>오늘 · <span style="color:#3B82F6;">■신차</span> <span style="color:#10B981;">■재렌트</span></small></div>
         ${carTop.length
-          ?carTop.map(([nm,ct])=>`<div class="rp-baritem"><div class="nm">${escH(nm)}</div><div class="bar"><i style="width:${Math.round(ct/carMax*100)}%"></i></div><div class="ct">${ct}대</div></div>`).join('')
+          ?carTop.map(([nm,ct,shinCt,reCt])=>`<div class="rp-baritem"><div class="nm">${escH(nm)}</div><div class="bar" style="display:flex;">${shinCt?`<i style="width:${Math.round(shinCt/carMax*100)}%;background:#3B82F6;border-radius:${reCt?'7px 0 0 7px':'7px'};"></i>`:''}${reCt?`<i style="width:${Math.round(reCt/carMax*100)}%;background:#10B981;border-radius:${shinCt?'0 7px 7px 0':'7px'};"></i>`:''}</div><div class="ct">${ct}대</div></div>`).join('')
           :'<div style="font-size:12px;color:#C6C9D6;padding:14px 0;">오늘 출고 데이터가 없어요</div>'}
       </div>
       <div class="rp-card">
@@ -3481,7 +3493,7 @@ function renderReport(){
   if(rpCharts.donut)rpCharts.donut.destroy();
   rpCharts.donut=new Chart(document.getElementById('rpDonutChart'),{
     type:'doughnut',
-    data:{labels:['신차','재렌트'],datasets:[{data:[tAgg.shin,tAgg.re],backgroundColor:['#3B82F6','#10B981'],borderWidth:0}]},
+    data:{labels:prodTop.map(x=>x[0]),datasets:[{data:prodTop.map(x=>x[1]),backgroundColor:prodTop.map((x,i)=>prodColors[i%prodColors.length]),borderWidth:0}]},
     options:{animation:false,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:false}}}
   });
 }
