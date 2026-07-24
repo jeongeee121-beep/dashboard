@@ -558,10 +558,15 @@ main .main-grid{width:100%;}
 
     <!-- ===================== 월별 비교 페이지 ===================== -->
     <div id="reportPage" style="display:none;">
-      <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:16px;">
+      <div style="display:flex;justify-content:center;align-items:center;gap:14px;margin-bottom:16px;flex-wrap:wrap;">
+        <div style="display:flex;align-items:center;gap:8px;background:var(--bg);border:1px solid var(--line);border-radius:11px;padding:7px 14px;">
+          <span style="font-size:12.5px;font-weight:700;color:#8A8FA3;">📅 기준일</span>
+          <input type="date" id="rpDateInput" onchange="renderReport()"
+            style="border:none;background:transparent;font-family:inherit;font-size:13px;font-weight:800;color:#2B2E4A;outline:none;cursor:pointer;">
+        </div>
         <button id="rpDownBtn" onclick="downloadReportJPG()"
           style="background:var(--primary);color:#fff;border:none;border-radius:11px;padding:11px 22px;font-family:inherit;font-size:13.5px;font-weight:800;cursor:pointer;box-shadow:0 4px 14px rgba(91,95,232,0.35);">📥 JPG로 다운로드</button>
-        <span style="font-size:11.5px;color:#8A8FA3;">탁송(출고) 기준 · 오늘 데이터로 자동 생성돼요</span>
+        <span style="font-size:11.5px;color:#8A8FA3;">탁송(출고) 기준 · 선택한 날짜로 리포트가 다시 만들어져요</span>
       </div>
       <div id="dailyReport"></div>
     </div>
@@ -2599,7 +2604,7 @@ function renderExec(){
           });
         });
         list.sort((x,y)=>(x.day||99)-(y.day||99));
-        window._exUnexec={list,takso:taksoCnt,ym:baseYM};
+        window._exUnexec={list,takso:taksoCnt,ym:baseYM,day:baseDay};
         unexAvail=true;
         const n=list.length;
         unexecHtml=`
@@ -3278,7 +3283,12 @@ function renderReport(){
   const el=document.getElementById('dailyReport');
   if(!el)return;
   if(!rawTable){el.innerHTML='<div style="text-align:center;color:#bbb;padding:80px;font-size:14px;">데이터 로딩 중이에요...</div>';return;}
-  const today=new Date();
+  const rpInp=document.getElementById('rpDateInput');
+  const realToday=new Date();
+  if(rpInp&&!rpInp.value){
+    rpInp.value=`${realToday.getFullYear()}-${String(realToday.getMonth()+1).padStart(2,'0')}-${String(realToday.getDate()).padStart(2,'0')}`;
+  }
+  const today=(rpInp&&rpInp.value)?new Date(rpInp.value+'T00:00:00'):realToday;
   const y=today.getFullYear(), mo=today.getMonth()+1, dd=today.getDate();
   const ym=`${y}.${String(mo).padStart(2,'0')}`;
   const yoil=['일','월','화','수','목','금','토'][today.getDay()];
@@ -3313,7 +3323,17 @@ function renderReport(){
   const expectPct=tTotal?Math.round(expect/tTotal*100):null;
   const needPerDay=(tTotal&&remainBiz>0)?(Math.max(tTotal-cumTotal,0)/remainBiz):null;
 
-  const unexec=(window._exUnexec&&window._exUnexec.ym===ym)?window._exUnexec.list.length:null;
+  let unexec=(window._exUnexec&&window._exUnexec.ym===ym&&window._exUnexec.day===dd)?window._exUnexec.list.length:null;
+  if(unexec===null){
+    const baseInp=document.getElementById('baseDateInput');
+    const prevBaseVal=baseInp?baseInp.value:null;
+    try{
+      if(baseInp)baseInp.value=`${y}-${String(mo).padStart(2,'0')}-${String(dd).padStart(2,'0')}`;
+      renderExec();
+      if(window._exUnexec&&window._exUnexec.ym===ym)unexec=window._exUnexec.list.length;
+    }catch(e){console.error('리포트 미실행 계산 오류',e);}
+    finally{ if(baseInp&&prevBaseVal!=null)baseInp.value=prevBaseVal; }
+  }
 
   // 최근 7영업일 (주말·공휴일 제외)
   const isBizDayRp=dt=>{const w=dt.getDay();return w!==0&&w!==6&&!holidaySet.has(dateKey(dt));};
