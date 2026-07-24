@@ -3713,6 +3713,20 @@ function downloadReportJPG(){
   if(typeof html2canvas==='undefined'){alert('이미지 라이브러리 로딩 중이에요. 잠시 후 다시 시도해주세요.');return;}
   const btn=document.getElementById('rpDownBtn');
   if(btn){btn.disabled=true;btn.textContent='⏳ 이미지 생성 중...';}
+
+  // html2canvas는 <input>의 값을 캔버스에 정확히 그리지 못하는 경우가 있어서(베이스라인이 위로 밀림),
+  // 캡처 직전에만 입력창을 일반 텍스트로 잠깐 바꿔치기하고, 캡처 끝나면 원래 입력창으로 복원한다.
+  const appInput=document.getElementById('rpAppInput');
+  let appStand=null;
+  if(appInput){
+    appStand=document.createElement('div');
+    appStand.id='rpAppStandin';
+    appStand.textContent=appInput.value || '0';
+    appStand.style.cssText='width:52px;text-align:right;font-family:inherit;font-size:29px;font-weight:900;color:#C2410C;line-height:1;';
+    appInput.style.display='none';
+    appInput.insertAdjacentElement('afterend', appStand);
+  }
+
   html2canvas(el,{scale:2,backgroundColor:'#ffffff',useCORS:true,logging:false}).then(cv=>{
     const n=new Date();
     const a=document.createElement('a');
@@ -3724,6 +3738,8 @@ function downloadReportJPG(){
     alert('이미지 생성에 실패했어요. 새로고침 후 다시 시도해주세요.');
   }).finally(()=>{
     if(btn){btn.disabled=false;btn.textContent='📥 JPG로 다운로드';}
+    if(appStand)appStand.remove();
+    if(appInput)appInput.style.display='';
   });
 }
 
