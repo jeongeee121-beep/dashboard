@@ -3504,7 +3504,7 @@ function renderReport(){
     finally{ if(baseInp&&prevBaseVal!=null)baseInp.value=prevBaseVal; }
   }
 
-  // 최근 7영업일 (주말·공휴일 제외)
+  // 최근 7영업일 (주말·공휴일 제외) — 마지막은 익일로 교체해서 총 7일 유지
   const days=[];
   const dcur=new Date(today);
   let guard=0;
@@ -3513,7 +3513,9 @@ function renderReport(){
     dcur.setDate(dcur.getDate()-1);
     guard++;
   }
-  const dayData=days.map(d3=>({d:d3,agg:dayAgg(d3)}));
+  days.shift();          // 가장 오래된 날 하나 제거 (6일 남음: 과거 5일 + 당일)
+  days.push(new Date(tm)); // 익일(다음 영업일)을 마지막에 추가 → 총 7일
+  const dayData=days.map((d3,i)=>({d:d3,agg:dayAgg(d3),isTomorrow:(i===days.length-1)}));
 
   // 차종 TOP5(신차/재렌트 분리) · 상품별 구성 · 수행자 TOP3 (오늘, 차량교체 제외)
   const cc=taksoResolveCols();
@@ -3598,7 +3600,7 @@ function renderReport(){
     </div>
     <div class="rp-2col">
       <div class="rp-card">
-        <div class="rp-ct">일일 출고 추이 <small>최근 7영업일 · 주말/공휴일 제외</small></div>
+        <div class="rp-ct">일일 출고 추이 <small>최근 7영업일(익일 포함) · 주말/공휴일 제외</small></div>
         <div style="position:relative;height:215px;"><canvas id="rpTrendChart"></canvas></div>
       </div>
       <div class="rp-card">
@@ -3676,6 +3678,29 @@ function renderReport(){
   // 차트
   if(rpCharts.trend)rpCharts.trend.destroy();
   const rpTotals=dayData.map(x=>x.agg.shin+x.agg.re);
+  const tomorrowIdx=dayData.findIndex(x=>x.isTomorrow);
+  const rpTomorrowHighlight={id:'rpTomorrowHighlight',beforeDraw(chart){
+    try{
+      if(tomorrowIdx<0)return;
+      const {ctx,chartArea:{top,bottom}}=chart;
+      const xScale=chart.scales.x;
+      const center=xScale.getPixelForTick(tomorrowIdx);
+      const bandW=(xScale.getPixelForTick(1)-xScale.getPixelForTick(0))||60;
+      const halfW=bandW/2-2;
+      ctx.save();
+      ctx.fillStyle='rgba(250,204,21,0.22)';
+      const r=8, x0=center-halfW, y0=top, w=halfW*2, h=bottom-top;
+      ctx.beginPath();
+      ctx.moveTo(x0+r,y0);
+      ctx.arcTo(x0+w,y0,x0+w,y0+h,r);
+      ctx.arcTo(x0+w,y0+h,x0,y0+h,r);
+      ctx.arcTo(x0,y0+h,x0,y0,r);
+      ctx.arcTo(x0,y0,x0+w,y0,r);
+      ctx.closePath();
+      ctx.fill();
+      ctx.restore();
+    }catch(e){}
+  }};
   const rpCntPlugin={id:'rpCnt',afterDatasetsDraw(chart){
     try{
       const ctx=chart.ctx;
@@ -3689,20 +3714,22 @@ function renderReport(){
   rpCharts.trend=new Chart(document.getElementById('rpTrendChart'),{
     type:'bar',
     data:{
-      labels:dayData.map(x=>`${x.d.getMonth()+1}/${x.d.getDate()}(${['일','월','화','수','목','금','토'][x.d.getDay()]})`),
+      labels:dayData.map(x=>x.isTomorrow
+        ?[`${x.d.getMonth()+1}/${x.d.getDate()}(${['일','월','화','수','목','금','토'][x.d.getDay()]})`,'익일']
+        :`${x.d.getMonth()+1}/${x.d.getDate()}(${['일','월','화','수','목','금','토'][x.d.getDay()]})`),
       datasets:[
         {label:'신차',data:dayData.map(x=>x.agg.shin),backgroundColor:'#3B82F6',borderRadius:4,maxBarThickness:16},
         {label:'재렌트',data:dayData.map(x=>x.agg.re),backgroundColor:'#10B981',borderRadius:4,maxBarThickness:16},
         {label:'전체',data:rpTotals,backgroundColor:'#C7CAD9',borderRadius:4,maxBarThickness:16}
       ]
     },
-    plugins:[rpCntPlugin],
+    plugins:[rpTomorrowHighlight,rpCntPlugin],
     options:{
       animation:false,maintainAspectRatio:false,
       plugins:{legend:{position:'top',align:'start',labels:{boxWidth:9,boxHeight:9,font:{family:"Pretendard",size:11}}}},
       scales:{
         y:{beginAtZero:true,grace:'14%',grid:{color:'#F0F1F7'},ticks:{font:{family:"Pretendard",size:10}}},
-        x:{grid:{display:false},ticks:{font:{family:"Pretendard",size:10}}}
+        x:{grid:{display:false},ticks:{font:{family:"Pretendard",size:10},color:(ctx)=>ctx.index===tomorrowIdx?'#C2410C':'#8A8FA3',font:(ctx)=>ctx.index===tomorrowIdx?{family:"Pretendard",size:10,weight:'800'}:{family:"Pretendard",size:10}}}
       }
     }
   });
