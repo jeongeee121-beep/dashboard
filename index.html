@@ -2703,6 +2703,7 @@ function renderExec(){
     if(typeof rawTaksoTable!=='undefined'&&rawTaksoTable){
       const mCols=rawTable.cols.map(c=>(c.label||'')+'');
       const iAssetMain=mCols.findIndex(c=>c.includes('자산번호'));
+      const iStatusMain=mCols.findIndex(c=>c.includes('실행상태'));
       const tCols=rawTaksoTable.cols.map(c=>(c.label||'')+'');
       const tRows=rawTaksoTable.rows.map(r=>r.c.map(c=>c?c.v:null));
       const tAsset=tCols.findIndex(c=>c.includes('자산번호'));
@@ -2719,7 +2720,13 @@ function renderExec(){
       const tType=tCols.findIndex(c=>c.includes('신차구분'));
       const tCarNo=tCols.findIndex(c=>c.replace(/\s/g,'').includes('차량번호'));
       if(tAsset>=0&&iAssetMain>=0&&tDate>=0){
-        const execSet=new Set(monthRows.map(r=>((r[iAssetMain]||'')+'').trim()).filter(Boolean));
+        // 실행상태가 '종결'인 건은 이미 끝난 계약이라 자산번호가 재사용될 수 있음 → 실행완료로 치지 않음
+        const execSet=new Set(
+          monthRows
+            .filter(r=>iStatusMain<0 || !((r[iStatusMain]||'')+'').trim().includes('종결'))
+            .map(r=>((r[iAssetMain]||'')+'').trim())
+            .filter(Boolean)
+        );
         const seen=new Set();
         const list=[];let taksoCnt=0;
         tRows.forEach(r=>{
