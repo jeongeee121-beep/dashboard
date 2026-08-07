@@ -113,6 +113,42 @@ main{max-width:1400px;margin:0 auto;padding:20px 28px 40px;}
 .re-c{color:#22c997;font-weight:600;}
 .diff-up{color:#22c997;font-size:11px;}
 .diff-dn{color:#FF6B6B;font-size:11px;}
+.p0-mode-toggle{display:inline-flex;border:1px solid #e0e0ee;border-radius:8px;overflow:hidden;}
+.p0-mode-btn{padding:5px 13px;font-size:11.5px;font-family:inherit;font-weight:600;cursor:pointer;border:none;background:#fff;color:#888;}
+.p0-mode-btn.active{background:#5B5FE8;color:#fff;}
+.p0-mode-btn+.p0-mode-btn{border-left:1px solid #e0e0ee;}
+.p0-year-sel{padding:5px 10px;border-radius:8px;border:1px solid #e0e0ee;font-family:inherit;font-size:11.5px;color:#555;background:#fff;cursor:pointer;}
+.p0-trend-table{border-collapse:collapse;font-size:11.5px;table-layout:auto;min-width:100%;}
+.p0-trend-table th,.p0-trend-table td{white-space:nowrap;}
+.p0-trend-table th{padding:6px 4px;background:#f8f9fc;font-weight:700;color:#666;text-align:center;border-bottom:1px solid #ebebf5;white-space:nowrap;}
+.p0-trend-table td{padding:5px 4px;text-align:center;border-bottom:1px solid #f5f5f8;color:#333;}
+.p0-trend-table .p0-prodname{font-weight:800;font-size:13px;color:#1c1c2e;background:#fbfbfe;border-right:1px solid #ebebf5;}
+.p0-collapse-tri{display:inline-block;width:14px;color:#5B5FE8;cursor:pointer;font-size:10px;user-select:none;}
+.p0-collapse-tri:hover{color:#3B3FC0;}
+.p0-other-detail-tri{display:inline-block;font-size:9.5px;color:#888;font-weight:600;cursor:pointer;margin-left:4px;vertical-align:middle;}
+.p0-other-detail-tri:hover{color:#5B5FE8;}
+.p0-other-detail-row td{background:#fbfbfe;text-align:left;padding:8px 14px;font-size:11.5px;color:#555;border-bottom:2px solid #ebebf5;}
+.p0-trend-table .p0-prod-start td{border-top:2px solid #d8d9ea;}
+.p0-trend-table .p0-prod-start:first-child td{border-top:1px solid #ebebf5;}
+input.p0-year-sel[type="month"]{padding:5px 8px;}
+.p0-trend-table .p0-typelabel{font-weight:600;color:#888;border-right:1px solid #f5f5f8;}
+.p0-trend-table .p0-typelabel.shin{color:#5B5FE8;}
+.p0-trend-table .p0-typelabel.re{color:#22c997;}
+.p0-trend-table .p0-typelabel.sum{color:#1c1c2e;}
+.p0-trend-table .p0-sum-row td{font-weight:800;background:#fcfcfe;}
+.p0-trend-table .p0-cur-col{background:#fff0ef;color:#e2483d;border-left:2px solid #e2483d;}
+.p0-trend-table .p0-forecast-col{background:#fff8ec;color:#c47c2b;font-style:italic;}
+.p0-trend-table td.p0-forecast{background:#fffaf0;color:#c47c2b;font-style:italic;}
+.p0-trend-table .p0-blank{color:#ddd;}
+.p0-trend-table .p0-total-col{font-weight:800;color:#1c1c2e;background:#f0eeff;}
+.p0-trend-table .p0-sum-row td.p0-total-col{background:#e2ddff;color:#2b2470;}
+.p0-trend-table .p0-grand-row td.p0-total-col{background:#d8d2fb;color:#2b2470;}
+.p0-trend-table .p0-grand-total td.p0-total-col{background:#c7bdf7;color:#2b1f6e;font-weight:900;}
+.p0-trend-table .p0-grand-row td{background:#eef0fb;font-weight:800;color:#2b2470;}
+.p0-trend-table .p0-grand-total td{background:#dcd5fb;color:#2b1f6e;font-weight:900;}
+.p0-trend-table tbody tr:nth-child(6n+1) td.p0-prodname,
+.p0-trend-table tbody tr:nth-child(6n+2) td,
+.p0-trend-table tbody tr:nth-child(6n+3) td{background:#fcfcff;}
 
 /* STAT ROW */
 .stat-row{display:flex;gap:28px;flex-wrap:wrap;}
@@ -545,15 +581,16 @@ main .main-grid{width:100%;}
     <div class="nav-label">판매</div>
     <button class="sb-item active" data-page="exec" onclick="goPage('exec')"><span>🏠</span><span>판매현황</span></button>
     <button class="sb-item" data-page="inv" onclick="goPage('inv')"><span>📦</span><span>재고현황</span></button>
-    <button class="sb-item" data-page="takso" onclick="goPage('takso')"><span>🚚</span><span>탁송 현황</span></button>
+    <!-- [탁송현황 숨김] 다시 보이게 하려면 아래 버튼의 style="display:none;" 부분만 지우세요 -->
+    <button class="sb-item" data-page="takso" onclick="goPage('takso')" style="display:none;"><span>🚚</span><span>탁송 현황</span></button>
     <button class="sb-item" data-page="monthly" onclick="goPage('monthly')"><span>📊</span><span>기간별 비교</span></button>
     <button class="sb-item" data-page="report" onclick="goPage('report')"><span>📋</span><span>일일 리포트</span></button>
 
     <div class="nav-label">상세 분석 (실무)</div>
     <button class="sb-item" data-page="product" onclick="goPage('product')"><span>📦</span><span>상품별 현황</span></button>
     <button class="sb-item" data-page="model" onclick="goPage('model')"><span>🚙</span><span>차종별 현황</span></button>
-    <button class="sb-item" data-page="channel" onclick="goPage('channel')"><span>📡</span><span>판매채널별 현황</span></button>
     <button class="sb-item" data-page="agent" onclick="goPage('agent')"><span>👥</span><span>수행자별 현황</span></button>
+    <button class="sb-item" data-page="channel" onclick="goPage('channel')"><span>📡</span><span>판매채널별 현황</span></button>
 
     <div class="sb-foot" id="sbFoot"></div>
   </aside>
@@ -694,22 +731,21 @@ main .main-grid{width:100%;}
       <div class="ex-toprow">
         <div>
           <div class="ex-pagetitle">기간별 비교</div>
-          <div class="ex-pagedesc">월별·주간 출고 비교와 프로모션 메모</div>
+          <div class="ex-pagedesc">년간·월간·주간·일간 출고 비교와 프로모션 메모</div>
         </div>
-        <label class="ex-basedate">📅 연도
-          <select id="mcYearSel" onchange="mcYearChange(this.value)"
-            style="border:none;font-family:inherit;font-size:13px;font-weight:700;outline:none;background:none;cursor:pointer;"></select>
-        </label>
       </div>
 
       <section class="ex-card">
         <div class="ex-head">
           <div class="ex-badge">📊</div><div class="ex-title" id="mcChartTitle">월별 출고 비교</div>
-          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;">
+          <div style="margin-left:auto;display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+            <select id="mcYearSel" onchange="mcYearChange(this.value)" style="border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--text);outline:none;background:#fff;cursor:pointer;"></select>
             <select id="mcMonthSel" onchange="mcMonthChange(this.value)" style="display:none;border:1px solid var(--line);border-radius:9px;padding:6px 10px;font-family:inherit;font-size:12.5px;font-weight:700;color:var(--text);outline:none;background:#fff;cursor:pointer;"></select>
             <div class="ex-tabs" style="margin:0;padding:3px;">
-              <button id="mcModeMonth" class="ex-tab active" onclick="mcModeChange('month')" style="flex:none;padding:6px 16px;">월별</button>
-              <button id="mcModeWeek" class="ex-tab" onclick="mcModeChange('week')" style="flex:none;padding:6px 16px;">주간</button>
+              <button id="mcModeYear" class="ex-tab" onclick="mcModeChange('year')" style="flex:none;padding:6px 14px;">년간</button>
+              <button id="mcModeMonth" class="ex-tab active" onclick="mcModeChange('month')" style="flex:none;padding:6px 14px;">월간</button>
+              <button id="mcModeWeek" class="ex-tab" onclick="mcModeChange('week')" style="flex:none;padding:6px 14px;">주간</button>
+              <button id="mcModeDay" class="ex-tab" onclick="mcModeChange('day')" style="flex:none;padding:6px 14px;">일간</button>
             </div>
           </div>
         </div>
@@ -719,9 +755,14 @@ main .main-grid{width:100%;}
       </section>
 
       <section class="ex-card">
-        <div class="ex-head"><div class="ex-badge">📝</div><div class="ex-title">월별 메모 <small>프로모션·이슈 기록</small></div></div>
-        <div class="mc-grid" id="mcMemoGrid"></div>
-        <div id="mcNote" style="margin-top:14px;font-size:11.5px;color:#8A8FA3;line-height:1.7;"></div>
+        <div class="ex-head" style="cursor:pointer;" onclick="toggleMcMemo()">
+          <div class="ex-badge">📝</div><div class="ex-title">월별 메모 <small>프로모션·이슈 기록</small></div>
+          <span id="mcMemoToggleIcon" style="margin-left:auto;font-size:12px;color:#8A8FA3;font-weight:600;">▶ 펼치기</span>
+        </div>
+        <div id="mcMemoBody" style="display:none;">
+          <div class="mc-grid" id="mcMemoGrid"></div>
+          <div id="mcNote" style="margin-top:14px;font-size:11.5px;color:#8A8FA3;line-height:1.7;"></div>
+        </div>
       </section>
     </div><!-- /monthlyPage -->
 
@@ -769,10 +810,16 @@ main .main-grid{width:100%;}
   <div class="period-seg">
     <button class="seg-btn active" onclick="setMode('month')" id="seg_month">월별</button>
     <button class="seg-btn" onclick="setMode('year')" id="seg_year">년도별</button>
+    <button class="seg-btn" onclick="setMode('range')" id="seg_range">기간 지정</button>
   </div>
   <div class="period-sep"></div>
   <select class="period-sel" id="yearSel" onchange="onYearChange()"><option value="">년도</option></select>
   <select class="period-sel" id="monthSel" onchange="renderCurrent()"><option value="">월</option></select>
+  <span id="rangeInputsWrap" style="display:none;align-items:center;gap:6px;">
+    <input type="month" id="rangeFromInput" class="period-sel" onchange="onRangeChange()" style="padding:6px 8px;">
+    <span style="color:#bbb;">~</span>
+    <input type="month" id="rangeToInput" class="period-sel" onchange="onRangeChange()" style="padding:6px 8px;">
+  </span>
 </div>
 <div id="detailMemoBox" style="display:none;"></div>
 
@@ -863,6 +910,9 @@ main .main-grid{width:100%;}
   <!-- P0: 상품별 현황 -->
   <div id="panel0" class="sheet-panel active">
     <!-- 상품유형 필터 -->
+    <div style="margin-bottom:8px;">
+      <button id="p0FilterToggleBtn" onclick="p0ToggleFilterBar()" style="padding:5px 12px;border-radius:8px;border:1px solid #e0e0ee;background:#fff;color:#888;font-family:inherit;font-size:11.5px;cursor:pointer;">🔽 상품 필터 보기</button>
+    </div>
     <div id="typeFilterBar" style="display:none;padding:10px 0 14px;border-bottom:1px solid #f0f0f8;margin-bottom:16px;flex-wrap:wrap;gap:8px;align-items:center;">
       <span style="font-size:12px;color:#999;margin-right:4px;">상품 필터</span>
       <div id="typeCheckboxes" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
@@ -923,23 +973,61 @@ main .main-grid{width:100%;}
 
 const COLORS=['#5B5FE8','#22c997','#FF6B6B','#FFA94D','#4dabf7','#f06595','#a9e34b','#74c0fc','#e599f7','#ffd43b'];
 const MONTHS_KR=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
+
+// ===== 구글 시트 데이터 로더 (gviz 직접 방식 · 구글 CDN에서 바로 받아옴) =====
+// ※ 사용 조건: 시트 공유 설정을 "링크가 있는 모든 사용자 → 뷰어"로 해두어야
+//   브라우저에서 직접 읽을 수 있습니다. (예전 깃허브 때와 동일한 방식)
+// gviz 응답이 프론트가 쓰는 {table:{cols,rows}} 형식과 같아서 아래 두 함수만 바뀝니다.
+
+function gvizUrl(id, sheetName){
+  return 'https://docs.google.com/spreadsheets/d/' + encodeURIComponent(id)
+    + '/gviz/tq?tqx=out:json&headers=1&sheet=' + encodeURIComponent(sheetName)
+    + '&_=' + Date.now(); // 캐시 우회용
+}
+
+async function fetchSheetJSON(sheetName, id){
+  try{
+    if(!id) return null;
+    const res = await fetch(gvizUrl(id, sheetName), { cache: 'no-store' });
+    const text = await res.text();
+    // gviz 응답은 google.visualization.Query.setResponse({...}); 형태 → 안쪽 JSON만 추출
+    const s = text.indexOf('{'), e = text.lastIndexOf('}');
+    if(s < 0 || e < 0) return null;
+    const json = JSON.parse(text.substring(s, e + 1));
+    const table = (json && json.table) ? json.table : null;
+    return (table && table.rows && table.rows.length) ? table : null;
+  }catch(err){ console.error('시트 로드 실패:', sheetName, err); return null; }
+}
+
+// gviz는 탭 하나씩만 지원 → 여러 탭은 병렬로 동시 요청 (구글 CDN이라 빠름)
+async function fetchSheetsJSON(sheetNames, id){
+  try{
+    const results = await Promise.all(sheetNames.map(n => fetchSheetJSON(n, id)));
+    const out = {};
+    sheetNames.forEach((n, i) => { out[n] = results[i]; });
+    return out;
+  }catch(err){ console.error('시트 로드 실패:', err); return {}; }
+}
 let rawTable=null, rawTaksoTable=null, currentTab=0, dataMode='exec', selectedCar='__all__', carTypeMode='신차', allCarList=[];
 let viewMode='month'; // 'month' | 'accum'
 let selYear='', selMonth='', accumRange='all'; // accum: 'all'|'YYYY'|'YYYY.MM~YYYY.MM'
 let selectedWorker='__all__', chSearchQuery='', selectedSeller='__all__';
+let assetSeriesMap=null; // 자산번호 -> 시리즈명(차종), 차량 RAW DATA에서 구축 (탁송데이터 당월 대체용)
 let calFrom={year:2025,month:null}, calTo={year:2026,month:null};
 let popupTabCtx=0, selectedSeries=new Set(['__all__']);
 const charts={};
 
-const WORKER_MAP={'이연수':'하모니','이현수':'하모니','백광현':'하모니','양서영':'토스','염대현':'토스','박주영':'토스','주식회사 하렌파트너스':'하렌파트너스'};
-function mapWorker(v){const s=(v||'').toString().trim();if(!s)return null;for(const[k,l]of Object.entries(WORKER_MAP))if(s.includes(k))return l;return s.slice(0,3)||null;}
+const WORKER_MAP={'이연수':'하모니','이현수':'하모니','백광현':'하모니','양서영':'토스','염대현':'토스','박주영':'토스','박수빈':'토스','이우성':'하렌파트너스','주식회사 하렌파트너스':'하렌파트너스','주식회사 하렌카':'하렌카'};
+function mapWorker(v){const s=(v||'').toString().trim();if(!s)return'하모니';for(const[k,l]of Object.entries(WORKER_MAP))if(s.includes(k))return l;return s.slice(0,3)||null;}
 
 // 탁송 수행자 매핑
 function mapTaksoWorker(v){
   const s=(v||'').toString().trim();
   if(!s)return'미확인';
   if(s.includes('특이건'))return'특이건';
-  if(s.includes('하렌파트너스')||s.includes('주식회사 하렌'))return'하렌파트너스';
+  if(s.includes('이우성'))return'하렌파트너스';
+  if(s.includes('하렌파트너스'))return'하렌파트너스';
+  if(s.includes('하렌카'))return'하렌카';
   // 괄호 앞 이름만 (예: 이진희(차드림) → 이진희)
   const m=s.match(/^([^(（]+)/);
   return m?m[1].trim().slice(0,3):s.slice(0,3);
@@ -979,27 +1067,65 @@ function setDataMode(mode){
 function switchTab(idx){
   currentTab=idx;
   [0,1,2,3].forEach(i=>{document.getElementById(`tab${i}`).classList.toggle('active',i===idx);document.getElementById(`panel${i}`).classList.toggle('active',i===idx);});
-  // 차종별 탭(1)은 월별/년도별 버튼 숨기고 년도만
+  // 모든 탭에서 기간바(월간/년간/기간 지정) 사용
   const segEl=document.querySelector('.period-seg');
   const sepEl=document.querySelector('.period-bar .period-sep');
   const monthSel=document.getElementById('monthSel');
-  if(idx===1){
-    if(segEl)segEl.style.display='none';
-    if(sepEl)sepEl.style.display='none';
+  const ySel=document.getElementById('yearSel');
+  const rWrap=document.getElementById('rangeInputsWrap');
+  if(segEl)segEl.style.display='flex';
+  if(sepEl)sepEl.style.display='block';
+  if(viewMode==='range'){
+    ensureRangeDefaults();
+    if(rWrap)rWrap.style.display='inline-flex';
+    if(ySel)ySel.style.display='none';
     if(monthSel)monthSel.style.display='none';
-  } else {
-    if(segEl)segEl.style.display='flex';
-    if(sepEl)sepEl.style.display='block';
+  }else{
+    if(rWrap)rWrap.style.display='none';
+    if(ySel)ySel.style.display='';
     if(monthSel)monthSel.style.display=viewMode==='month'?'inline-block':'none';
   }
   setTimeout(()=>renderCurrent(),30);
 }
 
+let rangeFrom='', rangeTo=''; // 'YYYY.MM' 기간 지정용
+function ensureRangeDefaults(){
+  const fI=document.getElementById('rangeFromInput'), tI=document.getElementById('rangeToInput');
+  if(!fI||!tI)return;
+  if(!fI.value||!tI.value){
+    const now=new Date();
+    tI.value=`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+    const f=new Date(now.getFullYear(),now.getMonth()-2,1); // 기본: 최근 3개월
+    fI.value=`${f.getFullYear()}-${String(f.getMonth()+1).padStart(2,'0')}`;
+  }
+  rangeFrom=fI.value.replace('-','.'); rangeTo=tI.value.replace('-','.');
+}
+function onRangeChange(){
+  const fI=document.getElementById('rangeFromInput'), tI=document.getElementById('rangeToInput');
+  if(fI&&fI.value)rangeFrom=fI.value.replace('-','.');
+  if(tI&&tI.value)rangeTo=tI.value.replace('-','.');
+  if(rangeFrom&&rangeTo&&rangeFrom>rangeTo){ // 시작>종료면 자동 교환
+    const t=rangeFrom;rangeFrom=rangeTo;rangeTo=t;
+    const tv=fI.value;fI.value=tI.value;tI.value=tv;
+  }
+  renderCurrent();
+}
 function setMode(m){
   viewMode=m;
-  ['month','year'].forEach(k=>{const el=document.getElementById('seg_'+k);if(el)el.classList.toggle('active',k===m);});
+  ['month','year','range'].forEach(k=>{const el=document.getElementById('seg_'+k);if(el)el.classList.toggle('active',k===m);});
   const mSel=document.getElementById('monthSel');
-  if(mSel)mSel.style.display=m==='month'?'inline-block':'none';
+  const ySel=document.getElementById('yearSel');
+  const rWrap=document.getElementById('rangeInputsWrap');
+  if(m==='range'){
+    ensureRangeDefaults();
+    if(rWrap)rWrap.style.display='inline-flex';
+    if(ySel)ySel.style.display='none';
+    if(mSel)mSel.style.display='none';
+  }else{
+    if(rWrap)rWrap.style.display='none';
+    if(ySel)ySel.style.display='';
+    if(mSel)mSel.style.display=m==='month'?'inline-block':'none';
+  }
   renderCurrent();
 }
 
@@ -1025,20 +1151,10 @@ async function loadAll(){
   const id=document.getElementById('sheetId').value.trim();
   if(!id){setStatus('시트 ID를 입력해주세요.',false);return;}
   setStatus('불러오는 중...',null);
-  const gvizUrl=sheet=>`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
-  const fetchTable=async(sheet)=>{
-    try{
-      const res=await fetch(gvizUrl(sheet));
-      const text=await res.text();
-      const m=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
-      if(!m)return null;
-      const json=JSON.parse(m[1]);
-      return json.table?.rows?.length?json.table:null;
-    }catch(e){return null;}
-  };
   try{
-    // 판매현황테스트 · 탁송데이터를 동시에(병렬로) 요청 — 서로 의존관계 없어서 순서대로 기다릴 필요 없음
-    const [salesTable,taksoTable]=await Promise.all([fetchTable('판매현황테스트'),fetchTable('탁송데이터')]);
+    // 판매현황테스트 · 탁송데이터를 한 번의 요청으로 같이 받아옴 (왕복 횟수를 줄여서 로딩 속도 개선)
+    const _salesTables=await fetchSheetsJSON(['판매현황테스트','탁송데이터'],id);
+    const salesTable=_salesTables['판매현황테스트']||null, taksoTable=_salesTables['탁송데이터']||null;
     if(!salesTable)throw new Error('데이터 없음');
     rawTable=salesTable;
     if(taksoTable){
@@ -1058,7 +1174,7 @@ async function loadAll(){
 
     [0,1,2,3].forEach(i=>setBadge(`tab${i}`,rawTable.rows.length));
     const tfBar=document.getElementById('typeFilterBar');
-    if(tfBar)tfBar.style.display='flex';
+    if(tfBar)tfBar.style.display=(typeof p0FilterOpen!=='undefined'&&p0FilterOpen)?'flex':'none';
     populatePickers();
     renderCurrent();
     setStatus(`✓ ${rawTable.rows.length.toLocaleString()}건`+(rawTaksoTable?` / 탁송 ${rawTaksoTable.rows.length.toLocaleString()}건`:' / 탁송 로드안됨'),true);
@@ -1096,6 +1212,10 @@ function thisMonth(){const n=new Date();return`${n.getFullYear()}.${String(n.get
 function getFilteredRows(rows,iDate){
   const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
   const mo=document.getElementById('monthSel')?.value||'';
+  if(viewMode==='range'){
+    ensureRangeDefaults();
+    return rows.filter(r=>{const ym=getYM(r[iDate]);return ym&&ym>=rangeFrom&&ym<=rangeTo;});
+  }
   if(viewMode==='month'){
     if(mo)return rows.filter(r=>getYM(r[iDate])===mo);
     return rows.filter(r=>getYM(r[iDate])===thisMonth());
@@ -1107,6 +1227,11 @@ function getFilteredRows(rows,iDate){
 function getPeriodLabel(){
   const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
   const mo=document.getElementById('monthSel')?.value||'';
+  if(viewMode==='range'){
+    ensureRangeDefaults();
+    const f=rangeFrom.split('.'), t=rangeTo.split('.');
+    return `${f[0]}년 ${parseInt(f[1])}월 ~ ${t[0]}년 ${parseInt(t[1])}월`;
+  }
   if(viewMode==='month'){
     if(mo){const p=mo.split('.');return p[0]+'년 '+parseInt(p[1])+'월';}
     const p=thisMonth().split('.');return p[0]+'년 '+parseInt(p[1])+'월';
@@ -1217,13 +1342,29 @@ function renderP0(){
   const iNoDepo=idx('무보증여부'),iEnd=idx('종료후처리'),iWorker=idx('수행원');
   const iAge=idx('계약 당시 연령대'),iRental=idx('렌탈료');
 
-  const filtered=getFilteredRows(rows,iDate).filter(r=>{
+  const filteredExecRaw=getFilteredRows(rows,iDate).filter(r=>{
     if(selectedTypes.size===0)return false;
     const t=(r[iType]||'').toString().trim();
     return selectedTypes.has(t);
   });
+  // 당월(실제 오늘 기준)이 조회 기간에 포함되면, 그 달의 실행 데이터를 탁송데이터 기준으로 통째로 교체
+  // → 상품별 상세현황/비중/신차재렌트비교/성장률/요약카드가 모두 같은 숫자를 사용하게 됨
+  // ※ 탁송데이터에 없는 항목(무보증여부/종료후처리 등)은 당월 몫이 실행 기준(그 시점까지 입력된 값)이 아니라 0으로 집계됨에 유의
+  const p0TodayYM=thisMonth();
+  let p0TaksoOverrideUsed=false;
+  let filtered=filteredExecRaw;
+  if(rawTaksoTable&&periodIncludesMonth(p0TodayYM)){
+    const others=filteredExecRaw.filter(r=>getYM(r[iDate])!==p0TodayYM);
+    const taksoRows=buildTaksoRows(p0TodayYM);   // ※ 상품필터로 거르지 않음 — 아래 '상품별 추세 비교' 표와 동일하게 전체 포함(대차렌탈 등 소수상품 누락 방지)
+    filtered=others.concat(taksoRows);
+    p0TaksoOverrideUsed=true;
+  }
   const shincha=filtered.filter(r=>(r[iProd]||'').includes('신차'));
   const rerent=filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
+
+  const cardShinCt=shincha.length;
+  const cardReCt=rerent.length;
+  const cardTotalCt=filtered.length;
 
   // 전년 동기 비교
   const prevYearRows=getPrevYearRows(rows,iDate);
@@ -1257,19 +1398,201 @@ function renderP0(){
   const gudokInsu=insuRows.filter(r=>(r[iType]||'').includes('구독')).length;
   const insuPct=filtered.length?Math.round(insuRows.length/filtered.length*100):0;
 
-  // ---- 상품별 월별 추세 (최근 6개월 · 당월은 탁송 기준) ----
-  const P0_TREND_PRODS=['동반차','동반차리스','구입형리스','6&12렌트','믿음카'];
+  // ---- 상품별 월별 계약 추세: 그래프/표 공통 기간(월) + 동적 상품목록 ----
   const P0_PROD_COLORS={'동반차':'#5B5FE8','동반차리스':'#8B5CF6','구입형리스':'#22c997','6&12렌트':'#FFA94D','믿음카':'#FF6B6B','구독카':'#14B8A6','월렌트':'#38BDF8'};
+  const P0_COLOR_PALETTE=['#5B5FE8','#22c997','#FFA94D','#FF6B6B','#8B5CF6','#14B8A6','#38BDF8','#F59E0B','#EC4899','#84CC16','#0EA5E9','#A855F7'];
   const _pt=new Date();
-  const p0TodayYM=`${_pt.getFullYear()}.${String(_pt.getMonth()+1).padStart(2,'0')}`;
-  const p0TrendMonths=[];
-  for(let k=5;k>=0;k--){const dtt=new Date(_pt.getFullYear(),_pt.getMonth()-k,1);p0TrendMonths.push(`${dtt.getFullYear()}.${String(dtt.getMonth()+1).padStart(2,'0')}`);}
-  const p0TaksoMap=taksoProdMapFor(p0TodayYM);   // 당월 탁송 상품별 (null이면 실행 폴백)
-  const p0TrendData={};   // {상품: [월별 count]}
-  P0_TREND_PRODS.forEach(p=>{p0TrendData[p]=p0TrendMonths.map(m=>{
-    if(m===p0TodayYM&&p0TaksoMap)return p0TaksoMap[p]||0;
-    return rows.filter(r=>getYM(r[iDate])===m&&((r[iType]||'').toString().trim()===p)).length;
-  });});
+  const p0RealYM=`${_pt.getFullYear()}.${String(_pt.getMonth()+1).padStart(2,'0')}`;
+  if(!p0PeriodFrom||!p0PeriodTo){ p0PeriodFrom=`${_pt.getFullYear()}.01`; p0PeriodTo=`${_pt.getFullYear()}.12`; }
+  const p0Months=[];
+  {
+    let [fy,fm]=p0PeriodFrom.split('.').map(Number);
+    const [ty,tm]=p0PeriodTo.split('.').map(Number);
+    let guard=0;
+    while((fy<ty||(fy===ty&&fm<=tm))&&guard<12){
+      p0Months.push(`${fy}.${String(fm).padStart(2,'0')}`);
+      fm++; if(fm>12){fm=1;fy++;} guard++;
+    }
+  }
+  const p0MultiYear=p0Months.length>0&&p0Months[0].slice(0,4)!==p0Months[p0Months.length-1].slice(0,4);
+  const p0MoLabel=m=>p0MultiYear?`${m.slice(2,4)}.${m.slice(5,7)}`:`${parseInt(m.split('.')[1])}월`;
+  const p0RealYMIdx=p0Months.indexOf(p0RealYM);
+  const p0PresetKey=(()=>{
+    const n=new Date(); const cy=n.getFullYear(), cm=n.getMonth()+1;
+    const mk=(y,m)=>`${y}.${String(m).padStart(2,'0')}`;
+    const back=(k)=>{let y=cy,m=cm-(k-1);while(m<1){m+=12;y--;}return mk(y,m);};
+    if(p0PeriodFrom===mk(cy,cm)&&p0PeriodTo===mk(cy,cm))return 'thisMonth';
+    if(p0PeriodFrom===back(3)&&p0PeriodTo===mk(cy,cm))return '3m';
+    if(p0PeriodFrom===back(6)&&p0PeriodTo===mk(cy,cm))return '6m';
+    if(p0PeriodFrom===back(12)&&p0PeriodTo===mk(cy,cm))return '12m';
+    if(p0PeriodFrom===mk(cy,1)&&p0PeriodTo===mk(cy,12))return 'thisYear';
+    if(p0PeriodFrom===mk(cy-1,1)&&p0PeriodTo===mk(cy-1,12))return 'lastYear';
+    return 'custom';
+  })();
+
+  // 상품 목록: 지정된 7개 순서 고정, 그 외(대차렌탈·마이다스·오너형·제휴처상품 등 소수 상품)는 '기타'로 묶음
+  const P0_MAIN_LIST=['동반차','동반차리스','구입형리스','6&12렌트','믿음카','월렌트','구독카'];
+  const P0_ALIAS={'믿음카리스':'믿음카'};   // 이 상품명은 '기타'가 아니라 지정된 메인 상품으로 합침
+  const p0BucketOf=name=>{
+    if(P0_ALIAS[name])return P0_ALIAS[name];
+    return P0_MAIN_LIST.includes(name)?name:'기타';
+  };
+  const p0AllTypesInData=(()=>{
+    const set=new Set(rows.map(r=>(r[iType]||'').toString().trim()).filter(Boolean));
+    // 당월이 조회 기간에 있으면, 실행데이터엔 아직 한 번도 없었지만 탁송에만 있는 신규 상품도 포함(그래야 표/카드 합계가 일치함)
+    if(p0RealYMIdx>=0){
+      const sp=taksoProdSplitFor(p0RealYM,null,null);
+      if(sp)Object.keys(sp).forEach(k=>{if(k)set.add(k);});
+    }
+    return[...set];
+  })();
+  const p0HasOther=p0AllTypesInData.some(t=>p0BucketOf(t)==='기타');
+  const p0Products=P0_MAIN_LIST.filter(p=>p0AllTypesInData.includes(p)||p0AllTypesInData.some(t=>p0BucketOf(t)===p)).concat(p0HasOther?['기타']:[]);
+  const p0ColorFor=p=>p==='기타'?'#94A3B8':(P0_PROD_COLORS[p]||P0_COLOR_PALETTE[p0Products.indexOf(p)%P0_COLOR_PALETTE.length]);
+  const p0BucketSplit=sp=>{
+    if(!sp)return null;
+    const out={};
+    Object.entries(sp).forEach(([k,v])=>{
+      const b=p0BucketOf(k);
+      if(!out[b])out[b]={shin:0,re:0};
+      out[b].shin+=v.shin; out[b].re+=v.re;
+    });
+    return out;
+  };
+
+  // 상품별 x 월별 {shin,re} — 실행 데이터 기준, 실제 당월이 범위 안이면 그 달만 탁송 기준
+  const p0Data={};
+  p0Products.forEach(p=>{
+    p0Data[p]=p0Months.map(m=>{
+      if(m===p0RealYM){
+        const sp=p0BucketSplit(taksoProdSplitFor(m,null,null));
+        return sp&&sp[p]?sp[p]:{shin:0,re:0};
+      }
+      if(m>p0RealYM)return null;   // 아직 안 지난 미래월
+      const mrows=rows.filter(r=>getYM(r[iDate])===m&&p0BucketOf((r[iType]||'').toString().trim())===p);
+      const shin=mrows.filter(r=>(r[iProd]||'').includes('신차')).length;
+      return {shin,re:mrows.length-shin};
+    });
+  });
+
+  // 예상(당월이 선택 기간 안에 있을 때만)
+  let p0Forecast=null;
+  if(p0RealYMIdx>=0){
+    const [ry,rm]=p0RealYM.split('.').map(Number);
+    const mStart=new Date(ry,rm-1,1), mEnd=new Date(ry,rm,0);
+    const totalBiz=bizDays(mStart,mEnd), elapsedBiz=Math.max(bizDays(mStart,_pt),1);
+    p0Forecast={};
+    p0Products.forEach(p=>{
+      const cur=p0Data[p][p0RealYMIdx]||{shin:0,re:0};
+      p0Forecast[p]={shin:Math.round(cur.shin/elapsedBiz*totalBiz),re:Math.round(cur.re/elapsedBiz*totalBiz)};
+    });
+  }
+  // 월별(전체 상품) 합계 — 하단 누계행 + 비율 계산 분모
+  const p0MonthTotal=p0Months.map((m,mi)=>{
+    let s=0,r=0;
+    p0Products.forEach(p=>{const v=p0Data[p][mi];if(v){s+=v.shin;r+=v.re;}});
+    return{shin:s,re:r};
+  });
+  const p0MonthTotalForecast=p0Forecast?(()=>{let s=0,r=0;p0Products.forEach(p=>{s+=p0Forecast[p].shin;r+=p0Forecast[p].re;});return{shin:s,re:r};})():null;
+  // 상품별 누계(선택 기간 합, 예상 제외)
+  const p0RowTotal={};
+  p0Products.forEach(p=>{
+    let s=0,r=0;
+    p0Data[p].forEach(v=>{if(v){s+=v.shin;r+=v.re;}});
+    p0RowTotal[p]={shin:s,re:r};
+  });
+
+  // '기타'에 실제로 뭐가 섞여있는지(선택 기간 합계, 상품명별)
+  const p0OtherBreakdown=(()=>{
+    if(!p0Products.includes('기타'))return[];
+    const map={};
+    p0Months.forEach(m=>{
+      if(m===p0RealYM){
+        const sp=taksoProdSplitFor(m,null,null);
+        if(sp)Object.entries(sp).forEach(([k,v])=>{if(p0BucketOf(k)==='기타')map[k]=(map[k]||0)+v.shin+v.re;});
+      }else if(m<=p0RealYM){
+        rows.filter(r=>getYM(r[iDate])===m).forEach(r=>{
+          const t=(r[iType]||'').toString().trim();
+          if(t&&p0BucketOf(t)==='기타')map[t]=(map[t]||0)+1;
+        });
+      }
+    });
+    return Object.entries(map).sort((a,b)=>b[1]-a[1]);
+  })();
+
+  // ---- 표 HTML 생성 (대수/비율 모드) ----
+  const p0IsPct=p0ViewMode==='percent';
+  const p0Cell=(v,isFc)=>v==null?'<td class="p0-blank">-</td>':`<td${isFc?' class="p0-forecast"':''}>${v.toLocaleString()}</td>`;
+  const p0PctCell=(part,whole,isFc)=>(part==null||whole==null||whole===0)?'<td class="p0-blank">-</td>':`<td${isFc?' class="p0-forecast"':''}>${(part/whole*100).toFixed(1)}%</td>`;
+  let p0TableHTML='<table class="p0-trend-table"><thead><tr><th style="width:90px;">구분</th><th style="width:50px;">신/재</th>';
+  p0Months.forEach(m=>{
+    const isCur=(m===p0RealYM);
+    p0TableHTML+=`<th${isCur?' class="p0-cur-col"':''}>${p0MoLabel(m)}</th>`;
+    if(isCur&&p0ShowForecast)p0TableHTML+=`<th class="p0-forecast-col">${p0MoLabel(m)} 예상</th>`;
+  });
+  p0TableHTML+='<th style="width:60px;">누계</th></tr></thead><tbody>';
+  p0Products.forEach(p=>{
+    const arr=p0Data[p];
+    const shinRow=arr.map(v=>v?v.shin:null), reRow=arr.map(v=>v?v.re:null), sumRow=arr.map(v=>v?v.shin+v.re:null);
+    const fc=p0Forecast?p0Forecast[p]:null;
+    const collapsed=p0CollapsedProducts.has(p);
+    const rowsToShow=collapsed
+      ?[['합계',sumRow,fc?fc.shin+fc.re:null,'sum']]
+      :[['신차',shinRow,fc?fc.shin:null,'shin'],['재렌트',reRow,fc?fc.re:null,'re'],['합계',sumRow,fc?fc.shin+fc.re:null,'sum']];
+    rowsToShow.forEach(([label,arr2,fcVal,kind],ri)=>{
+      p0TableHTML+=`<tr class="${kind==='sum'?'p0-sum-row':''} ${ri===0?'p0-prod-start':''}">`;
+      if(ri===0){
+        const pEsc=p.replace(/'/g,"\\'");
+        const detailToggle=(p==='기타')?` <span class="p0-other-detail-tri" onclick="p0ToggleOtherDetail()">${p0OtherDetailOpen?'▲ 상세':'▼ 상세'}</span>`:'';
+        p0TableHTML+=`<td class="p0-prodname" rowspan="${rowsToShow.length}"><span class="p0-collapse-tri" onclick="p0ToggleProdRow('${pEsc}')">${collapsed?'▶':'▼'}</span>${escH(p)}${detailToggle}</td>`;
+      }
+      p0TableHTML+=`<td class="p0-typelabel ${kind}">${label}</td>`;
+      p0Months.forEach((m,mi)=>{
+        const v=arr2[mi];
+        const whole=p0MonthTotal[mi].shin+p0MonthTotal[mi].re;
+        p0TableHTML+=p0IsPct?p0PctCell(v,whole,false):p0Cell(v,false);
+        if(m===p0RealYM&&p0ShowForecast){
+          const wholeF=p0MonthTotalForecast.shin+p0MonthTotalForecast.re;
+          p0TableHTML+=p0IsPct?p0PctCell(fcVal,wholeF,true):p0Cell(fcVal,true);
+        }
+      });
+      const rowTotal=kind==='sum'?(p0RowTotal[p].shin+p0RowTotal[p].re):p0RowTotal[p][kind];
+      p0TableHTML+=p0IsPct?'<td>-</td>':`<td class="p0-total-col">${rowTotal.toLocaleString()}</td>`;
+      p0TableHTML+='</tr>';
+    });
+    if(p==='기타'&&p0OtherDetailOpen){
+      const colspan=2+p0Months.length+(p0RealYMIdx>=0&&p0ShowForecast?1:0)+1;
+      const detailHtml=p0OtherBreakdown.length
+        ?p0OtherBreakdown.map(([name,ct])=>`<span style="display:inline-block;margin:2px 10px 2px 0;">${escH(name)} <b style="color:#1c1c2e;">${ct.toLocaleString()}건</b></span>`).join('')
+        :'<span style="color:#bbb;">선택 기간에 기타 상품 데이터가 없어요</span>';
+      p0TableHTML+=`<tr class="p0-other-detail-row"><td colspan="${colspan}">${detailHtml}</td></tr>`;
+    }
+  });
+  const grandShinTotal=p0MonthTotal.reduce((a,v)=>a+v.shin,0), grandReTotal=p0MonthTotal.reduce((a,v)=>a+v.re,0);
+  [['신차','shin'],['재렌트','re']].forEach(([label,kind])=>{
+    p0TableHTML+=`<tr class="p0-grand-row">${kind==='shin'?'<td rowspan="3" class="p0-prodname">누계</td>':''}<td class="p0-typelabel ${kind}">${label}</td>`;
+    p0Months.forEach((m,mi)=>{
+      const v=p0MonthTotal[mi];
+      p0TableHTML+=p0IsPct?p0PctCell(v[kind],v.shin+v.re,false):p0Cell(v[kind],false);
+      if(m===p0RealYM&&p0ShowForecast){
+        p0TableHTML+=p0IsPct?p0PctCell(p0MonthTotalForecast[kind],p0MonthTotalForecast.shin+p0MonthTotalForecast.re,true):p0Cell(p0MonthTotalForecast[kind],true);
+      }
+    });
+    const gt=kind==='shin'?grandShinTotal:grandReTotal;
+    p0TableHTML+=p0IsPct?'<td>-</td>':`<td class="p0-total-col">${gt.toLocaleString()}</td>`;
+    p0TableHTML+='</tr>';
+  });
+  p0TableHTML+='<tr class="p0-grand-row p0-grand-total"><td class="p0-typelabel sum">누계</td>';
+  p0Months.forEach((m,mi)=>{
+    const v=p0MonthTotal[mi];
+    p0TableHTML+=p0IsPct?'<td>100.0%</td>':p0Cell(v.shin+v.re,false);
+    if(m===p0RealYM&&p0ShowForecast){
+      p0TableHTML+=p0IsPct?'<td class="p0-forecast">100.0%</td>':p0Cell(p0MonthTotalForecast.shin+p0MonthTotalForecast.re,true);
+    }
+  });
+  p0TableHTML+=p0IsPct?'<td>-</td>':`<td class="p0-total-col">${(grandShinTotal+grandReTotal).toLocaleString()}</td>`;
+  p0TableHTML+='</tr></tbody></table>';
+
 
   // ---- 상품별 상세/비중/성장률 (선택 상품유형 기준) ----
   const prodStats=[...selectedTypes].map(t=>{
@@ -1289,19 +1612,19 @@ function renderP0(){
     <!-- 요약 카드 -->
     <div class="summary-row" style="grid-template-columns:repeat(${3+(ndTotal>0?1:0)+(insuRows.length>0?1:0)},1fr)${isAllSelected?' auto':''};">
       <div class="sum-card">
-        <div class="sum-label">전체 계약</div>
-        <div class="sum-value" style="color:#1c1c2e;">${filtered.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
-        <div class="sum-sub">${pctBadge(filtered.length,prevTotal)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
+        <div class="sum-label">전체 계약${p0TaksoOverrideUsed?' <small style="color:#5B5FE8;font-weight:700;">(탁송)</small>':''}</div>
+        <div class="sum-value" style="color:#1c1c2e;">${cardTotalCt.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(cardTotalCt,prevTotal)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
       </div>
       <div class="sum-card">
-        <div class="sum-label">신차 계약</div>
-        <div class="sum-value" style="color:#5B5FE8;">${shincha.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
-        <div class="sum-sub">${pctBadge(shincha.length,prevShin)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
+        <div class="sum-label">신차 계약${p0TaksoOverrideUsed?' <small style="color:#5B5FE8;font-weight:700;">(탁송)</small>':''}</div>
+        <div class="sum-value" style="color:#5B5FE8;">${cardShinCt.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(cardShinCt,prevShin)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
       </div>
       <div class="sum-card">
-        <div class="sum-label">재렌트 계약</div>
-        <div class="sum-value" style="color:#22c997;">${rerent.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
-        <div class="sum-sub">${pctBadge(rerent.length,prevRe)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
+        <div class="sum-label">재렌트 계약${p0TaksoOverrideUsed?' <small style="color:#22c997;font-weight:700;">(탁송)</small>':''}</div>
+        <div class="sum-value" style="color:#22c997;">${cardReCt.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(cardReCt,prevRe)} <span style="color:#bbb;font-size:11px;">전년 동기 대비</span></div>
       </div>
       ${ndTotal>0?`
       <div class="sum-card">
@@ -1313,7 +1636,7 @@ function renderP0(){
       <div class="sum-card">
         <div class="sum-label">인수형 판매대수</div>
         <div class="sum-value" style="color:#FFA94D;">${insuRows.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
-        <div class="sum-sub"><span style="color:#888;font-size:11.5px;">동반차 ${dongbanInsu} · 구독카 ${gudokInsu}</span> <span class="stat-pct" style="background:#fff4e8;color:#c47c2b;">전체의 ${insuPct}%</span></div>
+        <div class="sum-sub"><span class="stat-pct" style="background:#fff4e8;color:#c47c2b;">전체의 ${insuPct}%</span></div>
       </div>`:''}
       <div class="yoy-card" style="display:${isAllSelected?'flex':'none'};flex-direction:column;justify-content:space-between;">
         <div class="yoy-title">📊 전년 동기 대비 요약</div>
@@ -1325,18 +1648,44 @@ function renderP0(){
       </div>
     </div>
 
-    <!-- 월별 계약 추세 비교 (상품별 · 와이드) -->
+    <!-- 상품별 추세 비교 (상품별 · 와이드) -->
     <div class="card" style="margin-bottom:16px;">
-      <div class="card-header">
-        <span class="card-title">월별 계약 추세 비교 <span style="font-size:11px;color:#999;font-weight:600;margin-left:6px;">최근 6개월 · ${parseInt(p0TodayYM.split('.')[1])}월(당월)은 탁송 기준, 이전 월은 실행 기준</span></span>
+      <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+        <span class="card-title">상품별 추세 비교 <span style="font-size:11px;color:#999;font-weight:600;margin-left:6px;">${p0PeriodFrom} ~ ${p0PeriodTo}${p0RealYMIdx>=0?` · 당월은 탁송 기준${p0ShowForecast?'(예상 포함)':''}`:''} · 그 외는 실행 기준</span></span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <select class="p0-year-sel" onchange="p0ApplyPreset(this.value)">
+            <option value="thisMonth" ${p0PresetKey==='thisMonth'?'selected':''}>이번달</option>
+            <option value="3m" ${p0PresetKey==='3m'?'selected':''}>최근 3개월</option>
+            <option value="6m" ${p0PresetKey==='6m'?'selected':''}>최근 6개월</option>
+            <option value="12m" ${p0PresetKey==='12m'?'selected':''}>최근 12개월</option>
+            <option value="thisYear" ${p0PresetKey==='thisYear'?'selected':''}>올해 전체</option>
+            <option value="lastYear" ${p0PresetKey==='lastYear'?'selected':''}>작년 전체</option>
+            <option value="custom" ${p0PresetKey==='custom'?'selected':''}>직접 설정</option>
+          </select>
+          <div id="p0CustomRangeWrap" style="display:${p0PresetKey==='custom'?'flex':'none'};align-items:center;gap:6px;">
+            <input type="month" id="p0PeriodFromInput" class="p0-year-sel" value="${p0PeriodFrom.replace('.','-')}" onchange="p0SetPeriod(this.value,document.getElementById('p0PeriodToInput').value)">
+            <span style="color:#bbb;">~</span>
+            <input type="month" id="p0PeriodToInput" class="p0-year-sel" value="${p0PeriodTo.replace('.','-')}" onchange="p0SetPeriod(document.getElementById('p0PeriodFromInput').value,this.value)">
+          </div>
+          <div class="p0-mode-toggle">
+            <button class="p0-mode-btn ${p0ViewMode==='count'?'active':''}" onclick="p0SetViewMode('count')">대수</button>
+            <button class="p0-mode-btn ${p0ViewMode==='percent'?'active':''}" onclick="p0SetViewMode('percent')">비율</button>
+            <button class="p0-mode-btn ${p0ViewMode==='graph'?'active':''}" onclick="p0SetViewMode('graph')">그래프</button>
+          </div>
+          ${(p0RealYMIdx>=0&&p0ViewMode!=='graph')?`<button class="p0-mode-btn" style="border:1px solid #e0e0ee;border-radius:8px;${p0ShowForecast?'':'background:#fdecec;color:#c0392b;border-color:#f3c9c9;'}" onclick="p0ToggleForecast()">${p0ShowForecast?'예상 끄기':'예상 켜기'}</button>`:''}
+        </div>
       </div>
-      <div class="chart-wrap" style="height:320px;"><canvas id="p0_prodTrend"></canvas></div>
+      <div style="font-size:10.5px;color:#bbb;margin:2px 0 4px;">직접 설정은 최대 1년(12개월)까지 가능해요</div>
+      ${p0ViewMode==='graph'
+        ?'<div class="chart-wrap" style="height:320px;"><canvas id="p0_prodTrend"></canvas></div>'
+        :`${p0Months.length>6?'<div style="font-size:10.5px;color:#aaa;margin-bottom:4px;">→ 표가 길면 오른쪽으로 스크롤하면 맨 끝 누계 열까지 보여요</div>':''}<div style="overflow-x:auto;margin-top:6px;">${p0TableHTML}</div>`}
     </div>
 
     <!-- 상품별 상세 현황 + 상품별 비중 -->
     <div style="display:grid;grid-template-columns:1.25fr 1fr;gap:16px;margin-bottom:16px;">
       <div class="card">
         <div class="card-header"><span class="card-title">상품별 상세 현황</span><span class="card-badge">${filtered.length}건</span></div>
+        ${p0TaksoOverrideUsed?`<div style="font-size:10.5px;color:#8A8FA3;margin:-6px 0 8px;">※ ${parseInt(p0TodayYM.split('.')[1])}월(당월)은 탁송(출고) 기준 · 이전 월은 실행 확정 기준 (무보증·인수형은 탁송데이터에 항목이 없어 실행 기준 유지)</div>`:''}
         <table class="trend-table" style="width:100%;">
           <thead><tr><th style="text-align:left;">상품</th><th>전체 계약</th><th>비중</th><th style="color:#5B5FE8;">신차</th><th style="color:#22c997;">재렌트</th><th>전년 동기 대비</th></tr></thead>
           <tbody>
@@ -1392,8 +1741,8 @@ function renderP0(){
     if(charts['p0_prodTrend'])charts['p0_prodTrend'].destroy();
     charts['p0_prodTrend']=new Chart(ptc.getContext('2d'),{
       type:'bar',
-      data:{labels:p0TrendMonths.map(m=>m===p0TodayYM?m+' (탁송)':m),
-        datasets:P0_TREND_PRODS.map(p=>({label:p,data:p0TrendData[p],backgroundColor:P0_PROD_COLORS[p]||'#94A3B8',borderRadius:4,maxBarThickness:26}))},
+      data:{labels:p0Months.map(m=>m===p0RealYM?p0MoLabel(m)+' (탁송)':p0MoLabel(m)),
+        datasets:p0Products.map(p=>({label:p,data:p0Data[p].map(v=>v?v.shin+v.re:0),backgroundColor:p0ColorFor(p),borderRadius:4,maxBarThickness:26}))},
       options:{responsive:true,maintainAspectRatio:false,
         plugins:{legend:{position:'bottom',labels:{font:{size:11},usePointStyle:true,boxWidth:8}}},
         scales:{x:{grid:{display:false},border:{display:false},ticks:{font:{size:11}}},
@@ -1488,6 +1837,12 @@ function getPrevYearRows(rows,iDate){
   const curY=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
   const prevY=String(parseInt(curY)-1);
   const mo=document.getElementById('monthSel')?.value||'';
+  if(viewMode==='range'){
+    ensureRangeDefaults();
+    const shift=ym=>{const p=ym.split('.');return `${parseInt(p[0])-1}.${p[1]}`;};
+    const pf=shift(rangeFrom), pt=shift(rangeTo);
+    return rows.filter(r=>{const ym=getYM(r[iDate]);return ym&&ym>=pf&&ym<=pt;});
+  }
   if(viewMode==='month'&&mo){
     const pm=prevY+'.'+mo.split('.')[1];
     return rows.filter(r=>getYM(r[iDate])===pm);
@@ -1498,6 +1853,109 @@ function getPrevYearRows(rows,iDate){
 // ===================== P1: 차량별 현황 =====================
 let selectedTypes=new Set();
 let _removedTypes=new Set(); // 사용자가 체크 해제한 상품
+let p0ViewMode='count';   // 상품별 추세 비교: 'graph' | 'count' | 'percent' (기본: 대수)
+let p0TableYear=null;     // (구버전 호환용, 더 이상 사용 안함)
+let p0PeriodFrom=null;    // 'YYYY.MM' 기간 시작
+let p0PeriodTo=null;      // 'YYYY.MM' 기간 끝
+let p0CollapsedProducts=new Set();  // 접힌 상품(신차/재렌트 숨김)
+let p0OtherDetailOpen=false;        // '기타' 상세 상품명 펼침 여부
+function p0ToggleOtherDetail(){ p0OtherDetailOpen=!p0OtherDetailOpen; renderP0(); }
+let p0FilterOpen=false;   // 상품 필터 패널 열림 여부
+let p0ShowForecast=true;  // 당월 예상 컬럼 표시 여부
+function p0ToggleForecast(){ p0ShowForecast=!p0ShowForecast; renderP0(); }
+
+// ---- 수행자별 추세 비교(P3) 독립 기간 상태 — 상단 카드(월/년 토글)와는 별개 ----
+let p3TrendFrom=null, p3TrendTo=null;   // 'YYYY.MM'
+function p3TrendResetDefault(){
+  const n=new Date();
+  p3TrendFrom=`${n.getFullYear()}.01`;
+  p3TrendTo=`${n.getFullYear()}.${String(n.getMonth()+1).padStart(2,'0')}`;
+}
+function p3TrendSetPeriod(from,to){
+  if(!from||!to)return;
+  const [fy,fm]=from.split('-').map(Number), [ty,tm]=to.split('-').map(Number);
+  const fromYM=`${fy}.${String(fm).padStart(2,'0')}`, toYM=`${ty}.${String(tm).padStart(2,'0')}`;
+  const spanMonths=(ty-fy)*12+(tm-fm)+1;
+  if(spanMonths<1){alert('시작월이 끝월보다 늦을 수 없어요.');return;}
+  if(spanMonths>12){alert('기간은 최대 1년(12개월)까지 선택할 수 있어요.');return;}
+  p3TrendFrom=fromYM; p3TrendTo=toYM;
+  renderP3();
+}
+function p3TrendApplyPreset(val){
+  const n=new Date(); const cy=n.getFullYear(), cm=n.getMonth()+1;
+  const mk=(y,m)=>`${y}-${String(m).padStart(2,'0')}`;
+  const back=(k)=>{let y=cy,m=cm-(k-1);while(m<1){m+=12;y--;}return mk(y,m);};
+  if(val==='custom'){
+    const cw=document.getElementById('p3TrendCustomWrap');
+    if(cw)cw.style.display='flex';
+    return;
+  }
+  let from,to;
+  if(val==='ytd'){from=mk(cy,1);to=mk(cy,cm);}
+  else if(val==='thisMonth'){from=mk(cy,cm);to=mk(cy,cm);}
+  else if(val==='3m'){from=back(3);to=mk(cy,cm);}
+  else if(val==='6m'){from=back(6);to=mk(cy,cm);}
+  else if(val==='12m'){from=back(12);to=mk(cy,cm);}
+  else if(val==='thisYear'){from=mk(cy,1);to=mk(cy,12);}
+  else if(val==='lastYear'){from=mk(cy-1,1);to=mk(cy-1,12);}
+  else return;
+  p3TrendSetPeriod(from,to);
+}
+function p0SetViewMode(m){ p0ViewMode=m; renderP0(); }
+function p0SetTableYear(y){ p0TableYear=y; renderP0(); }
+function p0SetPeriod(from,to){
+  if(!from||!to)return;
+  const [fy,fm]=from.split('-').map(Number), [ty,tm]=to.split('-').map(Number);
+  const fromYM=`${fy}.${String(fm).padStart(2,'0')}`, toYM=`${ty}.${String(tm).padStart(2,'0')}`;
+  const spanMonths=(ty-fy)*12+(tm-fm)+1;
+  if(spanMonths<1){alert('시작월이 끝월보다 늦을 수 없어요.');return;}
+  if(spanMonths>12){alert('기간은 최대 1년(12개월)까지 선택할 수 있어요.');return;}
+  p0PeriodFrom=fromYM; p0PeriodTo=toYM;
+  renderP0();
+}
+function p0ResetPeriodToYear(){
+  const y=new Date().getFullYear();
+  p0PeriodFrom=`${y}.01`; p0PeriodTo=`${y}.12`;
+  renderP0();
+}
+function p0ApplyPreset(val){
+  const n=new Date(); const cy=n.getFullYear(), cm=n.getMonth()+1;
+  const mk=(y,m)=>`${y}-${String(m).padStart(2,'0')}`;
+  const back=(k)=>{let y=cy,m=cm-(k-1);while(m<1){m+=12;y--;}return mk(y,m);};
+  if(val==='custom'){
+    const cw=document.getElementById('p0CustomRangeWrap');
+    if(cw)cw.style.display='flex';
+    return;
+  }
+  let from,to;
+  if(val==='thisMonth'){from=mk(cy,cm);to=mk(cy,cm);}
+  else if(val==='3m'){from=back(3);to=mk(cy,cm);}
+  else if(val==='6m'){from=back(6);to=mk(cy,cm);}
+  else if(val==='12m'){from=back(12);to=mk(cy,cm);}
+  else if(val==='thisYear'){from=mk(cy,1);to=mk(cy,12);}
+  else if(val==='lastYear'){from=mk(cy-1,1);to=mk(cy-1,12);}
+  else return;
+  p0SetPeriod(from,to);
+}
+function p0ToggleProdRow(p){
+  if(p0CollapsedProducts.has(p))p0CollapsedProducts.delete(p);else p0CollapsedProducts.add(p);
+  renderP0();
+}
+function p0ToggleFilterBar(){
+  p0FilterOpen=!p0FilterOpen;
+  const tfBar=document.getElementById('typeFilterBar');
+  if(tfBar)tfBar.style.display=p0FilterOpen?'flex':'none';
+  const btn=document.getElementById('p0FilterToggleBtn');
+  if(btn)btn.textContent=p0FilterOpen?'🔼 상품 필터 숨기기':'🔽 상품 필터 보기';
+}
+let detailMemoOpen=false;
+function toggleDetailMemo(){
+  detailMemoOpen=!detailMemoOpen;
+  const b=document.getElementById('detailMemoBodyWrap');
+  const a=document.getElementById('detailMemoArrow');
+  if(b)b.style.display=detailMemoOpen?'block':'none';
+  if(a)a.textContent=detailMemoOpen?'▲ 접기':'▼ 펼치기';
+}
 let p1CarMode='all';
 let p1SelectedCar=null;
 let p1ClickedMonth=null;
@@ -1558,9 +2016,18 @@ function renderP1(){
   const iFuelIdx=cols.findIndex(c=>c&&c.includes('유종'));
   const iTrimIdx=cols.findIndex(c=>c&&(c.includes('모델명')||c.includes('옵션')));
 
-  // 차종별 현황은 항상 년도별 (월별 선택 없음)
+  // 차종별 현황: 상단 기간바(월간/년간/기간 지정)를 따름
   const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
-  const yearRows=rows.filter(r=>getYM(r[iDate])?.startsWith(yr));
+  const periodLabel=getPeriodLabel();
+  const yearRowsExec=getFilteredRows(rows,iDate);
+  const p1TodayYM=thisMonth();
+  let p1TaksoOverrideUsed=false;
+  let yearRows=yearRowsExec;
+  if(rawTaksoTable&&periodIncludesMonth(p1TodayYM)){
+    const others=yearRowsExec.filter(r=>getYM(r[iDate])!==p1TodayYM);
+    yearRows=others.concat(buildTaksoRows(p1TodayYM));
+    p1TaksoOverrideUsed=true;
+  }
 
   const shinRows=yearRows.filter(r=>(r[iProd]||'').includes('신차'));
   const reRows=yearRows.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
@@ -1584,7 +2051,7 @@ function renderP1(){
   // 월 목록
   const now=new Date();
   const availMonths=[...new Set(
-    rows.filter(r=>getYM(r[iDate])?.startsWith(yr)).map(r=>getYM(r[iDate])).filter(Boolean)
+    yearRows.map(r=>getYM(r[iDate])).filter(Boolean)
   )].sort();
   const months=availMonths.length>0?availMonths:
     Array.from({length:yr===now.getFullYear().toString()?now.getMonth()+1:12},
@@ -1671,7 +2138,7 @@ function renderP1(){
         <div style="display:flex;align-items:center;justify-content:space-between;margin:16px 0;flex-wrap:wrap;gap:10px;">
           <div>
             <div style="font-size:20px;font-weight:700;">${p1SelectedCar||'전체'}</div>
-            <div style="font-size:12px;color:#aaa;margin-top:2px;">${yr}년 기준 · ${carRows.length}건</div>
+            <div style="font-size:12px;color:#aaa;margin-top:2px;">${periodLabel} 기준 · ${carRows.length}건${p1TaksoOverrideUsed?' <span style="color:#5B5FE8;font-weight:700;">· 당월은 탁송 기준</span>':''}</div>
           </div>
           <div style="display:flex;background:#f0f0f8;border-radius:8px;padding:3px;gap:2px;">
             ${['shin','re','all'].map(m=>`<button onclick="setP1Mode('${m}')" style="padding:6px 14px;border-radius:6px;font-size:12px;font-weight:500;font-family:inherit;cursor:pointer;border:none;background:${p1CarMode===m?'#fff':'transparent'};color:${p1CarMode===m?'#5B5FE8':'#888'};box-shadow:${p1CarMode===m?'0 1px 4px rgba(0,0,0,0.1)':'none'};">${m==='shin'?'신차':m==='re'?'재렌트':'전체'}</button>`).join('')}
@@ -1681,7 +2148,7 @@ function renderP1(){
         <!-- 월별 막대 차트 -->
         <div class="card" style="margin-bottom:16px;">
           <div class="card-header">
-            <span class="card-title">${yr}년 월별 출고 현황</span>
+            <span class="card-title">월별 출고 현황 <span style="font-size:11px;color:#aaa;font-weight:600;">(${periodLabel})</span></span>
             <span style="font-size:12px;color:#aaa;">막대 클릭 → 유종/트림 상세</span>
           </div>
           <div style="position:relative;height:240px;"><canvas id="p1_month_chart"></canvas></div>
@@ -1940,15 +2407,205 @@ function renderP3(){
   const rerent=filtered.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');});
   const shinTypeMap=countMap(shincha,r=>(r[iType]||'기타').toString().trim());
   const reTypeMap=countMap(rerent,r=>(r[iType]||'기타').toString().trim());
+
+  // ---- 전년 동기(연도별 조회 시: 전년 전체) 대비 증감률 요약카드 ----
+  const p3PrevRowsAll=getPrevYearRows(rows,iDate);
+  const p3PrevRows=selectedWorker==='__all__'?p3PrevRowsAll:p3PrevRowsAll.filter(r=>mapWorker(r[iWorker])===selectedWorker);
+  const p3PrevTotal=p3PrevRows.length;
+  const p3PrevShin=p3PrevRows.filter(r=>(r[iProd]||'').includes('신차')).length;
+  const p3PrevRe=p3PrevRows.filter(r=>{const v=(r[iProd]||'');return v.includes('재렌트')||v.includes('재');}).length;
+  const p3PeriodLabel=viewMode==='year'?'전년 대비':'전년 동기 대비';
+
   const allMonths=getAllMonths(allFiltered,iDate).slice(-12);
   const shinByM={},reByM={};
   allMonths.forEach(m=>{shinByM[m]=0;reByM[m]=0;});
   filtered.forEach(r=>{const m=getYM(r[iDate]);if(!m||!shinByM.hasOwnProperty(m))return;if((r[iProd]||'').includes('신차'))shinByM[m]++;else if((r[iProd]||'').includes('재렌트')||(r[iProd]||'').includes('재'))reByM[m]++;});
+  const monthShortLabels=allMonths.map(m=>parseInt(m.split('.')[1])+'월');
+
+  // ---- 당월(오늘 기준)은 탁송데이터로 카운트 · 월이 지나면 자동으로 실행 기준 복귀 ----
+  const _todayP3=new Date();
+  const todayYM=`${_todayP3.getFullYear()}.${String(_todayP3.getMonth()+1).padStart(2,'0')}`;
+  let p3TaksoOverrideUsed=false;
+  let p3CardShin=null,p3CardRe=null; // 상세뷰 카드용 (당월만 채워짐)
+  if(rawTaksoTable){
+    if(!shinByM.hasOwnProperty(todayYM)){shinByM[todayYM]=0;reByM[todayYM]=0;}
+    if(selectedWorker==='__all__'){
+      const wMap=taksoWorkerAggFor(todayYM,null);
+      if(wMap){
+        const cur=Object.values(wMap).reduce((acc,v)=>({shin:acc.shin+v.shin,re:acc.re+v.re}),{shin:0,re:0});
+        shinByM[todayYM]=cur.shin;
+        reByM[todayYM]=cur.re;
+        p3TaksoOverrideUsed=true;
+        // 조회 기간이 당월 하나뿐이면(전체보기) 요약카드도 탁송 기준으로 대체
+        const p3ViewingMoAll=document.getElementById('monthSel')?.value||thisMonth();
+        const p3ViewingCurMonthAll=(typeof viewMode==='undefined'||viewMode==='month')&&p3ViewingMoAll===thisMonth();
+        if(p3ViewingCurMonthAll){p3CardShin=cur.shin;p3CardRe=cur.re;}
+      }
+    }else{
+      const wMap=taksoWorkerAggFor(todayYM,selectedWorker);
+      if(wMap){
+        const cur=wMap[selectedWorker]||{shin:0,re:0};
+        shinByM[todayYM]=cur.shin;
+        reByM[todayYM]=cur.re;
+        p3TaksoOverrideUsed=true;
+        // 조회 기간이 당월 하나뿐이면 요약 카드도 탁송 기준으로 대체 (무보증/인수형은 탁송데이터에 없어 실행 기준 유지)
+        const p3ViewingMo=document.getElementById('monthSel')?.value||thisMonth();
+        const p3ViewingCurMonth=(typeof viewMode==='undefined'||viewMode==='month')&&p3ViewingMo===thisMonth();
+        if(p3ViewingCurMonth){p3CardShin=cur.shin;p3CardRe=cur.re;}
+      }
+    }
+  }
+
+  const p3DispTotalSum=p3CardShin!=null?(p3CardShin+p3CardRe):totalAll;
+  const p3DispShinSum=p3CardShin!=null?p3CardShin:shincha.length;
+  const p3DispReSum=p3CardRe!=null?p3CardRe:rerent.length;
+  const p3SumTaksoTag=p3CardShin!=null?' <small style="color:#5B5FE8;font-weight:700;">(탁송)</small>':'';
+  const p3SummaryHtml=`
+    <div class="summary-row" style="grid-template-columns:1fr 1fr 1fr;margin-bottom:16px;">
+      <div class="sum-card">
+        <div class="sum-label">전체 계약${p3SumTaksoTag}${selectedWorker!=='__all__'?` <small style="color:#888;">(${escH(selectedWorker)})</small>`:''}</div>
+        <div class="sum-value" style="color:#1c1c2e;">${p3DispTotalSum.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(p3DispTotalSum,p3PrevTotal)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">신차 계약${p3SumTaksoTag}</div>
+        <div class="sum-value" style="color:#5B5FE8;">${p3DispShinSum.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(p3DispShinSum,p3PrevShin)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div>
+      </div>
+      <div class="sum-card">
+        <div class="sum-label">재렌트 계약${p3SumTaksoTag}</div>
+        <div class="sum-value" style="color:#22c997;">${p3DispReSum.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#aaa;"> 건</span></div>
+        <div class="sum-sub">${pctBadge(p3DispReSum,p3PrevRe)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div>
+      </div>
+    </div>`;
+
+  if(selectedWorker==='__all__'){
+    // ===== 전체: 수행자별 추세 비교 (상단 카드와 독립적인 기간 — 기본: 올해 1월~당월) =====
+    if(!p3TrendFrom||!p3TrendTo)p3TrendResetDefault();
+    const p3TrendMonths=[];
+    {
+      let [fy,fm]=p3TrendFrom.split('.').map(Number);
+      const [ty,tm]=p3TrendTo.split('.').map(Number);
+      let guard=0;
+      while((fy<ty||(fy===ty&&fm<=tm))&&guard<12){
+        p3TrendMonths.push(`${fy}.${String(fm).padStart(2,'0')}`);
+        fm++; if(fm>12){fm=1;fy++;} guard++;
+      }
+    }
+    const p3TrendMultiYear=p3TrendMonths.length>0&&p3TrendMonths[0].slice(0,4)!==p3TrendMonths[p3TrendMonths.length-1].slice(0,4);
+    const p3TrendMoLabel=m=>p3TrendMultiYear?`${m.slice(2,4)}.${m.slice(5,7)}`:`${parseInt(m.split('.')[1])}월`;
+    const p3TrendPresetKey=(()=>{
+      const n=new Date(); const cy=n.getFullYear(), cm=n.getMonth()+1;
+      const mk=(y,m)=>`${y}.${String(m).padStart(2,'0')}`;
+      const back=(k)=>{let y=cy,m=cm-(k-1);while(m<1){m+=12;y--;}return mk(y,m);};
+      if(p3TrendFrom===mk(cy,1)&&p3TrendTo===mk(cy,cm))return 'ytd';
+      if(p3TrendFrom===mk(cy,cm)&&p3TrendTo===mk(cy,cm))return 'thisMonth';
+      if(p3TrendFrom===back(3)&&p3TrendTo===mk(cy,cm))return '3m';
+      if(p3TrendFrom===back(6)&&p3TrendTo===mk(cy,cm))return '6m';
+      if(p3TrendFrom===back(12)&&p3TrendTo===mk(cy,cm))return '12m';
+      if(p3TrendFrom===mk(cy,1)&&p3TrendTo===mk(cy,12))return 'thisYear';
+      if(p3TrendFrom===mk(cy-1,1)&&p3TrendTo===mk(cy-1,12))return 'lastYear';
+      return 'custom';
+    })();
+
+    const workerMonthly={};
+    rows.forEach(r=>{
+      const name=mapWorker(r[iWorker]);if(!name)return;
+      const m=getYM(r[iDate]);if(!m||!p3TrendMonths.includes(m))return;
+      if(!workerMonthly[name])workerMonthly[name]=p3TrendMonths.map(()=>0);
+      workerMonthly[name][p3TrendMonths.indexOf(m)]++;
+    });
+    // 당월 컬럼(선택 기간 안에 있을 때만)은 탁송데이터 기준으로 대체 (수행자별)
+    const p3TrendTodayIdx=p3TrendMonths.indexOf(todayYM);
+    let p3TrendTaksoUsed=false;
+    if(p3TrendTodayIdx>=0&&rawTaksoTable){
+      const wMapAll=taksoWorkerAggFor(todayYM,null);
+      if(wMapAll){
+        Object.keys(wMapAll).forEach(name=>{if(!workerMonthly[name])workerMonthly[name]=p3TrendMonths.map(()=>0);});
+        Object.keys(workerMonthly).forEach(name=>{
+          const agg=wMapAll[name];
+          workerMonthly[name][p3TrendTodayIdx]=agg?(agg.shin+agg.re):0;
+        });
+        p3TrendTaksoUsed=true;
+      }
+    }
+    const rowsData=Object.entries(workerMonthly).map(([name,arr])=>{
+      const total=arr.reduce((a,b)=>a+b,0);
+      const g=p3GrowthInfo(arr,total);
+      return{name,arr,total,g};
+    }).sort((a,b)=>b.total-a.total);
+    const grandTotal=p3TrendMonths.map((m,i)=>rowsData.reduce((s,r)=>s+r.arr[i],0));
+    const p3TrendMoLabels=p3TrendMonths.map(p3TrendMoLabel);
+    document.getElementById('p3_content').innerHTML=`
+    ${p3SummaryHtml}
+    <div class="card" style="margin-bottom:16px;">
+      <div class="card-header" style="flex-wrap:wrap;gap:8px;">
+        <span class="card-title">수행자별 추세 비교 <span style="font-size:11px;color:#999;font-weight:600;margin-left:6px;">${p3TrendFrom} ~ ${p3TrendTo}${p3TrendTaksoUsed?` · ${parseInt(todayYM.split('.')[1])}월(당월)은 탁송 기준`:''}</span></span>
+        <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap;">
+          <select class="p0-year-sel" onchange="p3TrendApplyPreset(this.value)">
+            <option value="ytd" ${p3TrendPresetKey==='ytd'?'selected':''}>올해 1월~당월</option>
+            <option value="thisMonth" ${p3TrendPresetKey==='thisMonth'?'selected':''}>이번달</option>
+            <option value="3m" ${p3TrendPresetKey==='3m'?'selected':''}>최근 3개월</option>
+            <option value="6m" ${p3TrendPresetKey==='6m'?'selected':''}>최근 6개월</option>
+            <option value="12m" ${p3TrendPresetKey==='12m'?'selected':''}>최근 12개월</option>
+            <option value="thisYear" ${p3TrendPresetKey==='thisYear'?'selected':''}>올해 전체</option>
+            <option value="lastYear" ${p3TrendPresetKey==='lastYear'?'selected':''}>작년 전체</option>
+            <option value="custom" ${p3TrendPresetKey==='custom'?'selected':''}>직접 설정</option>
+          </select>
+          <div id="p3TrendCustomWrap" style="display:${p3TrendPresetKey==='custom'?'flex':'none'};align-items:center;gap:6px;">
+            <input type="month" id="p3TrendFromInput" class="p0-year-sel" value="${p3TrendFrom.replace('.','-')}" onchange="p3TrendSetPeriod(this.value,document.getElementById('p3TrendToInput').value)">
+            <span style="color:#bbb;">~</span>
+            <input type="month" id="p3TrendToInput" class="p0-year-sel" value="${p3TrendTo.replace('.','-')}" onchange="p3TrendSetPeriod(document.getElementById('p3TrendFromInput').value,this.value)">
+          </div>
+        </div>
+      </div>
+    <div style="display:flex;align-items:center;gap:18px;flex-wrap:wrap;margin:10px 0 14px;font-size:12.5px;color:#555;">
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:11px;height:11px;border-radius:3px;background:#22c997;display:inline-block;"></span>성장 (+10% 이상)</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:11px;height:11px;border-radius:3px;background:#9AA0B4;display:inline-block;"></span>유지 (±10% 이내)</span>
+      <span style="display:flex;align-items:center;gap:6px;"><span style="width:11px;height:11px;border-radius:3px;background:#FF6B6B;display:inline-block;"></span>하락 (-10% 이하)</span>
+    </div>
+    <div style="overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:13px;white-space:nowrap;">
+        <thead><tr style="border-bottom:2px solid #f0f0f8;">
+          <th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">수행자</th>
+          ${p3TrendMoLabels.map((l,i)=>`<th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">${l}${p3TrendMonths[i]===todayYM&&p3TrendTaksoUsed?'<br><span style="font-size:9.5px;color:#5B5FE8;font-weight:700;">(탁송)</span>':''}</th>`).join('')}
+          <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">합계</th>
+          <th style="text-align:center;padding:9px 12px;color:#999;font-weight:500;">추이</th>
+          <th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">증감률</th>
+        </tr></thead>
+        <tbody>
+        ${rowsData.map(r=>`<tr style="border-bottom:1px solid #f5f5f8;">
+          <td style="padding:9px 12px;font-weight:600;">${escH(r.name)}</td>
+          ${r.arr.map(v=>`<td style="text-align:right;padding:9px 12px;color:#555;">${v.toLocaleString()}</td>`).join('')}
+          <td style="text-align:right;padding:9px 12px;font-weight:700;">${r.total.toLocaleString()}</td>
+          <td style="text-align:center;padding:5px 12px;">${sparklineSVG(r.arr,r.g.color)}</td>
+          <td style="text-align:right;padding:9px 12px;font-weight:700;color:${r.g.color};">${r.g.label}</td>
+        </tr>`).join('')}
+        </tbody>
+        <tfoot><tr style="border-top:2px solid #f0f0f8;font-weight:700;">
+          <td style="padding:9px 12px;">전체 합계</td>
+          ${grandTotal.map(v=>`<td style="text-align:right;padding:9px 12px;">${v.toLocaleString()}</td>`).join('')}
+          <td style="text-align:right;padding:9px 12px;">${grandTotal.reduce((a,b)=>a+b,0).toLocaleString()}</td>
+          <td></td><td></td>
+        </tr></tfoot>
+      </table>
+    </div>
+    ${p3TrendTaksoUsed?`<div style="font-size:11px;color:#8A8FA3;margin-top:8px;">※ ${parseInt(todayYM.split('.')[1])}월(당월)은 탁송(출고) 기준 · 이전 월은 실행 확정 기준</div>`:''}
+    </div>`;
+    return;
+  }
+
+  // ===== 특정 수행자 상세: 출고 추이 차트를 위로, 요약 카드는 아래로 =====
+  const p3DispTotal=p3CardShin!=null?(p3CardShin+p3CardRe):totalAll;
+  const p3DispShin=p3CardShin!=null?p3CardShin:shincha.length;
+  const p3DispRe=p3CardRe!=null?p3CardRe:rerent.length;
+  const p3TaksoTag=p3CardShin!=null?' <small style="color:#5B5FE8;font-weight:700;">(탁송)</small>':'';
   document.getElementById('p3_content').innerHTML=`
+    <div class="card" style="margin-bottom:16px;"><div class="card-header"><span class="card-title">출고 추이</span></div><div style="position:relative;height:220px;"><canvas id="p3_trend_chart"></canvas></div></div>
     <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-bottom:16px;">
-      <div class="sum-card"><div class="sum-label">전체 계약</div><div class="sum-value" style="font-size:24px;">${totalAll.toLocaleString()}</div></div>
-      <div class="sum-card"><div class="sum-label">신차</div><div class="sum-value" style="font-size:24px;color:#5B5FE8;">${shincha.length}</div></div>
-      <div class="sum-card"><div class="sum-label">재렌트</div><div class="sum-value" style="font-size:24px;color:#22c997;">${rerent.length}</div></div>
+      <div class="sum-card"><div class="sum-label">전체 계약${p3TaksoTag}</div><div class="sum-value" style="font-size:24px;">${p3DispTotal.toLocaleString()}</div><div class="sum-sub">${pctBadge(totalAll,p3PrevTotal)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div></div>
+      <div class="sum-card"><div class="sum-label">신차${p3TaksoTag}</div><div class="sum-value" style="font-size:24px;color:#5B5FE8;">${p3DispShin}</div><div class="sum-sub">${pctBadge(shincha.length,p3PrevShin)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div></div>
+      <div class="sum-card"><div class="sum-label">재렌트${p3TaksoTag}</div><div class="sum-value" style="font-size:24px;color:#22c997;">${p3DispRe}</div><div class="sum-sub">${pctBadge(rerent.length,p3PrevRe)} <span style="color:#bbb;font-size:11px;">${p3PeriodLabel}</span></div></div>
       <div class="sum-card"><div class="sum-label">무보증</div><div class="sum-value" style="font-size:24px;color:#FFA94D;">${filtered.filter(r=>isNoDepo(r[iNoDepo])).length}</div></div>
     </div>
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;">
@@ -1960,14 +2617,6 @@ function renderP3(){
         <div class="donut-wrap"><div class="donut-canvas-wrap"><canvas id="donut_p3_re"></canvas><div class="donut-center"><div class="donut-center-val">${rerent.length}</div><div class="donut-center-label">재렌트</div></div></div><div class="donut-legend" id="legend_p3_re"></div></div>
         <div style="margin-top:12px;padding-top:12px;border-top:1px solid #f0f0f8;font-size:13px;color:#999;">무보증 <strong style="color:#22c997;margin-left:6px;">${filtered.filter(r=>{const v=(r[iProd]||'');return(v.includes('재렌트')||v.includes('재'))&&isNoDepo(r[iNoDepo]);}).length}건</strong></div>
       </div>
-    </div>
-    <div class="card" style="margin-bottom:16px;"><div class="card-header"><span class="card-title">월별 추세 (신차 / 재렌트)</span></div><div style="position:relative;height:200px;"><canvas id="p3_trend_chart"></canvas></div></div>
-    <div class="card" style="margin-bottom:16px;overflow-x:auto;">
-      <div class="card-header"><span class="card-title">수행자별 상세</span></div>
-      <table style="width:100%;border-collapse:collapse;font-size:13px;">
-        <thead><tr style="border-bottom:2px solid #f0f0f8;"><th style="text-align:left;padding:9px 12px;color:#999;font-weight:500;">수행자</th><th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">전체</th><th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">신차</th><th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">재렌트</th><th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">인수형</th><th style="text-align:right;padding:9px 12px;color:#999;font-weight:500;">무보증</th></tr></thead>
-        <tbody>${sorted.map(([name,s],i)=>`<tr style="border-bottom:1px solid #f5f5f8;"><td style="padding:9px 12px;font-weight:600;"><span style="display:inline-block;width:7px;height:7px;border-radius:50%;background:${COLORS[i%COLORS.length]};margin-right:7px;"></span>${name}</td><td style="text-align:right;padding:9px 12px;font-weight:700;">${s.total}</td><td style="text-align:right;padding:9px 12px;color:#5B5FE8;">${s.shin}</td><td style="text-align:right;padding:9px 12px;color:#22c997;">${s.re}</td><td style="text-align:right;padding:9px 12px;color:#FF6B6B;">${s.insu}</td><td style="text-align:right;padding:9px 12px;color:#FFA94D;">${s.noDepo}</td></tr>`).join('')}</tbody>
-      </table>
     </div>`;
   renderDonut('donut_p3_shin','legend_p3_shin',shinTypeMap);
   renderDonut('donut_p3_re','legend_p3_re',reTypeMap);
@@ -1977,6 +2626,47 @@ function renderP3(){
   }
 }
 function setWorker(w){selectedWorker=w;renderP3();}
+
+// 추이 스파크라인 SVG 생성 (성장률에 따라 초록/회색/빨강)
+function sparklineSVG(arr,color){
+  const W=110,H=34,pad=4;
+  const max=Math.max(...arr,1), min=Math.min(...arr,0);
+  const range=(max-min)||1;
+  const step=arr.length>1?(W-pad*2)/(arr.length-1):0;
+  const pts=arr.map((v,i)=>{
+    const x=pad+step*i;
+    const y=H-pad-((v-min)/range)*(H-pad*2);
+    return [x,y];
+  });
+  const path=pts.map((p,i)=>(i===0?'M':'L')+p[0].toFixed(1)+','+p[1].toFixed(1)).join(' ');
+  const last=pts[pts.length-1]||[W-pad,H-pad];
+  return `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" style="display:block;">
+    <path d="${path}" fill="none" stroke="${color}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+    <circle cx="${last[0].toFixed(1)}" cy="${last[1].toFixed(1)}" r="3" fill="${color}"/>
+  </svg>`;
+}
+function p3GrowthInfo(arr,total){
+  const n=arr.length;
+  const half=Math.ceil(n/2);
+  const firstArr=arr.slice(0,half), secondArr=arr.slice(half);
+  const firstSum=firstArr.reduce((a,b)=>a+b,0), secondSum=secondArr.reduce((a,b)=>a+b,0);
+  let color='#9AA0B4', label, cls='유지';
+  if(total<30){
+    const diff=secondSum-firstSum;
+    label=(diff>0?'+':'')+diff.toFixed(1)+'건';
+    if(diff>0){color='#22c997';cls='성장';}else if(diff<0){color='#FF6B6B';cls='하락';}
+    return{label,color,cls};
+  }
+  if(firstSum===0){
+    if(secondSum===0){label='0.0%';return{label,color,cls};}
+    label='NEW';color='#22c997';cls='성장';
+    return{label,color,cls};
+  }
+  const growth=(secondSum-firstSum)/firstSum*100;
+  label=(growth>=0?'+':'')+growth.toFixed(1)+'%';
+  if(growth>=10){color='#22c997';cls='성장';}else if(growth<=-10){color='#FF6B6B';cls='하락';}
+  return{label,color,cls};
+}
 
 // ===================== TREND POPUP =====================
 const MONTHS=['1월','2월','3월','4월','5월','6월','7월','8월','9월','10월','11월','12월'];
@@ -2372,13 +3062,14 @@ function moveTip(box,e){
   box.style.left=x+'px';box.style.top=y+'px';
 }
 function calcPctGlobal(curr,prev){if(!prev)return null;return((curr-prev)/prev*100).toFixed(1);}
+function pctBadge(curr,prev){const p=calcPctGlobal(curr,prev);if(p===null)return'';const up=parseFloat(p)>=0;return`<span class="stat-pct" style="background:${up?'#e8f8f0':'#fde8e8'};color:${up?'#1a7a4a':'#a32d2d'};">${up?'▲':'▼'} ${Math.abs(p)}%</span>`;}
 // 공지 팝업
 async function refreshAllData(){
   const btn=document.getElementById('nxRefreshBtn');
   if(btn){btn.disabled=true;btn.textContent='⏳ 불러오는 중...';}
   try{
-    await loadAll();
-    await loadExecExtras();
+    // 서로 의존관계 없음 -> 동시에 요청해서 대기 시간을 더 줄임
+    await Promise.all([loadAll(), loadExecExtras()]);
     if(navPage==='exec')renderExec();
     else if(navPage==='monthly')renderMonthly();
     else if(navPage==='report')renderReport();
@@ -2514,14 +3205,7 @@ function goPage(p){
 // --- 시트 탭 로더 (목표설정 / 이슈) ---
 async function fetchSheetTab(tab){
   const id=document.getElementById('sheetId').value.trim();
-  const url=`https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(tab)}`;
-  try{
-    const res=await fetch(url);const text=await res.text();
-    const m=text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
-    if(!m)return null;
-    const j=JSON.parse(m[1]);
-    return (j.table&&j.table.rows&&j.table.rows.length)?j.table:null;
-  }catch(e){return null;}
+  return fetchSheetJSON(tab,id);
 }
 
 function cellYM(c){
@@ -2563,25 +3247,32 @@ function parseIssuesTable(tI){
 }
 
 async function loadExecExtras(){
-  const [tT,tI,tV,tH,tX]=await Promise.all([fetchSheetTab('목표설정'),fetchSheetTab('이슈'),fetchSheetTab('차량 RAW DATA'),fetchSheetTab('공휴일'),fetchSheetTab('미실행제외')]);
+  const _extraId=document.getElementById('sheetId').value.trim();
+  const _extras=await fetchSheetsJSON(['목표설정','이슈','차량 RAW DATA','공휴일','미실행제외','자산변경'],_extraId);
+  const tT=_extras['목표설정']||null, tI=_extras['이슈']||null, tV=_extras['차량 RAW DATA']||null, tH=_extras['공휴일']||null;
   rawVehicleTable=tV||null;   // 재고현황(재고판) 재사용용 — 매번 재요청하지 않도록 캐시
   targetsMap=null;issuesList=null;assetBuyMap=null;
   unexecExcludeMap=null;
-  if(tX){
+  // 미실행 제외 자산: '미실행제외' 또는 '자산변경' 탭 — 둘 중 있는 것(둘 다 있으면 합침)을 읽는다
+  // ★ 방어: 없는 탭 이름을 요청하면 구글시트가 에러 대신 "첫 번째 시트(판매현황테스트)"를 통째로 돌려주는 경우가 있음.
+  //   그걸 제외 목록으로 오인하면 실행 이력이 있는 모든 자산이 미실행에서 빠져버리므로,
+  //   ①자산번호 열 + ②사유 열이 모두 있고 ③열 수가 적은(8개 이하) "진짜 제외 탭"만 인정한다.
+  [_extras['미실행제외'],_extras['자산변경']].forEach(tX=>{
+    if(!tX)return;
+    if((tX.cols||[]).length>8)return;            // ③ 판매현황테스트(수십 열) 오폴백 차단
     const fA=findColFlexible(tX,'자산번호');
     const fR=findColFlexible(tX,'사유');
-    if(fA){
-      unexecExcludeMap={};
-      const start=fA.skipFirst?1:0;
-      for(let k=start;k<tX.rows.length;k++){
-        const c=tX.rows[k].c;if(!c)continue;
-        const a=cellStr(c[fA.i]);
-        if(!a)continue;
-        unexecExcludeMap[a]=fR?cellStr(c[fR.i]):'';
-      }
-      if(!Object.keys(unexecExcludeMap).length)unexecExcludeMap=null;
+    if(!fA||!fR)return;                          // ①② 두 열 모두 있어야 제외 탭으로 인정
+    if(!unexecExcludeMap)unexecExcludeMap={};
+    const start=fA.skipFirst?1:0;
+    for(let k=start;k<tX.rows.length;k++){
+      const c=tX.rows[k].c;if(!c)continue;
+      const a=cellStr(c[fA.i]);
+      if(!a)continue;
+      unexecExcludeMap[a]=fR?cellStr(c[fR.i]):'';
     }
-  }
+  });
+  if(unexecExcludeMap&&!Object.keys(unexecExcludeMap).length)unexecExcludeMap=null;
   holidaySet=new Set();
   if(tH){
     const hCols=tH.cols.map(c=>((c.label||'')+'').trim());
@@ -2763,15 +3454,18 @@ function renderExec(){
       const tType=tCols.findIndex(c=>c.includes('신차구분'));
       const tCarNo=tCols.findIndex(c=>c.replace(/\s/g,'').includes('차량번호'));
       if(tAsset>=0&&iAssetMain>=0&&tDate>=0){
-        // 실행상태가 '종결'인 건은 이미 끝난 계약이라 자산번호가 재사용될 수 있음 → 실행완료로 치지 않음
-        const execSet=new Set(
-          monthRows
-            .filter(r=>iStatusMain<0 || !((r[iStatusMain]||'')+'').trim().includes('종결'))
-            .map(r=>((r[iAssetMain]||'')+'').trim())
-            .filter(Boolean)
-        );
-        const seen=new Set();
-        const list=[];let taksoCnt=0;
+        // === 미실행 판정 규칙 (자산별 건수 매칭) ===
+        // ① 당월(baseYM, 연-월 정확히 일치. 예: 2026.07 ≠ 2024.07) 탁송 건수를 자산별로 센다.
+        //    - 차량교체(수행자 공란/특이건) 제외, 자산변경(미실행제외 탭) 등록 자산 제외
+        // ② 당월 실행(판매현황) 건수를 자산별로 센다. ★실행상태 무관 — '종결'이어도 당월 실행 기록이면 실행으로 인정★
+        //    (당월에 실행됐다가 곧바로 계약해지(종결)된 건도 "실행은 된 것"이므로 미실행이 아님)
+        // ③ 자산별로 [탁송 건수 > 실행 건수] 인 경우에만 미실행.
+        //    - 탁송1 · 실행1(종결) → 매칭 → 실행완료 (예: 161하7748)
+        //    - 같은 자산이 당월 2회 출고(재실행): 탁송2 · 실행1(종결) → 1건 미실행 (새 계약분만 대기)
+        //    - 탁송1 · 실행0 → 미실행
+
+        // ① 당월 탁송: 자산별 건수 + 대표 행(가장 늦은 탁송)
+        const taksoCntMap={}, taksoRep={};
         tRows.forEach(r=>{
           const rd=rowDate(r);
           if(getYM(rd)!==baseYM)return;
@@ -2779,21 +3473,38 @@ function renderExec(){
           if(dd!=null&&dd>baseDay)return;   // 기준일 이후 탁송 제외
           if(tWk>=0&&isSwapWk(r[tWk]))return;   // 차량교체건 제외
           const a=((r[tAsset]||'')+'').trim();
-          if(!a||seen.has(a))return;
-          if(unexecExcludeMap&&Object.prototype.hasOwnProperty.call(unexecExcludeMap,a))return;   // 수동 제외 처리(차량번호 변경 등)
-          seen.add(a);taksoCnt++;
-          if(!execSet.has(a)){
-            const tv=tType>=0?((r[tType]||'')+''):'';
-            if(tv.includes('신차'))unexShin++;
-            else if(tv.includes('재렌트')||tv.includes('재'))unexRe++;
-          }
-          if(!execSet.has(a))list.push({
+          if(!a)return;
+          if(unexecExcludeMap&&Object.prototype.hasOwnProperty.call(unexecExcludeMap,a))return;   // 자산변경(번호판 변경 등) 수동 제외
+          taksoCntMap[a]=(taksoCntMap[a]||0)+1;
+          const dnum=getDayNum(rd);
+          if(!taksoRep[a]||((dnum||0)>=(taksoRep[a].day||0)))taksoRep[a]={r,day:dnum};
+        });
+        const taksoCnt=Object.keys(taksoCntMap).length;
+
+        // ② 당월 실행: 자산별 건수 (실행상태 무관 — 종결 포함)
+        const execCntMap={};
+        rows.forEach(r=>{
+          if(getYM(r[iDate])!==baseYM)return;
+          const a=((r[iAssetMain]||'')+'').trim();
+          if(!a)return;
+          execCntMap[a]=(execCntMap[a]||0)+1;
+        });
+
+        // ③ 판정: 탁송 건수가 실행 건수보다 많은 자산만 미실행
+        const list=[];
+        Object.keys(taksoCntMap).forEach(a=>{
+          if((execCntMap[a]||0)>=taksoCntMap[a])return;   // 전부 매칭 → 실행완료
+          const rep=taksoRep[a], r=rep.r;
+          const tv=tType>=0?((r[tType]||'')+''):'';
+          if(tv.includes('신차'))unexShin++;
+          else if(tv.includes('재렌트')||tv.includes('재'))unexRe++;
+          list.push({
             asset:a,
             carNo:(tCarNo>=0?((r[tCarNo]||'')+'').trim():'')||(assetCarNo?(assetCarNo[a]||''):''),
             prod:tProd>=0?((r[tProd]||'')+''):'',
             car:tCar>=0?((r[tCar]||'')+''):'',
             wk:(tWk>=0&&typeof mapWorker==='function')?(mapWorker(r[tWk])||''):'',
-            day:getDayNum(rd)
+            day:rep.day
           });
         });
         list.sort((x,y)=>(x.day||99)-(y.day||99));
@@ -3058,9 +3769,16 @@ function renderExec(){
 function setExDrill(k){exDrillKey=k;renderExec();}
 
 /* ===================== 월별 비교 ===================== */
-let mcYear=null, mcMode='month', mcMonth=null;
+let mcYear=null, mcMode='month', mcMonth=null, mcMemoOpen=false;
 function mcModeChange(m){mcMode=m;renderMonthly();}
 function mcMonthChange(v){mcMonth=parseInt(v);renderMonthly();}
+function toggleMcMemo(){
+  mcMemoOpen=!mcMemoOpen;
+  const body=document.getElementById('mcMemoBody');
+  const icon=document.getElementById('mcMemoToggleIcon');
+  if(body)body.style.display=mcMemoOpen?'block':'none';
+  if(icon)icon.textContent=mcMemoOpen?'▼ 접기':'▶ 펼치기';
+}
 function getDayNum(v){
   if(v==null)return null;
   const s=v.toString();
@@ -3140,6 +3858,111 @@ function taksoProdMapFor(ym){
   return map;
 }
 
+// 상품별 신차/재렌트 분리 탁송 집계 (월별 계약 추세 표의 당월/예상 칸용)
+// 탁송데이터 기준 수행자별 신차/재렌트 집계 (자산 중복 제거, 차량교체건 제외) — 수행자별 현황 당월 카운트용
+// workerFilter가 주어지면 해당 수행자(매핑명)만 집계, null이면 전체 수행자 맵 반환
+function taksoWorkerAggFor(ym,workerFilter){
+  const cc=taksoResolveCols();
+  if(!cc||!rawTaksoTable)return null;
+  const result={};
+  const seen=new Set();
+  rawTaksoTable.rows.forEach(rw=>{
+    const r=rw.c.map(c=>c?c.v:null);
+    const rd=cc.rowDate(r);
+    if(getYM(rd)!==ym)return;
+    if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
+    const a=(cc.tkAsset>=0?((r[cc.tkAsset]||'')+''):'').trim();
+    if(a){if(seen.has(a))return;seen.add(a);}
+    const rawW=cc.tkWk>=0?r[cc.tkWk]:null;
+    const name=(typeof mapWorker==='function')?mapWorker(rawW):null;
+    if(!name)return;
+    if(workerFilter&&name!==workerFilter)return;
+    if(!result[name])result[name]={shin:0,re:0};
+    const tv=cc.tkType>=0?((r[cc.tkType]||'')+''):'';
+    if(tv.includes('신차'))result[name].shin++; else result[name].re++;
+  });
+  return result;
+}
+
+// 현재 상단 기간바(월간/년간/기간 지정) 설정이 특정 월(ym)을 포함하는지 판단
+function periodIncludesMonth(ym){
+  if(typeof viewMode==='undefined')return ym===thisMonth();
+  const yr=document.getElementById('yearSel')?.value||new Date().getFullYear().toString();
+  const mo=document.getElementById('monthSel')?.value||'';
+  if(viewMode==='range'){
+    if(typeof ensureRangeDefaults==='function')ensureRangeDefaults();
+    return !!(rangeFrom&&rangeTo&&ym>=rangeFrom&&ym<=rangeTo);
+  }
+  if(viewMode==='month')return mo?mo===ym:ym===thisMonth();
+  return ym.startsWith(yr);
+}
+// 탁송데이터 → 판매현황 rows와 같은 컬럼 위치의 "대체 행" 생성 (당월 실행 데이터 대신 사용)
+// 채울 수 있는 필드: 상품구분(신차/재렌트), 상품유형(=상품명), 수행원, 계약실행일, 자산번호, 시리즈명(차종·자산매칭)
+// 채울 수 없는 필드(무보증여부/종료후처리/렌탈료/연령대/판매채널 등)는 null로 두어 해당 항목 집계에서는 자동 제외됨
+function buildTaksoRows(ym){
+  const cc=taksoResolveCols();
+  if(!cc||!rawTaksoTable||!rawTable)return [];
+  const tkColsAll=rawTaksoTable.cols.map(c=>(c.label||'')+'');
+  const tProdI=tkColsAll.findIndex(c=>c.includes('상품명'));
+  const cols=rawTable.cols.map(c=>c.label);
+  const iProd=cols.findIndex(c=>c&&c.includes('상품구분'));
+  const iType=cols.findIndex(c=>c&&c.includes('상품유형'));
+  const iWorker=cols.findIndex(c=>c&&c.includes('수행원'));
+  const iDateC=cols.findIndex(c=>c&&c.includes('계약실행일'));
+  const iAssetC=cols.findIndex(c=>c&&c.includes('자산번호'));
+  const iSeriesC=cols.findIndex(c=>c&&c.includes('시리즈명'));
+  const seen=new Set();
+  const out=[];
+  rawTaksoTable.rows.forEach(rw=>{
+    const r=rw.c.map(c=>c?c.v:null);
+    const rd=cc.rowDate(r);
+    if(getYM(rd)!==ym)return;
+    if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
+    const a=(cc.tkAsset>=0?((r[cc.tkAsset]||'')+''):'').trim();
+    if(a){if(seen.has(a))return;seen.add(a);}
+    const tv=cc.tkType>=0?((r[cc.tkType]||'')+''):'';
+    const isS=tv.includes('신차');
+    const prodName=(tProdI>=0?((r[tProdI]||'')+''):'').trim()||'미확인';
+    const pseudo=new Array(cols.length).fill(null);
+    if(iProd>=0)pseudo[iProd]=isS?'신차':'재렌트';
+    if(iType>=0)pseudo[iType]=prodName;
+    if(iWorker>=0&&cc.tkWk>=0)pseudo[iWorker]=r[cc.tkWk];
+    if(iDateC>=0)pseudo[iDateC]=rd;
+    if(iAssetC>=0)pseudo[iAssetC]=a;
+    if(iSeriesC>=0&&a&&assetSeriesMap&&assetSeriesMap[a])pseudo[iSeriesC]=assetSeriesMap[a];
+    out.push(pseudo);
+  });
+  return out;
+}
+
+function taksoProdSplitFor(ym,dayStart,dayEnd){
+  const cc=taksoResolveCols();
+  if(!cc||!rawTaksoTable)return null;
+  const tkColsAll=rawTaksoTable.cols.map(c=>(c.label||'')+'');
+  const tProdI=tkColsAll.findIndex(c=>c.includes('상품명'));
+  if(tProdI<0)return null;
+  const map={};
+  const seen=new Set();
+  rawTaksoTable.rows.forEach(rw=>{
+    const r=rw.c.map(c=>c?c.v:null);
+    const rd=cc.rowDate(r);
+    if(getYM(rd)!==ym)return;
+    if(dayStart!=null){
+      const d=getDayNum(rd);
+      if(d==null||d<dayStart||d>dayEnd)return;
+    }
+    if(cc.tkWk>=0&&isSwapWorkerVal(r[cc.tkWk]))return;
+    const a=(cc.tkAsset>=0?((r[cc.tkAsset]||'')+''):'').trim();
+    if(a){if(seen.has(a))return;seen.add(a);}
+    const pv=((r[tProdI]||'')+'').trim()||'미확인';
+    const tv=cc.tkType>=0?((r[cc.tkType]||'')+''):'';
+    const isS=tv.includes('신차');
+    if(!map[pv])map[pv]={shin:0,re:0};
+    if(isS)map[pv].shin++; else map[pv].re++;
+  });
+  return map;
+}
+
 function renderMonthly(){
   if(!rawTable)return;
   const{rows,idx}=getRows();
@@ -3186,10 +4009,77 @@ function renderMonthly(){
   let chLabels=labels.map(l=>parseInt(l.split('.')[1])+'월');
   let chShin=shinArr, chRe=reArr, chUsed=reUsedArr, chTitles=null;
   const mSel=document.getElementById('mcMonthSel');
-  const mBtnM=document.getElementById('mcModeMonth'), mBtnW=document.getElementById('mcModeWeek');
-  if(mBtnM&&mBtnW){mBtnM.classList.toggle('active',mcMode==='month');mBtnW.classList.toggle('active',mcMode==='week');}
+  const mBtnY=document.getElementById('mcModeYear'), mBtnM=document.getElementById('mcModeMonth'), mBtnW=document.getElementById('mcModeWeek'), mBtnD=document.getElementById('mcModeDay');
+  if(mBtnY)mBtnY.classList.toggle('active',mcMode==='year');
+  if(mBtnM)mBtnM.classList.toggle('active',mcMode==='month');
+  if(mBtnW)mBtnW.classList.toggle('active',mcMode==='week');
+  if(mBtnD)mBtnD.classList.toggle('active',mcMode==='day');
   const ttl=document.getElementById('mcChartTitle');
-  if(mcMode==='week'){
+  if(mcMode==='year'){
+    // ===== 년간: 전체 연도 비교 (연도 선택 숨김) =====
+    if(sel)sel.style.display='none';
+    if(mSel)mSel.style.display='none';
+    if(ttl)ttl.textContent='년간 출고 비교';
+    const sumEl=document.getElementById('mcMonthSummary');
+    if(sumEl)sumEl.style.display='none';
+    const yrList=(years.length?years:[nowY]);
+    chLabels=[];chShin=[];chRe=[];chUsed=[];chTitles=[];
+    yrList.forEach(Y=>{
+      let ys=0,yr=0,yu=0;
+      for(let mm=1;mm<=12;mm++){
+        const ym=`${Y}.${String(mm).padStart(2,'0')}`;
+        if(ym===todayYM){
+          const agg=taksoAggFor(ym);
+          if(agg){ys+=agg.shin;yr+=agg.re;yu+=(canUsed?agg.used:0);continue;}
+        }
+        const mrows=rows.filter(r=>getYM(r[iDate])===ym);
+        ys+=mrows.filter(isShin).length;
+        const mre=mrows.filter(isRe);
+        yr+=mre.length;
+        yu+=(canUsed?mre.filter(r=>isUsed(r)).length:0);
+      }
+      chLabels.push(Y+'년');
+      chShin.push(ys);chRe.push(yr);chUsed.push(yu);
+      chTitles.push(`${Y}년 전체`+(String(Y)===todayYM.slice(0,4)?' · 당월은 탁송 기준':''));
+    });
+  }else if(mcMode==='day'){
+    // ===== 일간: 선택한 달의 일별 추이 =====
+    if(sel)sel.style.display='';
+    if(mcMonth==null)mcMonth=(mcYear===String(new Date().getFullYear()))?(new Date().getMonth()+1):1;
+    if(mSel){
+      mSel.style.display='';
+      mSel.innerHTML=Array.from({length:12},(_,k)=>`<option value="${k+1}" ${(k+1)===mcMonth?'selected':''}>${k+1}월</option>`).join('');
+    }
+    if(ttl)ttl.textContent='일간 출고 비교';
+    const ymSel=`${mcYear}.${String(mcMonth).padStart(2,'0')}`;
+    const yNum=parseInt(mcYear);
+    const dim=new Date(yNum,mcMonth,0).getDate();
+    const isCurMonth=(ymSel===todayYM);
+    const sumEl=document.getElementById('mcMonthSummary');
+    if(sumEl){
+      const mS=shinArr[mcMonth-1]||0, mR=reArr[mcMonth-1]||0;
+      sumEl.style.display='';
+      sumEl.innerHTML=`<b>${mcMonth}월 합계</b> &nbsp;·&nbsp; 신차 <b>${mS.toLocaleString()}</b>대 &nbsp;·&nbsp; 재렌트 <b>${mR.toLocaleString()}</b>대 &nbsp;·&nbsp; 전체 <b style="color:var(--primary);">${(mS+mR).toLocaleString()}대</b>`;
+    }
+    const dowKr=['일','월','화','수','목','금','토'];
+    chLabels=[];chShin=[];chRe=[];chUsed=[];chTitles=[];
+    for(let dd=1;dd<=dim;dd++){
+      const dow=new Date(yNum,mcMonth-1,dd).getDay();
+      chLabels.push(dd+'');
+      chTitles.push(`${mcMonth}/${dd}(${dowKr[dow]})`+(isCurMonth?' · 탁송 기준':''));
+      if(isCurMonth){
+        const agg=taksoAggFor(ymSel,dd,dd)||{shin:0,re:0,used:0};
+        chShin.push(agg.shin);chRe.push(agg.re);chUsed.push(canUsed?agg.used:0);
+      }else{
+        const dy=rows.filter(r=>{if(getYM(r[iDate])!==ymSel)return false;const d=getDayNum(r[iDate]);return d===dd;});
+        chShin.push(dy.filter(isShin).length);
+        const dre=dy.filter(isRe);
+        chRe.push(dre.length);
+        chUsed.push(canUsed?dre.filter(r=>isUsed(r)).length:0);
+      }
+    }
+  }else if(mcMode==='week'){
+    if(sel)sel.style.display='';
     if(mcMonth==null)mcMonth=(mcYear===String(new Date().getFullYear()))?(new Date().getMonth()+1):1;
     if(mSel){
       mSel.style.display='';
@@ -3237,8 +4127,9 @@ function renderMonthly(){
       }
     });
   }else{
+    if(sel)sel.style.display='';
     if(mSel)mSel.style.display='none';
-    if(ttl)ttl.textContent='월별 출고 비교';
+    if(ttl)ttl.textContent='월간 출고 비교';
     const sumEl=document.getElementById('mcMonthSummary');
     if(sumEl)sumEl.style.display='none';
   }
@@ -3439,8 +4330,13 @@ function updateDetailMemoBox(){
   }
   box.style.display='block';
   box.innerHTML=`<div class="detail-memo-box">
-    <div class="detail-memo-head">📌 ${moNum}월 프로모션·이슈 메모</div>
-    <div class="detail-memo-list">${items.map(x=>`<span class="detail-memo-chip">${x.shared?'':'✏️ '}${x.t}</span>`).join('')}</div>
+    <div class="detail-memo-head" style="cursor:pointer;display:flex;justify-content:space-between;align-items:center;" onclick="toggleDetailMemo()">
+      <span>📌 ${moNum}월 프로모션·이슈 메모</span>
+      <span id="detailMemoArrow" style="font-size:11px;color:#5B5FE8;font-weight:600;">${detailMemoOpen?'▲ 접기':'▼ 펼치기'}</span>
+    </div>
+    <div id="detailMemoBodyWrap" style="display:${detailMemoOpen?'block':'none'};">
+      <div class="detail-memo-list">${items.map(x=>`<span class="detail-memo-chip">${x.shared?'':'✏️ '}${x.t}</span>`).join('')}</div>
+    </div>
   </div>`;
 }
 
@@ -3460,7 +4356,7 @@ function stripedFor(canvasEl,base){
   }catch(e){return base;}
 }
 
-let p1MemoOpen=true;
+let p1MemoOpen=false;
 function toggleP1Memo(){
   p1MemoOpen=!p1MemoOpen;
   const b=document.getElementById('p1MemoBody');
@@ -3729,12 +4625,12 @@ function renderReport(){
       </div>
     </div>
     <div class="rp-card" style="margin-bottom:14px;">
-      <div class="rp-ct">상세 현황 <small>당일 vs 전일</small></div>
+      <div class="rp-ct">상세 현황 <small>당일 vs 익일</small></div>
       <table class="rp-table">
-        <tr><th>구분</th><th>당일 출고</th><th>전일 출고</th><th>전일 대비</th></tr>
-        <tr><td>신차</td><td>${tAgg.shin}대</td><td>${yAgg.shin}대</td><td style="color:${tAgg.shin-yAgg.shin>=0?'#10B981':'#EF4444'};">${tAgg.shin-yAgg.shin>=0?'▲':'▼'} ${Math.abs(tAgg.shin-yAgg.shin)}대</td></tr>
-        <tr><td>재렌트</td><td>${tAgg.re}대</td><td>${yAgg.re}대</td><td style="color:${tAgg.re-yAgg.re>=0?'#10B981':'#EF4444'};">${tAgg.re-yAgg.re>=0?'▲':'▼'} ${Math.abs(tAgg.re-yAgg.re)}대</td></tr>
-        <tr><td>전체</td><td>${todayTotal}대</td><td>${yTotal}대</td><td style="color:${dayDiff>=0?'#10B981':'#EF4444'};">${dayDiff>=0?'▲':'▼'} ${Math.abs(dayDiff)}대</td></tr>
+        <tr><th>구분</th><th>당일 출고</th><th>익일 출고</th><th>익일 대비</th></tr>
+        <tr><td>신차</td><td>${tAgg.shin}대</td><td>${tmAgg.shin}대</td><td style="color:${tmAgg.shin-tAgg.shin>=0?'#10B981':'#EF4444'};">${tmAgg.shin-tAgg.shin>=0?'▲':'▼'} ${Math.abs(tmAgg.shin-tAgg.shin)}대</td></tr>
+        <tr><td>재렌트</td><td>${tAgg.re}대</td><td>${tmAgg.re}대</td><td style="color:${tmAgg.re-tAgg.re>=0?'#10B981':'#EF4444'};">${tmAgg.re-tAgg.re>=0?'▲':'▼'} ${Math.abs(tmAgg.re-tAgg.re)}대</td></tr>
+        <tr><td>전체</td><td>${todayTotal}대</td><td>${tmTotal}대</td><td style="color:${tmTotal-todayTotal>=0?'#10B981':'#EF4444'};">${tmTotal-todayTotal>=0?'▲':'▼'} ${Math.abs(tmTotal-todayTotal)}대</td></tr>
       </table>
     </div>
     <div class="rp-foot">💡 모두 수고 많으셨습니다! 내일도 화이팅입니다 😊 &nbsp;·&nbsp; 탁송(출고) 기준 자동 생성</div>
@@ -3848,8 +4744,8 @@ window.addEventListener('load', async ()=>{
   const n=new Date();
   inp.value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
   goPage('exec');
-  try{ await loadAll(); }catch(e){ console.error(e); }
-  try{ await loadExecExtras(); }catch(e){ console.error(e); }
+  // 서로 의존관계 없음 -> 동시에 요청해서 대기 시간을 더 줄임
+  await Promise.allSettled([loadAll(), loadExecExtras()]);
   if(navPage==='exec')renderExec();
   else if(navPage==='monthly')renderMonthly();
   else if(navPage==='report')renderReport();
@@ -3877,6 +4773,13 @@ function parseYMD(s){
   // "2026/07/08", "2026-07-08", "2026.07.08" 같은 텍스트 날짜
   m = str.match(/(\d{4})[\/\-.](\d{1,2})[\/\-.](\d{1,2})/);
   if(m) return new Date(parseInt(m[1]), parseInt(m[2])-1, parseInt(m[3]));
+  // 셀이 날짜 서식이 아니라 순수 숫자(구글시트 날짜 시리얼값, 1899-12-30=0 기준)로 들어온 경우
+  if(/^\d+(\.\d+)?$/.test(str.trim())){
+    const serial = parseFloat(str.trim());
+    if(serial > 20000 && serial < 60000){ // 대략 1954~2064년 범위만 날짜로 인정 (다른 순수 숫자 오인 방지)
+      return new Date(Math.round((serial - 25569) * 86400000));
+    }
+  }
   return null;
 }
 function daysSince(d){ return Math.round((TODAY - d) / 86400000); }
@@ -3891,6 +4794,261 @@ let rejaMode = '자사매입';
 let openShin = null, openReja = null;
 let tableSort = { shin:{key:null, dir:'desc'}, reja:{key:null, dir:'desc'} };
 
+// ===== 신차출시예정 / 구매계획 =====
+// 읽기는 기존 SHEET_DATA_URL(gviz)로 같이 받아오고, 쓰기(추가/삭제/수정)만 아래 PLAN_URL(별도 Apps Script)로 보냄.
+// PLAN_URL이 비어있으면 이 브라우저(localStorage)에만 저장되는 임시 모드로 동작함 — 설정 방법은 README_설정방법.md 참고.
+const LAUNCH_SHEET_NAME = '신차출시예정';
+const PLAN_SHEET_NAME = '구매계획';
+const MEMO_SHEET_NAME = '구매전략메모';
+const PLAN_URL = '';
+const REJA_PLAN_MODEL = '재렌트-중고매입'; // 재렌트 구매계획은 차종 구분 없이 이 이름으로 저장(자사매입은 대상 아님)
+
+let launchList = null; // [{gubun, name, month, note}]
+let planRows = null; // [{ym, model, fuel, qty}]
+let memoList = null; // [{ym, text}]
+let launchBannerOpen = false;
+let openPurchaseRow = null; // 구매현황에서 유종별 입력이 펼쳐진 차종명
+let invPageTab = '재고현황'; // '재고현황' | '구매현황' — 페이지 단위 탭
+let purchaseViewYm = null; // 구매현황에서 선택된 조회월(null이면 이번달). 'YYYY-MM'
+
+function ymAddMonths(ym, delta){
+  const [y, m] = ym.split('-').map(Number);
+  const d = new Date(y, (m-1)+delta, 1);
+  return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`;
+}
+function purchaseYmOrDefault(){ return purchaseViewYm || currentYM(); }
+function purchaseShiftMonth(delta){
+  purchaseViewYm = ymAddMonths(purchaseYmOrDefault(), delta);
+  invRender();
+}
+function renderPurchaseMonthNav(ym){
+  const today = currentYM();
+  const [y, mo] = ym.split('-').map(Number);
+  let badge = '';
+  if(ym > today) badge = '<span style="font-size:9.5px;font-weight:700;color:#fff;background:#6C63FF;padding:2px 7px;border-radius:8px;">다음달 계획</span>';
+  else if(ym < today) badge = '<span style="font-size:9.5px;font-weight:700;color:#999;background:#eee;padding:2px 7px;border-radius:8px;">🔒 지난달</span>';
+  return `<div style="display:flex;justify-content:flex-end;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:10px;background:#f7f7fb;border-radius:9px;padding:5px 8px;">
+      <button onclick="purchaseShiftMonth(-1)" style="border:none;background:none;color:#6C63FF;font-size:13px;cursor:pointer;padding:2px 6px;font-weight:800;">◀</button>
+      <span style="font-size:12.5px;font-weight:700;color:${ym===today?'#1c1c2e':'#6C63FF'};min-width:78px;text-align:center;">${y}년 ${mo}월</span>
+      ${badge}
+      <button onclick="purchaseShiftMonth(1)" style="border:none;background:none;color:#6C63FF;font-size:13px;cursor:pointer;padding:2px 6px;font-weight:800;">▶</button>
+    </div>
+  </div>`;
+}
+
+function getLocalLaunches(){ try{ return JSON.parse(localStorage.getItem('inv_launches')||'[]'); }catch(e){ return []; } }
+function saveLocalLaunches(list){ try{ localStorage.setItem('inv_launches', JSON.stringify(list)); }catch(e){} }
+function getLocalPlans(){ try{ return JSON.parse(localStorage.getItem('inv_plans')||'[]'); }catch(e){ return []; } }
+function saveLocalPlans(list){ try{ localStorage.setItem('inv_plans', JSON.stringify(list)); }catch(e){} }
+
+function parseLaunchTable(table){
+  if(!table) return PLAN_URL ? [] : getLocalLaunches();
+  const cols = table.cols.map(c=>c.label);
+  const idx = n => cols.findIndex(c=>c && c.includes(n));
+  const iGubun=idx('구분'), iName=idx('차종'), iMonth=idx('예정월'), iNote=idx('비고');
+  // "신차출시예정" 탭이 아직 없으면 gviz가 엉뚱한 시트(예: 차량 RAW DATA)를 대신 돌려줄 수 있어서,
+  // 이 탭에만 있는 컬럼(예정월/비고)이 실제로 있는지 확인한 뒤에만 데이터로 인정함
+  if(iMonth<0 || iNote<0) return PLAN_URL ? [] : getLocalLaunches();
+  return table.rows.map(r=>{
+    const c=r.c; const v=i=>(i>=0&&c[i]&&c[i].v!=null)?c[i].v:'';
+    return { gubun:v(iGubun)||'출시예정', name:v(iName), month:v(iMonth), note:v(iNote) };
+  }).filter(x=>x.name);
+}
+
+function parsePlanTable(table){
+  if(!table) return PLAN_URL ? [] : getLocalPlans();
+  const cols = table.cols.map(c=>c.label);
+  const idx = n => cols.findIndex(c=>c && c.includes(n));
+  const iYm=idx('연월'), iModel=idx('차종'), iFuel=idx('유종'), iQty=idx('계획대수');
+  // "구매계획" 탭이 아직 없으면 gviz가 엉뚱한 시트를 대신 돌려줄 수 있어서,
+  // 이 탭에만 있는 컬럼(연월/계획대수)이 실제로 있는지 확인한 뒤에만 데이터로 인정함
+  if(iYm<0 || iQty<0) return PLAN_URL ? [] : getLocalPlans();
+  return table.rows.map(r=>{
+    const c=r.c; const v=i=>(i>=0&&c[i]&&c[i].v!=null)?c[i].v:'';
+    return { ym:String(v(iYm)), model:v(iModel), fuel:v(iFuel), qty:Number(v(iQty))||0 };
+  }).filter(x=>x.model);
+}
+
+function getLocalPurchaseMemos(){ try{ return JSON.parse(localStorage.getItem('inv_purchase_memos')||'[]'); }catch(e){ return []; } }
+function saveLocalPurchaseMemos(list){ try{ localStorage.setItem('inv_purchase_memos', JSON.stringify(list)); }catch(e){} }
+
+function parseMemoTable(table){
+  if(!table) return PLAN_URL ? [] : getLocalPurchaseMemos();
+  const cols = table.cols.map(c=>c.label);
+  const idx = n => cols.findIndex(c=>c && c.includes(n));
+  const iYm=idx('연월'), iText=idx('내용');
+  // "구매전략메모" 탭이 아직 없으면 gviz가 엉뚱한 시트를 대신 돌려줄 수 있어서, 필수 컬럼이 있는지 확인 후에만 인정
+  if(iYm<0 || iText<0) return PLAN_URL ? [] : getLocalPurchaseMemos();
+  return table.rows.map(r=>{
+    const c=r.c; const v=i=>(i>=0&&c[i]&&c[i].v!=null)?c[i].v:'';
+    return { ym:String(v(iYm)), text:v(iText) };
+  }).filter(x=>x.ym && x.text);
+}
+
+async function addPurchaseMemo(ym, text){
+  if(!text) return;
+  if(!memoList) memoList = [];
+  memoList.push({ym, text});
+  invRender();
+  if(PLAN_URL){
+    try{ await fetch(PLAN_URL,{method:'POST',body:JSON.stringify({type:'memo',action:'add',ym,text})}); }
+    catch(e){ alert('저장에 실패했어요. 네트워크를 확인해주세요.'); }
+  } else {
+    saveLocalPurchaseMemos(memoList);
+  }
+}
+
+async function deletePurchaseMemo(i){
+  const item = memoList && memoList[i];
+  if(!item) return;
+  memoList.splice(i,1);
+  invRender();
+  if(PLAN_URL){
+    try{ await fetch(PLAN_URL,{method:'POST',body:JSON.stringify({type:'memo',action:'delete',ym:item.ym,text:item.text})}); }
+    catch(e){ alert('삭제에 실패했어요. 네트워크를 확인해주세요.'); }
+  } else {
+    saveLocalPurchaseMemos(memoList);
+  }
+}
+
+function invSetPageTab(tab){ invPageTab = tab; invRender(); }
+
+// 재렌트(중고매입) 구매계획은 차종 구분 없이 REJA_PLAN_MODEL 이름 하나로 저장 (setPlanQty/planQtyFor 그대로 재사용)
+function setRejaPlanQty(qty, ym){ setPlanQty(REJA_PLAN_MODEL, '', qty, ym); }
+function rejaPlanQtyFor(ym){ return planQtyFor(REJA_PLAN_MODEL, '', ym); }
+
+// 원본 차량 RAW DATA에서 특정 구분(gubun)의 매입계약일이 해당 연/월인 전체 대수 (차종 구분 없이 집계)
+function actualPurchasedByGubunInMonth(gubun, year, monthIdx0){
+  if(!rows) return 0;
+  return rows.filter(r=>r.gubun===gubun && r.pdate &&
+    r.pdate.getFullYear()===year && r.pdate.getMonth()===monthIdx0).length;
+}
+function actualPurchasedByGubunThisMonth(gubun){
+  return actualPurchasedByGubunInMonth(gubun, TODAY.getFullYear(), TODAY.getMonth());
+}
+
+// 최근 n개월(이번달 포함) 연월 목록, 오래된 순
+function recentMonths(n){
+  const list = [];
+  for(let i=n-1; i>=0; i--){
+    const d = new Date(TODAY.getFullYear(), TODAY.getMonth()-i, 1);
+    list.push(`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`);
+  }
+  return list;
+}
+
+// 신차 전체(모든 차종) 계획 합계 - 과거 달은 실제 저장된 값만 집계(예측 반영 안 함)
+function shinPlanTotalAllForYm(ym){
+  if(!planRows) return 0;
+  return planRows.filter(p=>p.ym===ym && p.model!==REJA_PLAN_MODEL).reduce((a,p)=>a+(p.qty||0), 0);
+}
+
+// buildPurchaseNeedList와 같은 기준으로 모델 하나의 예상 구매필요대수 + 유종별 배분을 계산 (구매현황 예측 프리필용)
+function predictBuyNeedByFuel(m){
+  if(!shipRows) return { buyNeed: 0, fuelAlloc: {}, fuelCounts: {} };
+  const biz = getBusinessDays();
+  const sc = shipCount('신차', m.name);
+  const proj = (biz.elapsed>0) ? Math.round(sc/biz.elapsed*biz.total) : sc;
+  const projStock = Math.max(0, m.total - (proj - sc));
+  const paceBasis = biz.elapsed>0 ? sc/biz.elapsed*biz.total : sc;
+  let avg3 = salesRows ? recentAvg('신차', m.name, 3) : paceBasis;
+  if(!avg3) avg3 = paceBasis;
+  const buyNeed = Math.max(0, Math.round(avg3*targetCoverage - projStock));
+  const fuelCounts = {};
+  m.items.forEach(it=>{ const f=fuelLabel(it.fuel)||'유종미상'; fuelCounts[f]=(fuelCounts[f]||0)+1; });
+  const fuelAlloc = {};
+  if(buyNeed>0 && m.total>0){
+    Object.entries(fuelCounts).forEach(([f,cnt])=>{
+      const alloc = Math.round(buyNeed * cnt / m.total);
+      if(alloc>0) fuelAlloc[f]=alloc;
+    });
+  }
+  return { buyNeed, fuelAlloc, fuelCounts };
+}
+
+function currentYM(){ return `${TODAY.getFullYear()}-${String(TODAY.getMonth()+1).padStart(2,'0')}`; }
+
+async function addLaunch(gubun, name, month, note){
+  if(!name) return;
+  if(!launchList) launchList = [];
+  launchList.push({gubun, name, month, note});
+  invRender();
+  if(PLAN_URL){
+    try{ await fetch(PLAN_URL,{method:'POST',body:JSON.stringify({type:'launch',action:'add',gubun,name,month,note})}); }
+    catch(e){ alert('저장에 실패했어요. 네트워크를 확인해주세요.'); }
+  } else {
+    saveLocalLaunches(launchList);
+  }
+}
+
+async function deleteLaunch(i){
+  const item = launchList && launchList[i];
+  if(!item) return;
+  if(!confirm(`"${item.name}" 항목을 삭제할까요?`)) return;
+  launchList.splice(i,1);
+  invRender();
+  if(PLAN_URL){
+    try{ await fetch(PLAN_URL,{method:'POST',body:JSON.stringify({type:'launch',action:'delete',gubun:item.gubun,name:item.name,month:item.month})}); }
+    catch(e){ alert('삭제에 실패했어요. 네트워크를 확인해주세요.'); }
+  } else {
+    saveLocalLaunches(launchList);
+  }
+}
+
+function invToggleLaunchBanner(){ launchBannerOpen = !launchBannerOpen; invRender(); }
+
+async function setPlanQty(model, fuel, qty, ym){
+  qty = Math.max(0, parseInt(qty)||0);
+  ym = ym || currentYM();
+  if(!planRows) planRows = [];
+  const i = planRows.findIndex(p=>p.ym===ym && p.model===model && p.fuel===fuel);
+  if(i>=0) planRows[i].qty = qty; else planRows.push({ym, model, fuel, qty});
+  if(PLAN_URL){
+    try{ await fetch(PLAN_URL,{method:'POST',body:JSON.stringify({type:'plan',action:'set',ym,model,fuel,qty,user:''})}); }
+    catch(e){ alert('저장에 실패했어요. 네트워크를 확인해주세요.'); }
+  } else {
+    saveLocalPlans(planRows);
+  }
+  invRender();
+}
+
+function planQtyFor(model, fuel, ym){
+  ym = ym || currentYM();
+  if(!planRows) return 0;
+  const r = planRows.find(p=>p.ym===ym && p.model===model && p.fuel===fuel);
+  return r ? r.qty : 0;
+}
+
+function planTotalFor(model, ym){
+  ym = ym || currentYM();
+  if(!planRows) return 0;
+  return planRows.filter(p=>p.ym===ym && p.model===model).reduce((a,p)=>a+(p.qty||0),0);
+}
+
+// 원본 차량 RAW DATA의 매입계약일이 이번달인 대수 (실제 구매 확정분, 자동 집계 - 사람이 입력하는 값 아님)
+function actualPurchasedInMonth(name, gubun, year, monthIdx0){
+  if(!rows) return 0;
+  return rows.filter(r=>r.gubun===gubun && r.name===name && r.pdate &&
+    r.pdate.getFullYear()===year && r.pdate.getMonth()===monthIdx0).length;
+}
+function actualPurchasedThisMonth(name, gubun){
+  return actualPurchasedInMonth(name, gubun, TODAY.getFullYear(), TODAY.getMonth());
+}
+// 저장된 구매계획(planRows)에 실제로 값이 있었던 연월들만 모아 계획 vs 실적을 비교 (최근순, 최대 n개월)
+function getPlanHistory(model, gubun, maxMonths){
+  if(!planRows) return [];
+  const yms = [...new Set(planRows.filter(p=>p.model===model && p.qty>0).map(p=>p.ym))].sort().reverse();
+  return yms.slice(0, maxMonths||6).map(ym=>{
+    const planTotal = planTotalFor(model, ym);
+    const [y, mo] = ym.split('-').map(Number);
+    const actual = (y && mo) ? actualPurchasedInMonth(model, gubun, y, mo-1) : 0;
+    return { ym, planTotal, actual };
+  });
+}
+
+function invTogglePurchaseRow(name){ openPurchaseRow = (openPurchaseRow===name) ? null : name; invRender(); }
+
 function invSetStatus(msg, isErr){
   const el = document.getElementById('invStatusMsg');
   el.textContent = msg;
@@ -3904,35 +5062,34 @@ async function invLoadAll(){
   const sheetName = document.getElementById('invSheetNameInput').value.trim() || '자산관리';
   if(!id){ invSetStatus('시트 ID를 입력해주세요.', true); return; }
   invSetStatus('불러오는 중...', false);
-  const gvizUrl = sheet => `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=${encodeURIComponent(sheet)}`;
-  const fetchTable = async(sheet) => {
-    try{
-      const res = await fetch(gvizUrl(sheet));
-      const text = await res.text();
-      const m = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\)/);
-      if(!m) return null;
-      const json = JSON.parse(m[1]);
-      return (json.table && json.table.rows && json.table.rows.length) ? json.table : null;
-    }catch(e){ return null; }
-  };
   try{
     const shipSheetName = document.getElementById('invShipSheetNameInput').value.trim() || '탁송데이터';
     const salesSheetName = document.getElementById('invSalesSheetNameInput').value.trim() || '판매현황테스트';
     let reuseNote = [];
 
-    // 판매현황(대시보드)이 이미 불러온 데이터가 있으면 재사용 — 없을 때만 새로 요청 (그것도 동시에·병렬로)
+    // 판매현황(대시보드)이 이미 불러온 데이터가 있으면 재사용 — 없을 때만 새로 요청 (필요한 것만 한 번의 요청으로)
     const needVehicle = !(typeof rawVehicleTable!=='undefined' && rawVehicleTable);
     const needTakso = !(typeof rawTaksoTable!=='undefined' && rawTaksoTable) || shipSheetName!=='탁송데이터';
     const needSales = !(typeof rawTable!=='undefined' && rawTable) || salesSheetName!=='판매현황테스트';
 
-    const [vehicleTable, taksoTable, salesTable] = await Promise.all([
-      needVehicle ? fetchTable(sheetName) : Promise.resolve(rawVehicleTable),
-      needTakso ? fetchTable(shipSheetName) : Promise.resolve(rawTaksoTable),
-      needSales ? fetchTable(salesSheetName) : Promise.resolve(rawTable),
-    ]);
+    const needLaunch = !launchList;
+    const needPlan = !planRows;
+    const needMemo = !memoList;
+
+    const _needNames=[...new Set([needVehicle?sheetName:null, needTakso?shipSheetName:null, needSales?salesSheetName:null, needLaunch?LAUNCH_SHEET_NAME:null, needPlan?PLAN_SHEET_NAME:null, needMemo?MEMO_SHEET_NAME:null].filter(Boolean))];
+    const _fetched = _needNames.length ? await fetchSheetsJSON(_needNames, id) : {};
+
+    const vehicleTable = needVehicle ? (_fetched[sheetName]||null) : rawVehicleTable;
+    const taksoTable = needTakso ? (_fetched[shipSheetName]||null) : rawTaksoTable;
+    const salesTable = needSales ? (_fetched[salesSheetName]||null) : rawTable;
+
     if(!needVehicle) reuseNote.push('차량 RAW DATA(재사용)');
     if(!needTakso) reuseNote.push('탁송데이터(재사용)');
     if(!needSales) reuseNote.push('판매현황(재사용)');
+
+    if(needLaunch) launchList = parseLaunchTable(_fetched[LAUNCH_SHEET_NAME]||null);
+    if(needPlan) planRows = parsePlanTable(_fetched[PLAN_SHEET_NAME]||null);
+    if(needMemo) memoList = parseMemoTable(_fetched[MEMO_SHEET_NAME]||null);
 
     if(!vehicleTable) throw new Error(`시트를 찾을 수 없어요. 탭 이름 "${sheetName}"이 맞는지 확인해주세요.`);
 
@@ -3958,6 +5115,8 @@ async function invLoadAll(){
     // 자산번호 -> 매입구분(자사매입/중고매입) 매핑 - 탁송데이터 출고건의 자사/중고 구분에 사용
     assetBuyMap = {};
     raw.forEach(r=>{ if(r.asset) assetBuyMap[String(r.asset)] = r.buy; });
+    assetSeriesMap={};
+    raw.forEach(r=>{ if(r.asset&&r.name) assetSeriesMap[String(r.asset)] = r.name; });
 
     rows = [];
     raw.forEach(r=>{
@@ -3987,7 +5146,7 @@ async function invLoadAll(){
           if(rd) grade = rd < REG_CUTOFF ? '장기' : '정상';
         }
       }
-      if(gubun) rows.push({gubun, name:r.name, grade, year:r.year, fuel:r.fuel});
+      if(gubun) rows.push({gubun, name:r.name, grade, year:r.year, fuel:r.fuel, pdate:parseYMD(r.pdate)});
     });
 
     // 탁송데이터(이번달 출고) 반영 - 실패해도 재고 표시는 계속 진행
@@ -4549,6 +5708,313 @@ function invToggleShin(name){ openShin = (openShin===name)? null : name; invRend
 function invToggleReja(name){ openReja = (openReja===name)? null : name; invRender(); }
 function invSetRejaMode(mode){ rejaMode = mode; openReja = null; invRender(); }
 
+function renderLaunchBanner(){
+  const list = launchList || [];
+  const launches = list.filter(x=>x.gubun!=='단종');
+  const discontinued = list.filter(x=>x.gubun==='단종');
+  const fmtList = (arr) => {
+    const shown = arr.slice(0, 4).map(x=>`${x.name}(${x.month||'-'})`).join(', ');
+    return arr.length > 4 ? `${shown} 외 ${arr.length-4}건` : shown;
+  };
+  const summaryParts = [];
+  if(discontinued.length) summaryParts.push(`<span style="color:#e2483d;">단종 ${fmtList(discontinued)}</span>`);
+  if(launches.length) summaryParts.push(`<span style="color:#6C63FF;">출시예정 ${fmtList(launches)}</span>`);
+  const summary = summaryParts.length ? summaryParts.join(' · ') : '<span style="color:#bbb;">등록된 항목 없음</span>';
+
+  const detailRows = list.map((x,i)=>`
+    <tr style="border-top:1px solid #f5f5fa;">
+      <td style="padding:7px 6px;font-weight:600;${x.gubun==='단종'?'color:#e2483d;':'color:#1c1c2e;'}">${x.gubun}</td>
+      <td style="padding:7px 6px;">${x.name}</td>
+      <td style="padding:7px 6px;text-align:center;color:#6C63FF;font-weight:700;">${x.month||'-'}</td>
+      <td style="padding:7px 6px;color:#555;">${x.note||''}</td>
+      <td style="padding:7px 6px;text-align:center;"><span onclick="deleteLaunch(${i})" style="cursor:pointer;color:#bbb;">✕</span></td>
+    </tr>`).join('');
+
+  const detail = launchBannerOpen ? `
+    <div style="background:#fff;border-radius:10px;border:1px solid #ebebf5;padding:14px 16px;margin-top:6px;">
+      <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+        <thead><tr style="color:#999;font-weight:600;font-size:11.5px;"><th style="text-align:left;padding:6px;">구분</th><th style="text-align:left;padding:6px;">차종</th><th style="padding:6px;">예정월</th><th style="text-align:left;padding:6px;">비고</th><th style="padding:6px;"></th></tr></thead>
+        <tbody>${detailRows || `<tr><td colspan="5" style="text-align:center;color:#aaa;padding:12px;">등록된 항목이 없어요</td></tr>`}</tbody>
+      </table>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap;align-items:center;" onclick="event.stopPropagation()">
+        <select id="launchGubunInput" style="padding:6px 8px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;font-size:12px;">
+          <option value="출시예정">출시예정</option>
+          <option value="단종">단종</option>
+        </select>
+        <input id="launchNameInput" placeholder="차종" style="width:100px;padding:6px 8px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;font-size:12px;">
+        <input id="launchMonthInput" placeholder="2026-09" style="width:90px;padding:6px 8px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;font-size:12px;">
+        <input id="launchNoteInput" placeholder="비고" style="flex:1;min-width:120px;padding:6px 8px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;font-size:12px;">
+        <button onclick="addLaunch(document.getElementById('launchGubunInput').value, document.getElementById('launchNameInput').value.trim(), document.getElementById('launchMonthInput').value.trim(), document.getElementById('launchNoteInput').value.trim())"
+          style="padding:6px 14px;border:none;border-radius:6px;background:#6C63FF;color:#fff;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;">+ 추가</button>
+      </div>
+      ${!PLAN_URL ? `<div style="font-size:10.5px;color:#bbb;margin-top:8px;">⚠ 백엔드 연결 전 — 이 브라우저에만 저장되고 팀과 공유되지 않아요.</div>` : ''}
+    </div>` : '';
+
+  return `<div style="background:#fff;border-radius:12px;padding:11px 16px;margin-bottom:10px;">
+    <div style="display:flex;align-items:center;gap:10px;cursor:pointer;flex-wrap:wrap;" onclick="invToggleLaunchBanner()">
+      <span style="font-size:13px;">🚗</span>
+      <span style="font-size:12px;font-weight:700;color:#1c1c2e;">신차 단종/출시예정</span>
+      <span style="font-size:12px;">${summary}</span>
+      <span style="margin-left:auto;font-size:11px;color:#6C63FF;font-weight:700;">${launchBannerOpen?'접기 ▴':'펼치기/관리 ▾'}</span>
+    </div>
+    ${detail}
+  </div>`;
+}
+
+// 모델의 유종별 "효과적 계획대수" — 사람이 이미 저장한 값이 있으면 그 값, 없으면 예측치(구매필요 로직) 사용
+// 과거월은 예측치로 채우지 않음 — 그 당시 실제로 저장된 계획만 의미가 있음(없으면 0)
+function effectivePlanQtyByFuel(m, fuel, fuelAlloc, ym){
+  ym = ym || currentYM();
+  const raw = planQtyRaw(m.name, fuel, ym);
+  if(raw != null) return raw;
+  if(ym < currentYM()) return 0; // 과거월: 예측 폴백 없음
+  return fuelAlloc[fuel] || 0; // 이번달/미래월: 예측치로 프리필
+}
+function planQtyRaw(model, fuel, ym){
+  ym = ym || currentYM();
+  if(!planRows) return null;
+  const r = planRows.find(p=>p.ym===ym && p.model===model && p.fuel===fuel);
+  return r ? r.qty : null;
+}
+function effectivePlanTotalForModel(m, ym){
+  ym = ym || currentYM();
+  const isPast = ym < currentYM();
+  const { fuelAlloc, fuelCounts } = predictBuyNeedByFuel(m);
+  const fuels = isPast ? new Set() : new Set(Object.keys(fuelCounts));
+  if(planRows) planRows.forEach(p=>{ if(p.ym===ym && p.model===m.name) fuels.add(p.fuel); });
+  let total = 0;
+  fuels.forEach(f=>{ total += effectivePlanQtyByFuel(m, f, fuelAlloc, ym); });
+  return total;
+}
+
+function renderPurchaseStatusTable(models, gubun, ym){
+  ym = ym || currentYM();
+  const today = currentYM();
+  const isPast = ym < today;
+  const isFuture = ym > today;
+  const [ymY, ymM] = ym.split('-').map(Number);
+  const monthLabel = `${ymM}월`;
+  const rowsHtml = models.map(m=>{
+    const projStock = (!isPast && m._projStock!=null) ? m._projStock : '-';
+    const pred = predictBuyNeedByFuel(m);
+    const fuelAlloc = pred.fuelAlloc, fuelCounts = pred.fuelCounts;
+    const fuelSet = isPast ? new Set() : new Set(Object.keys(fuelCounts));
+    if(planRows) planRows.forEach(function(p){ if(p.ym===ym && p.model===m.name) fuelSet.add(p.fuel); });
+    const fuelList = Array.from(fuelSet);
+    const planTotal = effectivePlanTotalForModel(m, ym);
+    const actual = isFuture ? null : actualPurchasedInMonth(m.name, gubun, ymY, ymM-1);
+    const remain = isFuture ? null : Math.max(0, planTotal - actual);
+    const achieved = isPast ? (actual >= planTotal && planTotal > 0) : null;
+    const isOpen = openPurchaseRow === m.name;
+    const safeName = m.name.replace(/'/g, "\\'");
+    const fuelInputs = fuelList.length ? fuelList.map(function(f){
+      const v = effectivePlanQtyByFuel(m, f, fuelAlloc, ym);
+      const isPredicted = !isPast && planQtyRaw(m.name, f, ym)==null;
+      if(isPast){
+        return '<div style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:#555;">' + f +
+          '<div style="width:50px;padding:5px;text-align:center;color:#999;font-weight:600;">' + v + '</div>' +
+          '</div>';
+      }
+      return '<label style="display:flex;flex-direction:column;gap:4px;font-size:11.5px;color:#555;">' + f +
+        '<input type="number" min="0" value="' + v + '"' +
+        ' onclick="event.stopPropagation()"' +
+        ' onchange="setPlanQty(\'' + safeName + '\',\'' + f + '\', this.value, \'' + ym + '\')"' +
+        ' style="width:50px;padding:5px;border:1.5px solid ' + (isPredicted?'#cfcaff':'#e8e8f0') + ';background:' + (isPredicted?'#f8f8ff':'#fff') + ';border-radius:6px;font-family:inherit;text-align:center;color:' + (isPredicted?'#6C63FF':'#1c1c2e') + ';font-weight:' + (isPredicted?'700':'400') + ';">' +
+        '</label>';
+    }).join('') : '<div style="font-size:11.5px;color:#bbb;">유종 정보 없음</div>';
+    const actualCell = isFuture ? '<span style="color:#ccc;">–</span>' : actual;
+    const lastCell = isPast
+      ? `<span style="font-weight:800;font-size:13px;color:${achieved?'#1aab73':'#e2483d'};">${achieved?'달성':'미달'}</span>`
+      : isFuture
+        ? '<span style="color:#ccc;">–</span>'
+        : `<span style="font-weight:800;font-size:15px;color:${remain>0?'#e2483d':'#999'};">${remain}</span>`;
+    const mainRow = `<tr style="border-top:1px solid #f5f5fa;cursor:pointer;" onclick="invTogglePurchaseRow('${safeName}')">
+        <td style="padding:9px 6px;font-weight:600;color:#6C63FF;">${m.name} ${isOpen?'▾':'▸'}</td>
+        <td style="padding:9px 6px;text-align:center;">${m.total}</td>
+        <td style="padding:9px 6px;text-align:center;">${projStock}</td>
+        <td style="padding:9px 6px;text-align:center;font-weight:800;font-size:15px;color:${planTotal>0?'#6C63FF':'#999'};">${planTotal}</td>
+        <td style="padding:9px 6px;text-align:center;color:#888;">${actualCell}</td>
+        <td style="padding:9px 6px;text-align:center;">${lastCell}</td>
+      </tr>`;
+    let historyHtml = '';
+    if(isOpen){
+      const hist = getPlanHistory(m.name, gubun, 6);
+      if(hist.length){
+        historyHtml = `<div style="margin-top:12px;padding-top:10px;border-top:1px dashed #e3e0ff;">
+          <div style="font-size:11px;color:#999;margin-bottom:6px;">계획 vs 실적 (최근 저장된 월 기준)</div>
+          <table style="width:100%;border-collapse:collapse;font-size:12px;">
+            <thead><tr style="color:#bbb;font-weight:600;"><th style="text-align:left;padding:4px 6px;">연월</th><th style="padding:4px 6px;color:#6C63FF;">계획</th><th style="padding:4px 6px;color:#888;">실적</th><th style="padding:4px 6px;">차이</th></tr></thead>
+            <tbody>${hist.map(h=>{
+              const diff = h.actual - h.planTotal;
+              const diffColor = diff>=0 ? '#1aab73' : '#e2483d';
+              const diffText = diff>0 ? `+${diff}` : `${diff}`;
+              return `<tr style="border-top:1px solid #f0f0f5;"><td style="padding:4px 6px;">${h.ym}</td><td style="padding:4px 6px;text-align:center;color:#6C63FF;font-weight:700;">${h.planTotal}</td><td style="padding:4px 6px;text-align:center;color:#888;">${h.actual}</td><td style="padding:4px 6px;text-align:center;font-weight:700;color:${diffColor};">${diffText}</td></tr>`;
+            }).join('')}</tbody>
+          </table>
+        </div>`;
+      }
+    }
+    const expandNote = isPast ? '읽기 전용(지난달) · 저장된 계획만 표시' : isFuture ? '<span style="color:#6C63FF;">파란 숫자는 예측치, 직접 조정 가능</span> · 미리 입력해두면 그 달이 됐을 때 그대로 반영돼요' : '<span style="color:#6C63FF;">파란 숫자는 예측치, 직접 조정 가능</span>';
+    const expandRow = isOpen ? `<tr><td colspan="6" style="padding:0;">
+        <div style="background:#fafaff;padding:10px 20px 12px;">
+          <div style="font-size:11px;color:#999;margin-bottom:6px;">${monthLabel} 유종별 구매계획 (${m.name}) · ${expandNote}</div>
+          <div style="display:flex;gap:14px;flex-wrap:wrap;">${fuelInputs}</div>
+          ${historyHtml}
+        </div>
+      </td></tr>` : '';
+    return mainRow + expandRow;
+  }).join('');
+
+  let totalRowHtml = '';
+  if(models.length){
+    const totalCurrent = models.reduce((a,m)=>a+m.total, 0);
+    const allProjKnown = !isPast && models.every(m=>m._projStock!=null);
+    const totalProjStock = allProjKnown ? models.reduce((a,m)=>a+m._projStock, 0) : null;
+    const totalPlan = models.reduce((a,m)=>a+effectivePlanTotalForModel(m, ym), 0);
+    const totalActual = isFuture ? null : models.reduce((a,m)=>a+actualPurchasedInMonth(m.name, gubun, ymY, ymM-1), 0);
+    const totalRemain = isFuture ? null : Math.max(0, totalPlan - totalActual);
+    const totalActualCell = isFuture ? '<span style="color:#ccc;">–</span>' : totalActual;
+    const totalLastCell = isPast
+      ? `<span style="color:${(totalActual>=totalPlan && totalPlan>0)?'#1aab73':'#e2483d'};">${(totalActual>=totalPlan && totalPlan>0)?'달성':'미달'}</span>`
+      : isFuture
+        ? '<span style="color:#ccc;">–</span>'
+        : totalRemain;
+    totalRowHtml = `<tr style="background:#fafaff;font-weight:700;">
+        <td style="padding:9px 6px;">계</td>
+        <td style="padding:9px 6px;text-align:center;">${totalCurrent}</td>
+        <td style="padding:9px 6px;text-align:center;">${totalProjStock!=null ? totalProjStock : '-'}</td>
+        <td style="padding:9px 6px;text-align:center;color:#6C63FF;">${totalPlan}</td>
+        <td style="padding:9px 6px;text-align:center;color:#888;">${totalActualCell}</td>
+        <td style="padding:9px 6px;text-align:center;color:#e2483d;">${totalLastCell}</td>
+      </tr>`;
+  }
+
+  const actualColLabel = isFuture ? '실구매' : `${monthLabel} 실구매`;
+  const lastColLabel = isPast ? '결과' : '남은 구매대수';
+  const planColLabel = `${monthLabel} 계획대수`;
+
+  return `<table class="inv-table">
+    <thead><tr>
+      <th style="text-align:left;">차종</th><th>현재고</th><th>마감예상재고</th>
+      <th style="color:#6C63FF;">${planColLabel}</th><th style="color:#888;">${actualColLabel}</th><th style="color:#e2483d;">${lastColLabel}</th>
+    </tr></thead>
+    <tbody>${totalRowHtml}${rowsHtml || `<tr><td colspan="6" style="text-align:center;color:#aaa;">데이터 없음</td></tr>`}</tbody>
+  </table>
+  <div style="font-size:11px;color:#999;margin-top:8px;">차종 클릭 시 유종별 입력 펼침(실제 보유 유종 기준) · ${monthLabel} 계획대수 = 유종별 값 합계(저장값 우선${isPast?'':', 없으면 구매필요 예측치'}) · 실구매는 매입계약일이 ${monthLabel}인 대수(원본 차량 RAW DATA에서 자동 집계)${isFuture?' · 미래월은 아직 실구매/결과를 알 수 없어 "–"로 표시':''}</div>`;
+}
+function renderRejaPurchaseCard(ym){
+  ym = ym || currentYM();
+  const today = currentYM();
+  const isPast = ym < today;
+  const isFuture = ym > today;
+  const [ymY, ymM] = ym.split('-').map(Number);
+  const monthLabel = `${ymM}월`;
+  const plan = rejaPlanQtyFor(ym);
+  const actual = isFuture ? null : actualPurchasedByGubunInMonth(REJA_PLAN_MODEL, ymY, ymM-1);
+  const remain = isFuture ? null : Math.max(0, plan - actual);
+  const achieved = isPast ? (actual >= plan && plan > 0) : null;
+  const planCell = isPast
+    ? `<div style="text-align:center;font-weight:700;color:#999;">${plan}</div>`
+    : `<input type="number" min="0" value="${plan}" onchange="setRejaPlanQty(this.value, '${ym}')"
+        style="width:56px;padding:5px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;text-align:center;color:#6C63FF;font-weight:700;">`;
+  const actualCell = isFuture ? '<span style="color:#ccc;">–</span>' : actual;
+  const lastCell = isPast
+    ? `<span style="font-weight:800;font-size:13px;color:${achieved?'#1aab73':'#e2483d'};">${achieved?'달성':'미달'}</span>`
+    : isFuture
+      ? '<span style="color:#ccc;">–</span>'
+      : `<span style="font-weight:800;font-size:15px;color:${remain>0?'#e2483d':'#999'};">${remain}</span>`;
+  const lastColLabel = isPast ? '결과' : '남은 구매대수';
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">재렌트 구매현황</div></div>
+    <table class="inv-table">
+      <thead><tr><th style="text-align:left;">구분</th><th style="color:#6C63FF;">${monthLabel} 계획대수</th><th style="color:#888;">${monthLabel} 실구매</th><th style="color:#e2483d;">${lastColLabel}</th></tr></thead>
+      <tbody>
+        <tr style="border-top:1px solid #f5f5fa;">
+          <td style="padding:9px 6px;font-weight:600;color:#f5a623;">중고매입</td>
+          <td style="text-align:center;">
+            ${planCell}
+          </td>
+          <td style="text-align:center;color:#888;">${actualCell}</td>
+          <td style="text-align:center;">${lastCell}</td>
+        </tr>
+      </tbody>
+    </table>
+    <div style="font-size:11px;color:#999;margin-top:8px;">자사매입은 외부 구매가 아니라서 제외 · 중고매입만 계획/실적 관리 · 차종 구분 없이 전체 대수로 관리${isFuture?' · 미래월은 실구매/결과를 알 수 없어 "–"로 표시':isPast?' · 지난달은 계획 수정 불가':''}</div>
+  </div>`;
+}
+
+function renderMonthlyPurchaseChart(){
+  const months = recentMonths(6);
+  const data = months.map(ym=>{
+    const [y, mo] = ym.split('-').map(Number);
+    const shinPlan = shinPlanTotalAllForYm(ym);
+    const shinActual = actualPurchasedByGubunInMonth('신차', y, mo-1);
+    const rejaPlan = rejaPlanQtyFor(ym);
+    const rejaActual = actualPurchasedByGubunInMonth(REJA_PLAN_MODEL, y, mo-1);
+    return { ym, shinPlan, shinActual, rejaPlan, rejaActual };
+  });
+  const maxVal = Math.max(1, ...data.flatMap(d=>[d.shinPlan, d.shinActual, d.rejaPlan, d.rejaActual]));
+  const barMaxPx = 130;
+  const curYm = currentYM();
+  const cols = data.map(d=>{
+    const shinH = Math.round(d.shinActual/maxVal*barMaxPx);
+    const shinPlanTop = barMaxPx - Math.round(d.shinPlan/maxVal*barMaxPx);
+    const rejaH = Math.round(d.rejaActual/maxVal*barMaxPx);
+    const rejaPlanTop = barMaxPx - Math.round(d.rejaPlan/maxVal*barMaxPx);
+    const isCur = d.ym===curYm;
+    const label = isCur ? `${parseInt(d.ym.split('-')[1])}월(진행중)` : `${parseInt(d.ym.split('-')[1])}월`;
+    return `<div style="display:flex;flex-direction:column;align-items:center;gap:6px;min-width:90px;">
+      <div style="display:flex;align-items:flex-end;gap:8px;height:${barMaxPx}px;">
+        <div style="position:relative;width:20px;height:${shinH}px;background:#4285f4;border-radius:3px 3px 0 0;">
+          <div style="position:absolute;left:-4px;right:-4px;top:${shinPlanTop}px;border-top:2px dashed #1c1c2e;"></div>
+        </div>
+        <div style="position:relative;width:20px;height:${rejaH}px;background:#f5a623;border-radius:3px 3px 0 0;">
+          <div style="position:absolute;left:-4px;right:-4px;top:${rejaPlanTop}px;border-top:2px dashed #1c1c2e;"></div>
+        </div>
+      </div>
+      <span style="font-size:11px;font-weight:600;color:${isCur?'#6C63FF':'#888'};">${label}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">📊 월별 구매 비교 (계획 vs 실적)</div></div>
+    <div style="display:flex;gap:16px;margin-bottom:12px;font-size:11.5px;color:#555;flex-wrap:wrap;">
+      <span><span style="display:inline-block;width:10px;height:10px;background:#4285f4;border-radius:2px;margin-right:5px;"></span>신차</span>
+      <span><span style="display:inline-block;width:10px;height:10px;background:#f5a623;border-radius:2px;margin-right:5px;"></span>재렌트(중고매입)</span>
+      <span style="color:#999;">┄ 점선=계획대수</span>
+    </div>
+    <div style="display:flex;align-items:flex-end;gap:22px;padding:0 4px 4px;border-bottom:1px solid #eee;overflow-x:auto;">${cols}</div>
+    <div style="font-size:11px;color:#999;margin-top:8px;">막대=실적(매입계약일 기준 자동집계) · 점선=계획대수(저장된 값, 이번달 신차는 예측치 포함) · 지난달까지는 실제 저장했던 계획만 반영</div>
+  </div>`;
+}
+
+function renderPurchaseMemoSection(){
+  const months = recentMonths(6);
+  const list = memoList || [];
+  const cards = months.map(ym=>{
+    const entries = list.map((m,i)=>({...m, idx:i})).filter(m=>m.ym===ym);
+    const itemsHtml = entries.length ? entries.map(e=>`
+      <div style="background:#fff;border-radius:7px;padding:7px 10px;font-size:12px;color:#333;margin-bottom:6px;display:flex;justify-content:space-between;gap:6px;">
+        <span>📌 ${e.text}</span>
+        <span onclick="deletePurchaseMemo(${e.idx})" style="color:#ccc;cursor:pointer;flex-shrink:0;">✕</span>
+      </div>`).join('') : `<div style="font-size:11.5px;color:#ccc;margin-bottom:6px;">메모 없음</div>`;
+    const mo = parseInt(ym.split('-')[1]);
+    return `<div style="background:#fafafc;border-radius:10px;padding:12px 14px;min-width:0;box-sizing:border-box;overflow:hidden;">
+      <div style="font-size:11.5px;color:#999;font-weight:700;margin-bottom:8px;">${mo}월</div>
+      ${itemsHtml}
+      <div style="display:flex;gap:6px;min-width:0;">
+        <input id="memoInput_${ym}" placeholder="메모 입력" style="flex:1;min-width:0;padding:6px 8px;border:1.5px solid #e8e8f0;border-radius:6px;font-family:inherit;font-size:11.5px;box-sizing:border-box;">
+        <button onclick="const el=document.getElementById('memoInput_${ym}'); addPurchaseMemo('${ym}', el.value.trim()); el.value='';"
+          style="border:none;background:#6C63FF;color:#fff;border-radius:6px;padding:0 12px;font-family:inherit;font-size:12px;font-weight:700;cursor:pointer;flex-shrink:0;box-sizing:border-box;">+</button>
+      </div>
+    </div>`;
+  }).join('');
+  return `<div class="card">
+    <div class="card-header"><div class="card-title">📝 월별 구매 전략 메모</div></div>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:12px;min-width:0;">${cards}</div>
+    ${!PLAN_URL ? `<div style="font-size:10.5px;color:#bbb;margin-top:10px;">⚠ 백엔드 연결 전 — 이 브라우저에만 저장되고 팀과 공유되지 않아요.</div>` : ''}
+  </div>`;
+}
+
 function invRender(){
   if(!rows) return;
   const content = document.getElementById('invContent');
@@ -4557,6 +6023,12 @@ function invRender(){
   const rejaAll = rows.filter(r=>r.gubun==='재렌트-자사매입');
   const rejuAll = rows.filter(r=>r.gubun==='재렌트-중고매입');
   const rejaCurrent = rejaMode==='자사매입' ? rejaAll : rejuAll;
+  const shinModels = groupByModel(shin);
+
+  const ym = currentYM();
+  const planTotalAll = shinModels.reduce((a,m)=>a+effectivePlanTotalForModel(m, ym), 0);
+  const actualTotalAll = shinModels.reduce((a,m)=>a+actualPurchasedThisMonth(m.name, '신차'), 0);
+  const planRemainAll = Math.max(0, planTotalAll - actualTotalAll);
 
   let shipBadge = '';
   if(shipRows){
@@ -4564,79 +6036,76 @@ function invRender(){
     shipBadge = ` — 마감예상출고는 현재 페이스 비례 추정, 구매필요는 마감예상재고가 (판매이력 있으면 최근3개월평균, 없으면 이번달 페이스) 기준 예상수요 × 목표커버리지에 못 미치는 만큼`;
   }
 
-  let shipSummaryCard = '';
+  let shipStatusCard = '';
   if(shipRows){
     const biz = getBusinessDays();
     const shinShip = shipRows.filter(r=>r.gubun==='신차').length;
-    const rejaShip = shipRows.filter(r=>r.gubun==='재렌트').length;
-    const totalShip = shinShip + rejaShip;
+    const rejaShip = shipRows.filter(r=>r.gubun==='재렌트');
+    const rejaShipCount = rejaShip.length;
+    const rejaShipJasa = rejaShip.filter(r=>assetBuyMap[String(r.asset)]==='자사매입').length;
+    const rejaShipJungo = rejaShip.filter(r=>assetBuyMap[String(r.asset)]==='중고매입').length;
+    const totalShip = shinShip + rejaShipCount;
     const projOf = n => biz.elapsed>0 ? Math.round(n/biz.elapsed*biz.total) : n;
     const projTotal = projOf(totalShip);
     const growthPct = totalShip>0 ? Math.round((projTotal/totalShip-1)*100) : 0;
-    shipSummaryCard = `
-    <div class="summary-row" style="grid-template-columns:1fr 1fr 1fr;">
-      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid #6C63FF;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div style="font-size:11.5px;color:#999;font-weight:600;">이번달 영업일 진척률</div>
+    shipStatusCard = `
+    <div style="background:#fff;border-radius:12px;padding:16px;margin-bottom:14px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px;flex-wrap:wrap;gap:10px;">
+        <div style="font-size:13.5px;font-weight:700;color:#1c1c2e;">이번달 출고 현황</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <span style="font-size:11.5px;color:#999;font-weight:600;">영업일 진척률</span>
+          <div style="width:110px;height:7px;background:#eee;border-radius:4px;overflow:hidden;"><div style="width:${biz.pct}%;height:100%;background:#6C63FF;"></div></div>
+          <span style="font-size:14px;font-weight:800;color:#6C63FF;">${biz.pct}%</span>
           <span style="font-size:10px;color:#6C63FF;font-weight:700;background:#f0eeff;padding:2px 8px;border-radius:10px;">${biz.elapsed}/${biz.total}일</span>
         </div>
-        <div style="font-size:30px;font-weight:800;color:#6C63FF;margin-top:8px;">${biz.pct}%</div>
-        <div style="height:6px;background:#eee;border-radius:3px;overflow:hidden;margin-top:10px;">
-          <div style="width:${biz.pct}%;height:100%;background:#6C63FF;"></div>
-        </div>
       </div>
-      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid #999;">
-        <div style="font-size:11.5px;color:#999;font-weight:600;">이번달 출고 (현재)</div>
-        <div style="font-size:30px;font-weight:800;color:#1c1c2e;margin-top:8px;">${totalShip.toLocaleString()}<span style="font-size:13px;font-weight:500;color:#bbb;">대</span></div>
-        <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#888;">
-          <span>신차 <b style="color:#1c1c2e;">${shinShip}</b></span>
-          <span>재렌트 <b style="color:#1c1c2e;">${rejaShip}</b></span>
-        </div>
-      </div>
-      <div style="background:#fff;border-radius:12px;padding:16px;border-left:4px solid #6C63FF;">
-        <div style="display:flex;justify-content:space-between;align-items:flex-start;">
-          <div style="font-size:11.5px;color:#999;font-weight:600;">마감 예상 출고</div>
-          <span style="font-size:10px;color:#22c997;font-weight:700;background:#eafbf3;padding:2px 8px;border-radius:10px;">${growthPct>=0?'+':''}${growthPct}%</span>
-        </div>
-        <div style="font-size:30px;font-weight:800;color:#6C63FF;margin-top:8px;">${projTotal.toLocaleString()}<span style="font-size:13px;font-weight:500;color:#c4bfff;">대</span></div>
-        <div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#888;">
-          <span>신차 <b style="color:#1c1c2e;">${projOf(shinShip)}</b></span>
-          <span>재렌트 <b style="color:#1c1c2e;">${projOf(rejaShip)}</b></span>
-        </div>
-      </div>
+      <table class="inv-table">
+        <thead>
+          <tr style="color:#999;font-weight:600;font-size:12px;">
+            <th style="text-align:left;">구분</th>
+            <th>현재</th>
+            <th style="color:#6C63FF;">마감예상 <span style="font-size:10px;color:#22c997;font-weight:700;background:#eafbf3;padding:2px 7px;border-radius:9px;margin-left:4px;">${growthPct>=0?'+':''}${growthPct}%</span></th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="background:#fafaff;border-top:1.5px solid #ececf5;">
+            <td style="font-weight:800;">전체</td>
+            <td style="text-align:center;font-weight:800;font-size:20px;">${totalShip.toLocaleString()}</td>
+            <td style="text-align:center;font-weight:800;font-size:20px;color:#6C63FF;">${projTotal.toLocaleString()}</td>
+          </tr>
+          <tr style="border-top:1px solid #f5f5fa;">
+            <td style="font-weight:700;color:#7a6fd0;">신차</td>
+            <td style="text-align:center;font-weight:800;font-size:19px;color:#a89bff;">${shinShip}</td>
+            <td style="text-align:center;font-weight:800;font-size:19px;color:#8c7cff;">${projOf(shinShip)}</td>
+          </tr>
+          <tr style="border-top:1px solid #f5f5fa;">
+            <td style="font-weight:700;color:#1c8a68;">재렌트</td>
+            <td style="text-align:center;font-weight:800;font-size:19px;color:#22a17a;">${rejaShipCount}</td>
+            <td style="text-align:center;">
+              <div style="font-weight:800;font-size:19px;color:#22a17a;">${projOf(rejaShipCount)}</div>
+              <div style="font-size:10.5px;color:#bbb;margin-top:1px;">자사${projOf(rejaShipJasa)} · 중고${projOf(rejaShipJungo)}</div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>`;
   }
 
-  content.innerHTML = `
-    <div style="background:#1c1c2e;border-radius:14px;padding:22px 24px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
-      <div>
-        <div style="font-size:12px;color:#9b9ac2;font-weight:600;margin-bottom:6px;">전체 재고</div>
-        <div style="font-size:38px;font-weight:800;color:#fff;">${rows.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#9b9ac2;"> 대</span></div>
-      </div>
-      <div style="display:flex;gap:28px;">
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:#9b9ac2;margin-bottom:4px;">신차</div>
-          <div style="font-size:22px;font-weight:800;color:#a89bff;">${shin.length}<span style="font-size:12px;font-weight:500;"> 대</span></div>
-        </div>
-        <div style="width:1px;background:#3a3a52;"></div>
-        <div style="text-align:right;">
-          <div style="font-size:11px;color:#9b9ac2;margin-bottom:4px;">재렌트</div>
-          <div style="font-size:22px;font-weight:800;color:#5ee0c0;">${(rejaAll.length+rejuAll.length).toLocaleString()}<span style="font-size:12px;font-weight:500;"> 대</span></div>
-          <div style="font-size:10.5px;color:#7a7a99;margin-top:2px;">자사${rejaAll.length} · 중고${rejuAll.length}</div>
-        </div>
-      </div>
-    </div>
-    ${shipSummaryCard}
+  const pageTabBar = `
+    <div style="display:flex;background:#f0f0f8;border-radius:9px;padding:3px;margin-bottom:14px;width:fit-content;">
+      <button onclick="invSetPageTab('재고현황')" style="padding:9px 24px;border-radius:7px;font-size:13.5px;font-weight:700;font-family:inherit;border:none;cursor:pointer;background:${invPageTab==='재고현황'?'#fff':'transparent'};box-shadow:${invPageTab==='재고현황'?'0 1px 3px rgba(0,0,0,.1)':'none'};color:${invPageTab==='재고현황'?'#6C63FF':'#888'};">📦 재고현황</button>
+      <button onclick="invSetPageTab('구매현황')" style="padding:9px 24px;border-radius:7px;font-size:13.5px;font-weight:700;font-family:inherit;border:none;cursor:pointer;background:${invPageTab==='구매현황'?'#fff':'transparent'};box-shadow:${invPageTab==='구매현황'?'0 1px 3px rgba(0,0,0,.1)':'none'};color:${invPageTab==='구매현황'?'#e2483d':'#888'};">🛒 구매현황</button>
+    </div>`;
 
+  const invPanel = `
     <div class="card">
       <div class="card-header">
         <div>
           <div class="card-title">신차 상세</div>
           <div class="card-sub">매입계약일 기준 · D+60↑ 장기 · D+30~59 반장기 · D+29↓ 정상${shipBadge}</div>
         </div>
-        ${renderPurchaseNeedButton(groupByModel(shin))}
       </div>
-      ${renderTable(groupByModel(shin), openShin, 'invToggleShin', true, '신차', undefined, 'shin')}
+      ${renderTable(shinModels, openShin, 'invToggleShin', true, '신차', undefined, 'shin')}
     </div>
 
     <div class="card">
@@ -4651,8 +6120,56 @@ function invRender(){
         </div>
       </div>
       ${renderTable(groupByModel(rejaCurrent), openReja, 'invToggleReja', false, '재렌트', rejaMode, 'reja')}
+    </div>`;
+
+  const purchaseYm = purchaseYmOrDefault();
+  const buyPanel = `
+    ${renderPurchaseMonthNav(purchaseYm)}
+    <div class="card">
+      <div class="card-header">
+        <div>
+          <div class="card-title">신차 구매현황</div>
+          <div class="card-sub">${shipBadge ? '마감예상재고 기준 자동 예측 + 직접 조정' : ''}</div>
+        </div>
+        ${renderPurchaseNeedButton(shinModels)}
+      </div>
+      ${renderPurchaseStatusTable(shinModels, '신차', purchaseYm)}
     </div>
-    ${renderPurchaseNeedModal(groupByModel(shin))}
+    ${renderRejaPurchaseCard(purchaseYm)}
+    ${renderMonthlyPurchaseChart()}
+    ${renderPurchaseMemoSection()}`;
+
+  content.innerHTML = `
+    ${renderLaunchBanner()}
+
+    <div style="background:#1c1c2e;border-radius:14px;padding:22px 24px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:16px;">
+      <div>
+        <div style="font-size:12px;color:#9b9ac2;font-weight:600;margin-bottom:6px;">전체 재고</div>
+        <div style="font-size:38px;font-weight:800;color:#fff;">${rows.length.toLocaleString()}<span style="font-size:16px;font-weight:500;color:#9b9ac2;"> 대</span></div>
+      </div>
+      <div style="display:flex;gap:28px;flex-wrap:wrap;">
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#9b9ac2;margin-bottom:4px;">신차</div>
+          <div style="font-size:22px;font-weight:800;color:#a89bff;">${shin.length}<span style="font-size:12px;font-weight:500;"> 대</span></div>
+        </div>
+        <div style="width:1px;background:#3a3a52;"></div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#9b9ac2;margin-bottom:4px;">재렌트</div>
+          <div style="font-size:22px;font-weight:800;color:#5ee0c0;">${(rejaAll.length+rejuAll.length).toLocaleString()}<span style="font-size:12px;font-weight:500;"> 대</span></div>
+          <div style="font-size:10.5px;color:#7a7a99;margin-top:2px;">자사${rejaAll.length} · 중고${rejuAll.length}</div>
+        </div>
+        <div style="width:1px;background:#3a3a52;"></div>
+        <div style="text-align:right;">
+          <div style="font-size:11px;color:#9b9ac2;margin-bottom:4px;">당월 구매계획</div>
+          <div style="font-size:22px;font-weight:800;color:#ffcf6b;">${planTotalAll}<span style="font-size:12px;font-weight:500;"> 대</span></div>
+          <div style="font-size:10.5px;color:#7a7a99;margin-top:2px;">구매 ${actualTotalAll} · 예정 ${planRemainAll}</div>
+        </div>
+      </div>
+    </div>
+    ${shipStatusCard}
+    ${pageTabBar}
+    ${invPageTab==='재고현황' ? invPanel : buyPanel}
+    ${renderPurchaseNeedModal(shinModels)}
   `;
 }
 
@@ -4664,6 +6181,16 @@ window.invSetRejaMode = invSetRejaMode;
 window.invSetTargetCoverage = invSetTargetCoverage;
 window.invToggleShin = invToggleShin;
 window.invToggleReja = invToggleReja;
+window.invToggleLaunchBanner = invToggleLaunchBanner;
+window.addLaunch = addLaunch;
+window.deleteLaunch = deleteLaunch;
+window.invTogglePurchaseRow = invTogglePurchaseRow;
+window.setPlanQty = setPlanQty;
+window.invSetPageTab = invSetPageTab;
+window.setRejaPlanQty = setRejaPlanQty;
+window.purchaseShiftMonth = purchaseShiftMonth;
+window.addPurchaseMemo = addPurchaseMemo;
+window.deletePurchaseMemo = deletePurchaseMemo;
 window.__invGoLoad = function(){ if(!window.__invLoaded){ window.__invLoaded = true; try{ invLoadAll(); }catch(e){ console.error('재고 로드 오류', e); } } };
 
 })();
